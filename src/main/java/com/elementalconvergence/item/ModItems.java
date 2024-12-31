@@ -1,27 +1,33 @@
 package com.elementalconvergence.item;
 
 
-import net.minecraft.item.Item;
+
 import com.elementalconvergence.ElementalConvergence;
+import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.item.ItemGroups;
-import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
-
-import javax.swing.text.Element;
-import java.util.function.Function;
+import net.minecraft.item.*;
 
 public class ModItems {
 
-    public static final Item EXAMPLE_ITEM = register("test_item", new Item(new Item.Settings()));
+    //Test item with nothing on
+    //public static final Item EXAMPLE_ITEM = register("test_item", new Item(new Item.Settings()));
 
+    public static final Item TEST_ITEM = register("test_item", new TestItem(
+            new Item.Settings().maxCount(1)));
+    //Blank information scroll
+    public static final Item BLANK_SCROLL = register("blank_scroll", new Item(new Item.Settings()));
+
+
+    //to register every item
     public static <T extends Item> T register(String name, T item) {
         return Registry.register(Registries.ITEM, ElementalConvergence.id(name), item);
     }
 
+    //So that the class exists
     public static void initialize() {
     }
 
