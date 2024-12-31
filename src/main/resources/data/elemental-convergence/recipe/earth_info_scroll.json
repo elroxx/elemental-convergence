@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ISE"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:glow_ink_sac"
+    },
+    "S": {
+      "item": "elemental-convergence:blank_scroll"
+    },
+    "E": {
+      "item": "elemental-convergence:test_item"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:earth_info_scroll",
+    "count": 1
+  }
+}
