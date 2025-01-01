@@ -1,5 +1,7 @@
 package com.elementalconvergence.item;
 
+import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.data.MagicData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -18,7 +20,14 @@ public class TestItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!world.isClient()) {
-            user.sendMessage(Text.of("test"));
+            IMagicDataSaver dataSaver = (IMagicDataSaver) user;
+            MagicData magicData = dataSaver.getMagicData();
+
+            // For testing: increase earth magic level by 1 each use
+            int currentLevel = magicData.getMagicLevel(0);
+            magicData.setMagicLevel(0, currentLevel + 1);
+
+            user.sendMessage(Text.of("Earth Magic Level: " + magicData.getMagicLevel(0)));
         }
         return TypedActionResult.success(user.getStackInHand(hand));
     }

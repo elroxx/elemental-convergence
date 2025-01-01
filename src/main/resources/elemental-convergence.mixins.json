@@ -3,7 +3,9 @@
 	"package": "com.elementalconvergence.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
+		"ExampleMixin",
+		"PlayerDataMixin",
+		"ServerPlayerDataMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
