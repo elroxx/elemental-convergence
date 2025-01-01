@@ -25,7 +25,7 @@ public class ModItems {
     public static final Item[] INFO_SCROLLS = registerScrolls("_info_scroll");
 
     //all magic eyes
-    public static final Item[] MAGIC_EYES = registerEyes("_magic_eyes");
+    public static final Item[] MAGIC_EYES = registerEyes("_magic_eye");
 
 
     //to register every item

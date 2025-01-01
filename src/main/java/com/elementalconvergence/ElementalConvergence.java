@@ -3,9 +3,12 @@ package com.elementalconvergence;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.magic.SpellManager;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -34,6 +37,17 @@ public class ElementalConvergence implements ModInitializer {
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of the SetMagicLevelCommand
 		CommandRegistrationCallback.EVENT.register(GetSelectedMagicCommand::register); //Registration of the SetMagicLevelCommand
+
+
+		//Spell initialization depending on type of magic.
+
+		//RIGHT CLICK
+		UseItemCallback.EVENT.register((player, world, hand) -> {
+			if (!world.isClient()) {
+				SpellManager.handleRightClick(player);
+			}
+			return TypedActionResult.pass(player.getStackInHand(hand));
+		});
 	}
 
 
