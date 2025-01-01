@@ -1,5 +1,7 @@
 package com.elementalconvergence.item;
 
+import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.data.MagicData;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import com.elementalconvergence.ElementalConvergence;
@@ -28,7 +30,10 @@ public class InfoScrollItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!world.isClient()) {
-            user.sendMessage(Text.of("test"));
+            IMagicDataSaver dataSaver = (IMagicDataSaver) user;
+            MagicData magicData = dataSaver.getMagicData();
+
+            user.sendMessage(Text.of(magicString+" Magic Level: " + magicData.getMagicLevel(magicIndex)));
         }
         return TypedActionResult.success(user.getStackInHand(hand));
     }

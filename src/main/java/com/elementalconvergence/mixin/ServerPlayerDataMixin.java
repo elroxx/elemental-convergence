@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerDataMixin {
+    //THIS IS ON RESPAWN. WE NEED TO COPY FROM THE OLDPLAYER INTO THE NEW PLAYER BECAUSE EVERY DEATH STARTS A NEW PLAYER ENTITY FOR SOME REASON
     @Inject(method = "copyFrom", at = @At("TAIL"))
     private void copyMagicData(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         IMagicDataSaver newPlayer = (IMagicDataSaver) this;
@@ -19,5 +20,8 @@ public class ServerPlayerDataMixin {
         for (int i = 0; i < ElementalConvergence.BASE_MAGIC_ID.length; i++) {
             newPlayer.getMagicData().setMagicLevel(i, oldDataSaver.getMagicData().getMagicLevel(i));
         }
+
+        // Copy selected magic
+        newPlayer.getMagicData().setSelectedMagic(oldDataSaver.getMagicData().getSelectedMagic());
     }
 }

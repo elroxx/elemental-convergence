@@ -15,18 +15,17 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 
 public class ModItems {
 
-    //Test item with nothing on
-    //public static final Item EXAMPLE_ITEM = register("test_item", new Item(new Item.Settings()));
-
     public static final Item TEST_ITEM = register("test_item", new TestItem(
             new Item.Settings().maxCount(1)));
+
     //Blank information scroll
     public static final Item BLANK_SCROLL = register("blank_scroll", new Item(new Item.Settings()));
 
     //all scrolls
     public static final Item[] INFO_SCROLLS = registerScrolls("_info_scroll");
-    //Individual scroll
-    //public static final Item EARTH_INFO_SCROLL = register(BASE_MAGIC_ID[0]+"_info_scroll", new Item(new Item.Settings().maxCount(1)));
+
+    //all magic eyes
+    public static final Item[] MAGIC_EYES = registerEyes("_magic_eyes");
 
 
     //to register every item
@@ -40,6 +39,14 @@ public class ModItems {
             scrolls[i]= register(BASE_MAGIC_ID[i]+baseString, new InfoScrollItem(new Item.Settings().maxCount(1), i));
         }
         return scrolls;
+    }
+
+    public static Item[] registerEyes(String baseString){
+        Item[] eyes = new Item[BASE_MAGIC_ID.length];
+        for (int i=0; i<BASE_MAGIC_ID.length; i++){
+            eyes[i]= register(BASE_MAGIC_ID[i]+baseString, new MagicEyeItem(new Item.Settings().maxCount(1), i));
+        }
+        return eyes;
     }
 
     //So that the class exists

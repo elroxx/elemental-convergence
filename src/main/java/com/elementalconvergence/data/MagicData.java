@@ -4,11 +4,13 @@ import com.elementalconvergence.ElementalConvergence;
 import net.minecraft.nbt.NbtCompound;
 
 public class MagicData {
+    private int selectedMagic;
     private final int[] magicLevels;
 
     public MagicData() {
         // Initialize with the same length as your BASE_MAGIC_ID array
         this.magicLevels = new int[ElementalConvergence.BASE_MAGIC_ID.length];
+        this.selectedMagic=-1;
     }
 
     public int getMagicLevel(int magicIndex) {
@@ -21,16 +23,33 @@ public class MagicData {
 
     // Save data to NBT
     public NbtCompound writeNbt(NbtCompound nbt) {
+        //Save nbt for magic levels
         for (int i = 0; i < magicLevels.length; i++) {
             nbt.putInt(ElementalConvergence.BASE_MAGIC_ID[i] + "_level", magicLevels[i]);
         }
+        //Save selected magic
+        nbt.putInt("selected_magic", selectedMagic);
         return nbt;
     }
 
     // Load data from NBT
     public void readNbt(NbtCompound nbt) {
+        //Load nbt for magic levels
         for (int i = 0; i < magicLevels.length; i++) {
             magicLevels[i] = nbt.getInt(ElementalConvergence.BASE_MAGIC_ID[i] + "_level");
         }
+        // Load nbt for selected magic
+        selectedMagic = nbt.getInt("selected_magic");
     }
+
+    //Basic setter for selected Magic
+    public int getSelectedMagic() {
+        return selectedMagic;
+    }
+
+    //Basic getter for selected Magic
+    public void setSelectedMagic(int magic) {
+        this.selectedMagic = magic;
+    }
+
 }
