@@ -3,6 +3,7 @@ package com.elementalconvergence;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
 import net.fabricmc.api.ModInitializer;
 
@@ -29,10 +30,10 @@ public class ElementalConvergence implements ModInitializer {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
-
 		LOGGER.info("Hello Fabric world!");
 		//Items initialization
 		ModItems.initialize();
+		MagicRegistry.initialize();
 
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of the SetMagicLevelCommand
@@ -42,6 +43,7 @@ public class ElementalConvergence implements ModInitializer {
 		//Spell initialization depending on type of magic.
 
 		//RIGHT CLICK
+		System.out.println("TESTING PRINT");
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			if (!world.isClient()) {
 				SpellManager.handleRightClick(player);

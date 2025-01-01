@@ -4,9 +4,9 @@ import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 
-public class FireMagicHandler implements IMagicHandler {
+public class WaterMagicHandler implements IMagicHandler {
     @Override
     public void handleRightClick(PlayerEntity player) {
-        player.sendMessage(Text.of("test"));
+
     }
 }

@@ -2,11 +2,10 @@ package com.elementalconvergence.magic.handlers;
 
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
 
-public class FireMagicHandler implements IMagicHandler {
+public class NoMagicHandler implements IMagicHandler {
     @Override
     public void handleRightClick(PlayerEntity player) {
-        player.sendMessage(Text.of("test"));
+        System.out.println("HANDLERIGHTCLICKNOMAGIC");
     }
 }
