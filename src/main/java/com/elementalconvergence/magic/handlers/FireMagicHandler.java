@@ -60,4 +60,22 @@ public class FireMagicHandler implements IMagicHandler {
             }
         }
     }
+
+    @Override
+    public void handlePrimarySpell(PlayerEntity player) {
+        player.sendMessage(Text.of("test"));
+        System.out.println("Primary spell cast on " +
+                (player.getWorld().isClient() ? "CLIENT" : "SERVER") +
+                " side by player: " + player.getName().getString());
+    }
+
+    @Override
+    public void handleSecondarySpell(PlayerEntity player) {
+
+    }
+
+    @Override
+    public void handleTertiarySpell(PlayerEntity player) {
+
+    }
 }

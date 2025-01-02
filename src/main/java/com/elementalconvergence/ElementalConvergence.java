@@ -5,19 +5,24 @@ import com.elementalconvergence.commands.SetMagicLevelCommand;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.networking.SpellCastPayload;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +89,21 @@ public class ElementalConvergence implements ModInitializer {
 			}
 			return ActionResult.PASS;
 		});
+
+		// Register packet on both sides
+		PayloadTypeRegistry.playC2S().register(SpellCastPayload.ID, SpellCastPayload.CODEC);
+
+		// Register server-side packet handler
+		ServerPlayNetworking.registerGlobalReceiver(SpellCastPayload.ID, (payload, context) -> {
+			ServerPlayerEntity player = context.player();
+			World world = player.getWorld();
+
+			// Execute spell on server side
+			context.server().execute(() -> {
+				int spellNumber = payload.spellNumber();
+				SpellManager.handleKeyPress(player, spellNumber);
+			});
+		});
 	}
 
 	private void registerKeybindings() {
@@ -124,15 +144,14 @@ public class ElementalConvergence implements ModInitializer {
 	}
 
 	private void handleSpellKey(int spellNumber) {
-		LOGGER.info("Spell key " + spellNumber + " got pressed"); //FOR TESTING PURPOSES
-		//CALL MY GOATED SPELLMANAGER HERE
-		if (!(spellNumber==1 || spellNumber==2 || spellNumber==3)){
+		LOGGER.info("Spell key " + spellNumber + " got pressed"); // FOR TESTING PURPOSES
+		if (!(spellNumber == 1 || spellNumber == 2 || spellNumber == 3)) {
 			System.out.println("Error: Wrong spellkey number somehow?");
-		}
-		else{
-
+			return;
 		}
 
+		// Send packet to server requesting spell cast
+		ClientPlayNetworking.send(new SpellCastPayload(spellNumber));
 	}
 
 

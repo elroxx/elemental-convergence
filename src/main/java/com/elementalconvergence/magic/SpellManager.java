@@ -5,6 +5,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+import static com.mojang.text2speech.Narrator.LOGGER;
+
 public class SpellManager {
     public static void handleRightClick(PlayerEntity player) {
         if (!(player instanceof ServerPlayerEntity))
@@ -43,4 +45,35 @@ public class SpellManager {
             handler.handleAttack(player, victim);
         }
     }
+
+    public static void handleKeyPress(ServerPlayerEntity player, int spellNumber) {
+        // Verify player and get magic data
+        if (player == null) return;
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
+
+        // Get the appropriate magic handler
+        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        if (handler == null) {
+            LOGGER.error("No handler found for magic type: " + selectedMagic);
+            return;
+        }
+
+        // Handle the specific spell based on the key pressed
+        switch(spellNumber) {
+            case 1:
+                handler.handlePrimarySpell(player);
+                break;
+            case 2:
+                handler.handleSecondarySpell(player);
+                break;
+            case 3:
+                handler.handleTertiarySpell(player);
+                break;
+            default:
+                LOGGER.error("Invalid spell number received: " + spellNumber);
+        }
+    }
+
 }

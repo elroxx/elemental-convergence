@@ -20,4 +20,19 @@ public class ShadowMagicHandler implements IMagicHandler {
     public void handleAttack(PlayerEntity player, Entity victim) {
 
     }
+
+    @Override
+    public void handlePrimarySpell(PlayerEntity player) {
+
+    }
+
+    @Override
+    public void handleSecondarySpell(PlayerEntity player) {
+
+    }
+
+    @Override
+    public void handleTertiarySpell(PlayerEntity player) {
+
+    }
 }
