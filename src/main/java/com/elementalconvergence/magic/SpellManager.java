@@ -17,7 +17,7 @@ public class SpellManager {
 
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
-        System.out.println("SelectedMagic: "+selectedMagic);
+        //System.out.println("SelectedMagic: "+selectedMagic);
         IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
         if (handler != null) {
             handler.handleRightClick(player);
