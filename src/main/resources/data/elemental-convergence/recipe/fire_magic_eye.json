@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MAM",
+    "LEL",
+    "BBB"
+  ],
+  "key": {
+    "L": {
+      "item": "minecraft:lava_bucket"
+    },
+    "M": {
+      "item": "minecraft:magma_block"
+    },
+    "B": {
+      "item": "minecraft:blaze_rod"
+    },
+    "A": {
+      "item": "minecraft:allium"
+    },
+    "E": {
+      "item": "minecraft:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:fire_magic_eye",
+    "count": 1
+  }
+}
