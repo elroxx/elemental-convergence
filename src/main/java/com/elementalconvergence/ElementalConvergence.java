@@ -7,7 +7,11 @@ import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import org.slf4j.Logger;
@@ -19,6 +23,7 @@ public class ElementalConvergence implements ModInitializer {
 
 	public static final String[] BASE_MAGIC_DISPLAY = {"Earth", "Air", "Fire", "Water", "Shadow", "Light", "Life", "Death"};
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
+	public static final int TICKSEC = 20;
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -42,6 +47,13 @@ public class ElementalConvergence implements ModInitializer {
 
 		//Spell initialization depending on type of magic.
 
+		//PASSIVE EACH TICK
+		ServerTickEvents.START_SERVER_TICK.register(server -> {
+			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
+				SpellManager.handlePassives(player);
+			}
+		});
+
 		//RIGHT CLICK
 		System.out.println("TESTING PRINT");
 		UseItemCallback.EVENT.register((player, world, hand) -> {
@@ -49,6 +61,14 @@ public class ElementalConvergence implements ModInitializer {
 				SpellManager.handleRightClick(player);
 			}
 			return TypedActionResult.pass(player.getStackInHand(hand));
+		});
+
+		// On HIT
+		AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+			if (!world.isClient()) {
+				SpellManager.handleAttack(player, entity);
+			}
+			return ActionResult.PASS;
 		});
 	}
 
