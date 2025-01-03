@@ -18,10 +18,16 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -157,5 +163,65 @@ public class ElementalConvergence implements ModInitializer {
 
 	public static Identifier id(String path){
 		return Identifier.of(MOD_ID, path);
+	}
+
+	public static BlockPos getLookingAtBlockPos(PlayerEntity player, double maxRange, boolean considerFace) {
+		// Get where the player is looking
+		Vec3d eyePos = player.getEyePos();
+		Vec3d lookVec = player.getRotationVec(1.0F);
+
+		// Put a maxRange on the ray
+		double rayLength = maxRange;
+		Vec3d endVec = eyePos.add(lookVec.multiply(rayLength));
+
+		// Do the raycast
+		BlockHitResult hitResult = player.getWorld().raycast(new RaycastContext(
+				eyePos,
+				endVec,
+				RaycastContext.ShapeType.OUTLINE,
+				RaycastContext.FluidHandling.NONE,
+				player
+		));
+
+		BlockPos targetPos = hitResult.getBlockPos();
+		Direction face = hitResult.getSide();
+
+		if (considerFace) {
+			//WE ALSO VERIFY HERE IF THE BLOCKHIT IS NOT AIR BECAUSE THEN WE DONT WANT TO CONSIDERFACE AT ALL AND WE RETURN NULL
+			if (player.getWorld().getBlockState(targetPos).isAir()){
+				return null;
+			}
+			// Calculate position based on the hit face
+			double x = targetPos.getX() + 0.5;
+			double y = targetPos.getY();
+			double z = targetPos.getZ() + 0.5;
+
+			// adjust based on face
+			switch (face) {
+				case UP:
+					y = targetPos.getY() + 1.0; // Stand on top
+					break;
+				case DOWN:
+					y = targetPos.getY() - 1.0; // Stand below
+					break;
+				case NORTH:
+					z = targetPos.getZ() - 0.1; // Stand slightly away from north face
+					break;
+				case SOUTH:
+					z = targetPos.getZ() + 1.1; // Stand slightly away from south face
+					break;
+				case WEST:
+					x = targetPos.getX() - 0.1; // Stand slightly away from west face
+					break;
+				case EAST:
+					x = targetPos.getX() + 1.1; // Stand slightly away from east face
+					break;
+			}
+
+			BlockPos facePos = BlockPos.ofFloored(x, y, z);
+			return facePos;
+		}else {
+			return hitResult.getBlockPos(); //this is the block that was hit by the raycast. THIS IS THE DIRECT ONE.
+		}
 	}
 }
