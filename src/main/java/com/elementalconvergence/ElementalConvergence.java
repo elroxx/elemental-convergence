@@ -1,7 +1,9 @@
 package com.elementalconvergence;
 
+import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
+import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
@@ -64,10 +66,12 @@ public class ElementalConvergence implements ModInitializer {
 		ModItems.initialize(); //Items
 		MagicRegistry.initialize(); //Magic Types and spells
 		registerKeybindings(); //Keybinds
+		ModBlocks.initialize(); //Blocks
+		ModEntities.initialize();
 
 		// COMMANDS SECTION
-		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of the SetMagicLevelCommand
-		CommandRegistrationCallback.EVENT.register(GetSelectedMagicCommand::register); //Registration of the SetMagicLevelCommand
+		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
+		CommandRegistrationCallback.EVENT.register(GetSelectedMagicCommand::register); //Registration of SetMagicLevelCommand
 
 
 		//Spell initialization depending on type of magic.
@@ -104,7 +108,7 @@ public class ElementalConvergence implements ModInitializer {
 			ServerPlayerEntity player = context.player();
 			World world = player.getWorld();
 
-			// Execute spell on server side
+			// THIS IS SO THAT THE SPELLS ARE SERVER SIDE ONLY
 			context.server().execute(() -> {
 				int spellNumber = payload.spellNumber();
 				SpellManager.handleKeyPress(player, spellNumber);
@@ -135,7 +139,7 @@ public class ElementalConvergence implements ModInitializer {
 				"category." + MOD_ID + ".spells"
 		));
 
-		// Register the tick event to check for key presses
+		// TICK EVENTS FOR KEYPRESSES
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 			if (primarySpellKb.wasPressed()) {
 				handleSpellKey(1);
@@ -156,7 +160,7 @@ public class ElementalConvergence implements ModInitializer {
 			return;
 		}
 
-		// Send packet to server requesting spell cast
+		// Send packet to server asking for the  spell cast payload
 		ClientPlayNetworking.send(new SpellCastPayload(spellNumber));
 	}
 
@@ -166,15 +170,15 @@ public class ElementalConvergence implements ModInitializer {
 	}
 
 	public static BlockPos getLookingAtBlockPos(PlayerEntity player, double maxRange, boolean considerFace) {
-		// Get where the player is looking
+		//where the player is looking
 		Vec3d eyePos = player.getEyePos();
 		Vec3d lookVec = player.getRotationVec(1.0F);
 
-		// Put a maxRange on the ray
+		// maxRange on ray
 		double rayLength = maxRange;
 		Vec3d endVec = eyePos.add(lookVec.multiply(rayLength));
 
-		// Do the raycast
+		// raycast
 		BlockHitResult hitResult = player.getWorld().raycast(new RaycastContext(
 				eyePos,
 				endVec,
@@ -191,7 +195,7 @@ public class ElementalConvergence implements ModInitializer {
 			if (player.getWorld().getBlockState(targetPos).isAir()){
 				return null;
 			}
-			// Calculate position based on the hit face
+			//based on the hit face
 			double x = targetPos.getX() + 0.5;
 			double y = targetPos.getY();
 			double z = targetPos.getZ() + 0.5;
@@ -199,22 +203,22 @@ public class ElementalConvergence implements ModInitializer {
 			// adjust based on face
 			switch (face) {
 				case UP:
-					y = targetPos.getY() + 1.0; // Stand on top
+					y = targetPos.getY() + 1.0;
 					break;
 				case DOWN:
-					y = targetPos.getY() - 1.0; // Stand below
+					y = targetPos.getY() - 1.0;
 					break;
 				case NORTH:
-					z = targetPos.getZ() - 0.1; // Stand slightly away from north face
+					z = targetPos.getZ() - 0.1;
 					break;
 				case SOUTH:
-					z = targetPos.getZ() + 1.1; // Stand slightly away from south face
+					z = targetPos.getZ() + 1.1;
 					break;
 				case WEST:
-					x = targetPos.getX() - 0.1; // Stand slightly away from west face
+					x = targetPos.getX() - 0.1;
 					break;
 				case EAST:
-					x = targetPos.getX() + 1.1; // Stand slightly away from east face
+					x = targetPos.getX() + 1.1;
 					break;
 			}
 
