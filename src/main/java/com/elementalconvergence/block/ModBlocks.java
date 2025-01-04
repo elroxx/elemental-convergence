@@ -23,7 +23,7 @@ public class ModBlocks {
             .sounds(BlockSoundGroup.SNOW)
             .nonOpaque()
             .noCollision()));*/
-    public static final Block BLACK_SNOW_LAYER = register("living_shadow_layer", new BlackSnowLayerBlock(Block.Settings.create()
+    public static final Block BLACK_SNOW_LAYER = register("black_snow_layer", new BlackSnowLayerBlock(Block.Settings.create()
             .nonOpaque()
             .noCollision()));
 

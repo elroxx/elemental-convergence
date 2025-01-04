@@ -24,6 +24,7 @@ public class ShadowballItem extends SnowballItem {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+
         ItemStack itemStack = user.getStackInHand(hand);
         // Shadow sound when launching the item
         world.playSound(null, user.getX(), user.getY(), user.getZ(),
@@ -35,6 +36,9 @@ public class ShadowballItem extends SnowballItem {
             ShadowballEntity shadowballEntity = new ShadowballEntity(world, user);
             shadowballEntity.setItem(itemStack);
             shadowballEntity.setVelocity(user, user.getPitch(), user.getYaw(), 0.0F, 1.5F, 1.0F);
+
+            // Store owner-specific data in the entity's DataTracker
+            shadowballEntity.setOwner(user);
 
             // CAN ADD PARTICLE EFFECTS BUT I HATED THEM
             /*((ServerWorld) world).spawnParticles(

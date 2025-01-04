@@ -1,6 +1,7 @@
 package com.elementalconvergence.magic.handlers;
 
 import com.elementalconvergence.ElementalConvergence;
+import com.elementalconvergence.block.BlackSnowLayerBlock;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
@@ -108,38 +109,44 @@ public class ShadowMagicHandler implements IMagicHandler {
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
-        if (victim instanceof LivingEntity){
-            StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, 15, 0, false, false, false);
-            ((LivingEntity) victim).addStatusEffect(darkness);
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
+        if (shadowLevel>=1) {
+            if (victim instanceof LivingEntity) {
+                StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, 15, 0, false, false, false);
+                ((LivingEntity) victim).addStatusEffect(darkness);
 
-            //Drop a random item on the ground if hit (only 25% chance of happenning)
-            if (victim instanceof PlayerEntity){
-                PlayerInventory inventory = ((PlayerEntity) victim).getInventory();
-                List<ItemStack> nonEmptySlots = new ArrayList<>();
-                for (int i=0; i< inventory.size(); i++){
-                    ItemStack stack = inventory.getStack(i);
-                    if (!stack.isEmpty()){
-                        nonEmptySlots.add(stack);
+                //Drop a random item on the ground if hit (only 25% chance of happenning)
+                if (victim instanceof PlayerEntity) {
+                    PlayerInventory inventory = ((PlayerEntity) victim).getInventory();
+                    List<ItemStack> nonEmptySlots = new ArrayList<>();
+                    for (int i = 0; i < inventory.size(); i++) {
+                        ItemStack stack = inventory.getStack(i);
+                        if (!stack.isEmpty()) {
+                            nonEmptySlots.add(stack);
+                        }
+                    }
+
+                    if (!nonEmptySlots.isEmpty()) {
+                        Random random = new Random();
+
+                        if (random.nextFloat() < CHANCE_OF_STEAL * nonEmptySlots.size()) {
+                            ItemStack selectedStack = nonEmptySlots.get(random.nextInt(nonEmptySlots.size()));
+
+                            int slot = inventory.getSlotWithStack(selectedStack);
+
+                            //So that we can dorp it later
+                            ItemStack stackToDrop = selectedStack.copy();
+
+                            inventory.removeStack(slot);
+
+                            ((PlayerEntity) victim).dropItem(stackToDrop, false, false);
+                        }
+
                     }
                 }
 
-                if (!nonEmptySlots.isEmpty()){
-                    Random random = new Random();
-
-                    if (random.nextFloat()<CHANCE_OF_STEAL*nonEmptySlots.size()){
-                        ItemStack selectedStack = nonEmptySlots.get(random.nextInt(nonEmptySlots.size()));
-
-                        int slot = inventory.getSlotWithStack(selectedStack);
-
-                        //So that we can dorp it later
-                        ItemStack stackToDrop = selectedStack.copy();
-
-                        inventory.removeStack(slot);
-
-                        ((PlayerEntity) victim).dropItem(stackToDrop, false, false);
-                    }
-
-                }
             }
         }
     }
@@ -182,6 +189,11 @@ public class ShadowMagicHandler implements IMagicHandler {
     }
 
     public static boolean isShadowTpAble(BlockPos pos, World world){
+
+        if (world.getBlockState(pos).getBlock() instanceof BlackSnowLayerBlock || world.getBlockState(pos.down()).getBlock() instanceof BlackSnowLayerBlock ) {
+            return true;
+        }
+
         int lightlvl = world.getLightLevel(pos);
         if (lightlvl<=LIGHT_THRESHOLD){
             return true;
