@@ -14,13 +14,18 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
@@ -36,6 +41,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+
+import java.util.Optional;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
@@ -96,6 +103,14 @@ public class ElementalConvergence implements ModInitializer {
 		AttackEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
 			if (!world.isClient()) {
 				SpellManager.handleAttack(player, entity);
+			}
+			return ActionResult.PASS;
+		});
+
+		//ON MINE
+		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) ->{
+			if (!world.isClient()){
+				SpellManager.handleMine(player);
 			}
 			return ActionResult.PASS;
 		});
@@ -227,5 +242,25 @@ public class ElementalConvergence implements ModInitializer {
 		}else {
 			return hitResult.getBlockPos(); //this is the block that was hit by the raycast. THIS IS THE DIRECT ONE.
 		}
+	}
+
+	public static boolean hasAdvancement(PlayerEntity player, String advancementId){
+		if (!(player instanceof ServerPlayerEntity serverPlayer)){
+			return false;
+		}
+
+		MinecraftServer server = serverPlayer.getServer();
+		if (server == null){
+			return false;
+		}
+
+		Identifier id = Identifier.of("minecraft", advancementId);
+
+		AdvancementEntry advancement = server.getAdvancementLoader().get(id);
+
+		if (advancement!=null){
+			return serverPlayer.getAdvancementTracker().getProgress(advancement).isDone();
+		}
+		return false;
 	}
 }

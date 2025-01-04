@@ -22,6 +22,11 @@ public class WaterMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleMine(PlayerEntity player) {
+
+    }
+
+    @Override
     public void handlePrimarySpell(PlayerEntity player) {
 
     }

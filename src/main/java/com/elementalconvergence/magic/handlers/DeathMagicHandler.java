@@ -13,11 +13,16 @@ public class DeathMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
-
+        //DamageSource voidDmgSource = player.getWorld().getDamageSources().outOfWorld(); //TO IGNORE ARMOR AND SHIT
     }
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
+
+    }
+
+    @Override
+    public void handleMine(PlayerEntity player) {
 
     }
 

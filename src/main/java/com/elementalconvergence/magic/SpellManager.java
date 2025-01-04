@@ -46,6 +46,19 @@ public class SpellManager {
         }
     }
 
+    public static void handleMine(PlayerEntity player){
+        if (!(player instanceof ServerPlayerEntity)) return;
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
+
+        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        if (handler != null) {
+            handler.handleMine(player);
+        }
+    }
+
+
     public static void handleKeyPress(ServerPlayerEntity player, int spellNumber) {
         // Verify player and get magic data
         if (player == null) return;

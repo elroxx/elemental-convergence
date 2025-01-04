@@ -130,6 +130,11 @@ public class FireMagicHandler implements IMagicHandler {
         }
     }
 
+    @Override
+    public void handleMine(PlayerEntity player) {
+
+    }
+
     @Override //SPELL LVL 2 HERE
     public void handlePrimarySpell(PlayerEntity player) {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
