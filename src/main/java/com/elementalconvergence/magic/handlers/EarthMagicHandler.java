@@ -2,27 +2,28 @@ package com.elementalconvergence.magic.handlers;
 
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.magic.IMagicHandler;
+import com.elementalconvergence.networking.MiningSpeedPayload;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 import static com.elementalconvergence.ElementalConvergence.hasAdvancement;
 
 public class EarthMagicHandler implements IMagicHandler {
-    private static final float WOODEN_PICKAXE_MULTIPLIER=2.0f;
-    private static final float STONE_PICKAXE_MULTIPLIER=4.0f;
-    private static final float IRON_PICKAXE_MULTIPLIER=6.0f;
-    private static final float DIAMOND_PICKAXE_MULTIPLIER=8.0f;
-    private static final float NETHERITE_PICKAXE_MULTIPLIER=10.0f; //Technically it is 9.0f, but I wanted to make it faster
-    private static final float DEFAULT_PICKAXE_MULTIPLIER=1.0f;
+    public static final float WOODEN_PICKAXE_MULTIPLIER=2.0f;
+    public static final float STONE_PICKAXE_MULTIPLIER=4.0f;
+    public static final float IRON_PICKAXE_MULTIPLIER=6.0f;
+    public static final float DIAMOND_PICKAXE_MULTIPLIER=8.0f;
+    public static final float NETHERITE_PICKAXE_MULTIPLIER=10.0f; //Technically it is 9.0f, but I wanted to make it faster
+    public static final float DEFAULT_PICKAXE_MULTIPLIER=1.0f;
 
-    private static final int WOODEN_MINING_LEVEL = 0;
-    private static final int STONE_MINING_LEVEL = 1;
-    private static final int IRON_MINING_LEVEL = 2;
-    private static final int DIAMOND_MINING_LEVEL = 3;
-    private static final int NETHERITE_MINING_LEVEL = 4;
-    private static final int DEFAULT_MINING_LEVEL = 0;
 
 
     @Override
@@ -82,9 +83,14 @@ public class EarthMagicHandler implements IMagicHandler {
         else if (hasAdvancement(player, "story/mine_stone")){
             multiplier = WOODEN_PICKAXE_MULTIPLIER;
         }
-        System.out.println("HAND SPEED:"+multiplier);
         // /advancement grant @a only minecraft:nether/obtain_ancient_debris
-        ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(multiplier);
+        System.out.println("MINING MULTIPLIER: "+((IPlayerMiningMixin) player).getMiningSpeedMultiplier());
+        if (((IPlayerMiningMixin) player).getMiningSpeedMultiplier()!=multiplier) {
+           ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(multiplier);
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                ServerPlayNetworking.send(serverPlayer, new MiningSpeedPayload(multiplier));
+            }
+        }
     }
 
 }

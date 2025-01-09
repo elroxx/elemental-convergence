@@ -3,10 +3,13 @@ package com.elementalconvergence;
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
+import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.mixin.PlayerDataMixin;
+import com.elementalconvergence.networking.MiningSpeedPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
 import net.fabricmc.api.ModInitializer;
 
@@ -109,6 +112,7 @@ public class ElementalConvergence implements ModInitializer {
 
 		//ON MINE
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) ->{
+			//((IPlayerMiningMixin) player).setMiningSpeedMultiplier(10.0f);
 			if (!world.isClient()){
 				SpellManager.handleMine(player);
 			}
@@ -117,6 +121,9 @@ public class ElementalConvergence implements ModInitializer {
 
 		// Register packet on both sides
 		PayloadTypeRegistry.playC2S().register(SpellCastPayload.ID, SpellCastPayload.CODEC);
+
+		// INIT FOR MININGSPEED PAYLOAD
+		PayloadTypeRegistry.playS2C().register(MiningSpeedPayload.ID, MiningSpeedPayload.CODEC);
 
 		// Register server-side packet handler
 		ServerPlayNetworking.registerGlobalReceiver(SpellCastPayload.ID, (payload, context) -> {
