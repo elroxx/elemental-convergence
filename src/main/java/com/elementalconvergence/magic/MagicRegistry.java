@@ -15,6 +15,7 @@ public class MagicRegistry {
         MAGIC_HANDLERS[5] = new LightMagicHandler();
         MAGIC_HANDLERS[6] = new LifeMagicHandler();
         MAGIC_HANDLERS[7] = new DeathMagicHandler();
+      
         System.out.println("MAGICREGISTRY INITIALIZED");
     }
 

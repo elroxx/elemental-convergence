@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FLF",
+    "PEP",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:breeze_rod"
+    },
+    "P": {
+      "item": "minecraft:phantom_membrane"
+    },
+    "F": {
+      "item": "minecraft:feather"
+    },
+    "L": {
+      "item": "minecraft:lily_of_the_valley"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:air_magic_eye",
+    "count": 1
+  }
+}
