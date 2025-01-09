@@ -27,6 +27,9 @@ public class ModItems {
     //all magic eyes
     public static final Item[] MAGIC_EYES = registerEyes("_magic_eye");
 
+    public static final Item SHADOWBALL_ITEM = register("shadowball",
+           new ShadowballItem(new Item.Settings().maxCount(16)));
+
 
     //to register every item
     public static <T extends Item> T register(String name, T item) {

@@ -5,7 +5,9 @@
 	"mixins": [
 		"ExampleMixin",
 		"PlayerDataMixin",
-		"ServerPlayerDataMixin"
+		"ServerPlayerDataMixin",
+		"ArmorFeatureRendererMixin",
+		"MobEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

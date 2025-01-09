@@ -2,9 +2,12 @@ package com.elementalconvergence.item;
 
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.mixin.PlayerDataMixin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -45,6 +48,8 @@ public class MagicEyeItem extends Item {
                 //SELECTING MAGIC HERE
                 IMagicDataSaver dataSaver = (IMagicDataSaver) player;
                 dataSaver.getMagicData().setSelectedMagic(magicIndex);
+                player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F);
+                ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(1.0f);
 
                 return ActionResult.success(true);
             }
