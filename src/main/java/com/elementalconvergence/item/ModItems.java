@@ -27,8 +27,14 @@ public class ModItems {
     //all magic eyes
     public static final Item[] MAGIC_EYES = registerEyes("_magic_eye");
 
+
     //basic magic eye to craft other magic eyes
     public static final Item MAGIC_EYE = register("bland_magic_eye", new Item(new Item.Settings().maxCount(16)));
+
+    //Shadowball Item for the 3rd magic spell
+    public static final Item SHADOWBALL_ITEM = register("shadowball",
+           new ShadowballItem(new Item.Settings().maxCount(16)));
+
 
 
     //to register every item
