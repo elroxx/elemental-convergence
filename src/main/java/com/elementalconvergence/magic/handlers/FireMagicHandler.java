@@ -5,6 +5,7 @@ import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
@@ -132,6 +133,11 @@ public class FireMagicHandler implements IMagicHandler {
 
     @Override
     public void handleMine(PlayerEntity player) {
+
+    }
+
+    @Override
+    public void handleBlockBreak(PlayerEntity player, BlockPos pos, BlockState state, BlockEntity entity) {
 
     }
 

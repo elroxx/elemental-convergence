@@ -1,9 +1,12 @@
 package com.elementalconvergence.magic;
 
 import com.elementalconvergence.data.IMagicDataSaver;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 
 import static com.mojang.text2speech.Narrator.LOGGER;
 
@@ -55,6 +58,18 @@ public class SpellManager {
         IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
         if (handler != null) {
             handler.handleMine(player);
+        }
+    }
+
+    public static void handleBlockBreak(PlayerEntity player, BlockPos pos, BlockState state, BlockEntity entity) {
+        if (!(player instanceof ServerPlayerEntity)) return;
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
+
+        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        if (handler != null) {
+            handler.handleBlockBreak(player, pos, state, entity);
         }
     }
 
