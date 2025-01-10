@@ -15,6 +15,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -123,7 +124,19 @@ public class EarthMagicHandler implements IMagicHandler {
 
         ItemStack mainHand = player.getMainHandStack();
         if (!mainHand.isEmpty()){
-            multiplier=DEFAULT_PICKAXE_MULTIPLIER;
+            if (mainHand.isOf(Items.NETHERITE_PICKAXE)) {
+                multiplier = NETHERITE_PICKAXE_MULTIPLIER+0.5f;
+            } else if (mainHand.isOf(Items.DIAMOND_PICKAXE)) {
+                multiplier = DIAMOND_PICKAXE_MULTIPLIER+0.5f;
+            } else if (mainHand.isOf(Items.IRON_PICKAXE)) {
+                multiplier = IRON_PICKAXE_MULTIPLIER+0.5f;
+            } else if (mainHand.isOf(Items.STONE_PICKAXE)) {
+                multiplier = STONE_PICKAXE_MULTIPLIER+0.5f;
+            } else if (mainHand.isOf(Items.WOODEN_PICKAXE)) {
+                multiplier = WOODEN_PICKAXE_MULTIPLIER+0.5f;
+            } else {
+                multiplier = DEFAULT_PICKAXE_MULTIPLIER;
+            }
         }
         else if (hasAdvancement(player, "nether/obtain_ancient_debris")) {
             multiplier = NETHERITE_PICKAXE_MULTIPLIER;
