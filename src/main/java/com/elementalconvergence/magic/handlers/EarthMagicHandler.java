@@ -5,6 +5,7 @@ import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
 import com.elementalconvergence.networking.MiningSpeedPayload;
+import com.ibm.icu.number.Scale;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
@@ -13,13 +14,19 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -29,10 +36,7 @@ import virtuoel.pehkui.api.ScaleRegistries;
 import virtuoel.pehkui.api.ScaleType;
 import virtuoel.pehkui.api.ScaleTypes;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 import static com.elementalconvergence.ElementalConvergence.hasAdvancement;
 
@@ -43,15 +47,35 @@ public class EarthMagicHandler implements IMagicHandler {
     public static final float DIAMOND_PICKAXE_MULTIPLIER=8.0f;
     public static final float NETHERITE_PICKAXE_MULTIPLIER=10.0f; //Technically it is 9.0f, but I wanted to make it faster
     public static final float DEFAULT_PICKAXE_MULTIPLIER=1.0f;
+
+    public static final float EARTH_PLAYER_SCALE = 1.33f;
+    public static final float EARTH_MOVE_SPEED=0.06f;
+    public static final float EARTH_JUMP_HEIGHT=0.30f;
+    public static final float EARTH_STEP_HEIGHT=1.0f;
+    public static final float EARTH_HELD_ITEM=1.0f;
+
+    public static final float BURROW_SCALE = 0.1f;
+    public static final float BURROW_REACH = 0.01f;
+    public static final float BURROW_SPEED = 0.18f;
+    public static final float BURROW_JUMP = 0.01f;
+    public static final float BURROW_STEP = 4f;
+    public static final float BURROW_HELD = 0f;
+
+    //Abilities Toggle
     private boolean veinMinerToggle=false;
     private boolean burrowToggle=false;
 
+    //For vein miner
     private static final int BREAK_DELAY_TICKS = 2;
     private static final int MAX_BLOCKS = 64;
     private static final Set<BlockPos> PROCESSING_BLOCKS = new HashSet<>();
 
-    public static final float EARTH_PLAYER_SCALE = 1.33f;
-    public static final float EARTH_PLAYER_SPEED = 0.50f;
+    //Particles for burrow
+    private static final int PARTICLE_COUNT = 1;
+    private static final double SPAWN_RADIUS = 0.5f;
+
+
+
 
 
 
@@ -62,26 +86,67 @@ public class EarthMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
-        //Negative size passive + slight slowness;
+        //SCALING MODIFIED (SO NEGATIVE PASSIVE+BURROW)
         if (player instanceof ServerPlayerEntity){
+            float scaleModifier=EARTH_PLAYER_SCALE;
+            float reachModifier=EARTH_PLAYER_SCALE;
+            float speedModifier=EARTH_MOVE_SPEED;
+            float jumpModifier=EARTH_JUMP_HEIGHT;
+            float stepModifier=EARTH_STEP_HEIGHT;
+            float heldItemModifier=EARTH_HELD_ITEM;
+
+            if (burrowToggle){
+                //ONLY BURROW MODIFIER
+                scaleModifier=BURROW_SCALE;
+                reachModifier=BURROW_REACH;
+                speedModifier=BURROW_SPEED;
+                jumpModifier=BURROW_JUMP;
+                stepModifier=BURROW_STEP;
+                heldItemModifier=BURROW_HELD;
+            }
+
+
+            //SETTING SIZE WITH PEKHUI SCALE
             ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
             ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
-            //ScaleData playerScale = ScaleTypes.BASE.getScaleData(player);
-            ScaleData playerSpeed = ScaleTypes.MOTION.getScaleData(player);
-            ScaleData playerJumpHeight = ScaleTypes.JUMP_HEIGHT.getScaleData(player);
-            if (!(Math.abs(playerHeight.getScale()-EARTH_PLAYER_SCALE)<0.05f)) {
-                //playerScale.setScale(EARTH_PLAYER_SCALE);
-                playerHeight.setScale(EARTH_PLAYER_SCALE);
-                playerWidth.setScale(EARTH_PLAYER_SCALE);
-                //playerSpeed.setScale(EARTH_PLAYER_SPEED);
-                playerJumpHeight.setScale(3f);
-                System.out.println("Modified Everything");
+            ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
+            ScaleData playerStep = ScaleTypes.STEP_HEIGHT.getScaleData(player);
+            ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
+
+            if (!(Math.abs(playerHeight.getScale()-scaleModifier)<0.05f)) {
+                playerHeight.setScale(scaleModifier);
+                playerWidth.setScale(scaleModifier);
+                playerReach.setScale(reachModifier);
+                playerStep.setScale(stepModifier);
+                playerHeldItem.setScale(heldItemModifier);
+                //System.out.println("Modified Everything");
+            }
+
+            //SETTING MOVEMENT SPEED AND JUMP HEIGHT SO ONLY PLAYER ATTRIBUTES
+            if (!(Math.abs(player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).getBaseValue()-speedModifier)<0.0005f)){
+                player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(speedModifier); //SPEED
+                player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_JUMP_STRENGTH).setBaseValue(jumpModifier); //JUMP HEIGHT
+            }
+
+        }
+
+        //Particles for burrow+Invis
+        if (burrowToggle){
+            //If no invis, put back invis
+            if (!player.hasStatusEffect(StatusEffects.INVISIBILITY)){
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.INVISIBILITY, -1, 0, false, false, false));
+            }
+
+            //Start particles
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                spawnBlockParticlesAtPlayerFeet(serverPlayer);
             }
         }
     }
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
+
     }
 
     @Override
@@ -138,8 +203,12 @@ public class EarthMagicHandler implements IMagicHandler {
         MagicData magicData = dataSaver.getMagicData();
         int earthLevel = magicData.getMagicLevel(0);
         if (earthLevel>=2) {
-            veinMinerToggle=!veinMinerToggle;
-            player.sendMessage(Text.of("Vein miner: " + veinMinerToggle));
+            burrowToggle=!burrowToggle;
+            player.sendMessage(Text.of("Burrow: " + burrowToggle));
+        }
+        //Remove invisibility
+        if (!burrowToggle){
+            player.removeStatusEffect(StatusEffects.INVISIBILITY);
         }
     }
 
@@ -265,4 +334,35 @@ public class EarthMagicHandler implements IMagicHandler {
             }
         });
     }
+
+    private void spawnBlockParticlesAtPlayerFeet(ServerPlayerEntity player) {
+        //Position of blocks
+        BlockPos playerPos = player.getBlockPos();
+        BlockPos blockBelowPos = playerPos.down();
+        ServerWorld world = player.getServerWorld();
+        BlockState blockBelow = world.getBlockState(blockBelowPos);
+
+        // Player pos
+        double playerX = player.getX();
+        double playerY = player.getY();
+        double playerZ = player.getZ();
+
+        // PARTICLE OF THE BLOCKSTATE
+        BlockStateParticleEffect blockParticle = new BlockStateParticleEffect(
+                ParticleTypes.BLOCK,
+                blockBelow
+        );
+
+        //SPAWN ALL THE PARTICLES
+        for (int i = 0; i < PARTICLE_COUNT; i++) {
+            double offsetX = (Math.random() - 0.5) * SPAWN_RADIUS;
+            double offsetZ = (Math.random() - 0.5) * SPAWN_RADIUS;
+
+            world.spawnParticles(
+                    blockParticle,
+                    playerX + offsetX, playerY, playerZ + offsetZ, 1, 0, 0, 0, 0.1
+            );
+        }
+    }
+
 }

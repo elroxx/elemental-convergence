@@ -18,10 +18,16 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 public class MagicEyeItem extends Item {
     private final int magicIndex;
     private final String magicString;
+
+    public static final float DEFAULT_MOVE_SPEED=0.1f;
+    public static final float DEFAULT_JUMP_HEIGHT=0.42f;
+    public static final float BASE_SCALE = 1.0f;
 
     public MagicEyeItem(Settings settings, int magicIndex) {
         super(settings);
@@ -52,8 +58,17 @@ public class MagicEyeItem extends Item {
                 //RESETTING PLAYER DATA WHEN USING AN EYE
                 player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F); //Reset max health
                 ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(1.0f); //Reset mining speed
-                //Reset movement speed
-                //Reset player scale
+
+                player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(DEFAULT_MOVE_SPEED); //Reset move speed
+                player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH).setBaseValue(DEFAULT_JUMP_HEIGHT); //Reset jump height
+
+                ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
+                ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+                ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
+                playerHeight.setScale(BASE_SCALE); //Reset player scale
+                playerWidth.setScale(BASE_SCALE);
+                playerReach.setScale(BASE_SCALE); //Reset player Reach
+
 
                 return ActionResult.success(true);
             }
