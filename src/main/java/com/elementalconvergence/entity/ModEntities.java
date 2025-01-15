@@ -19,7 +19,7 @@ public class ModEntities {
             ElementalConvergence.id("shadowball"),
             EntityType.Builder.<ShadowballEntity>create(ShadowballEntity::new, SpawnGroup.MISC)
                     .dimensions(0.25f, 0.25f) // Same size as snowball
-                    .build()
+                    .build("shadowball")
     );
 
     // Register method to register the entity type with the game
