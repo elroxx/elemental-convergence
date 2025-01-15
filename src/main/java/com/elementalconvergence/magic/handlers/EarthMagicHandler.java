@@ -27,6 +27,8 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -53,6 +55,7 @@ public class EarthMagicHandler implements IMagicHandler {
     public static final float EARTH_JUMP_HEIGHT=0.30f;
     public static final float EARTH_STEP_HEIGHT=1.0f;
     public static final float EARTH_HELD_ITEM=1.0f;
+    public static final float EARTH_KB_RES=0.0f;
 
     public static final float BURROW_SCALE = 0.1f;
     public static final float BURROW_REACH = 0.01f;
@@ -61,9 +64,14 @@ public class EarthMagicHandler implements IMagicHandler {
     public static final float BURROW_STEP = 4f;
     public static final float BURROW_HELD = 0f;
 
+    public static final float STONEARMOR_SPEED = 0.01f;
+    public static final float STONEARMOR_JUMP = 0.01f;
+    public static final float STONEARMOR_KB_RES= 1.0f;
+
     //Abilities Toggle
     private boolean veinMinerToggle=false;
     private boolean burrowToggle=false;
+    private boolean stoneArmorToggle=false;
 
     //For vein miner
     private static final int BREAK_DELAY_TICKS = 2;
@@ -86,6 +94,9 @@ public class EarthMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
+
+
+
         //SCALING MODIFIED (SO NEGATIVE PASSIVE+BURROW)
         if (player instanceof ServerPlayerEntity){
             float scaleModifier=EARTH_PLAYER_SCALE;
@@ -94,8 +105,9 @@ public class EarthMagicHandler implements IMagicHandler {
             float jumpModifier=EARTH_JUMP_HEIGHT;
             float stepModifier=EARTH_STEP_HEIGHT;
             float heldItemModifier=EARTH_HELD_ITEM;
+            float kbResModifier=EARTH_KB_RES;
 
-            if (burrowToggle){
+            if (burrowToggle && !stoneArmorToggle){
                 //ONLY BURROW MODIFIER
                 scaleModifier=BURROW_SCALE;
                 reachModifier=BURROW_REACH;
@@ -103,6 +115,12 @@ public class EarthMagicHandler implements IMagicHandler {
                 jumpModifier=BURROW_JUMP;
                 stepModifier=BURROW_STEP;
                 heldItemModifier=BURROW_HELD;
+            }
+            if (stoneArmorToggle && !burrowToggle){
+                //ONLY STONE ARMOR MODIFIER
+                speedModifier=STONEARMOR_SPEED;
+                jumpModifier=STONEARMOR_JUMP;
+                kbResModifier=STONEARMOR_KB_RES;
             }
 
 
@@ -126,6 +144,7 @@ public class EarthMagicHandler implements IMagicHandler {
             if (!(Math.abs(player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).getBaseValue()-speedModifier)<0.0005f)){
                 player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(speedModifier); //SPEED
                 player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_JUMP_STRENGTH).setBaseValue(jumpModifier); //JUMP HEIGHT
+                player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(kbResModifier); //KNOCKBACK RESISTANCE
             }
 
         }
@@ -141,6 +160,15 @@ public class EarthMagicHandler implements IMagicHandler {
             if (player instanceof ServerPlayerEntity serverPlayer) {
                 spawnBlockParticlesAtPlayerFeet(serverPlayer);
             }
+        }
+
+        //Resistance for Stone Armor
+        if (stoneArmorToggle){
+            //If no res, put back res. THIS IS RESISTANCE 3
+            if (!player.hasStatusEffect(StatusEffects.RESISTANCE)){
+                player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, -1, 2, false, false, true));
+            }
+
         }
     }
 
@@ -203,6 +231,10 @@ public class EarthMagicHandler implements IMagicHandler {
         MagicData magicData = dataSaver.getMagicData();
         int earthLevel = magicData.getMagicLevel(0);
         if (earthLevel>=2) {
+            if (stoneArmorToggle){
+                player.sendMessage(Text.of("Cannot have both Stone Armor and Burrow toggled on."));
+                return;
+            }
             burrowToggle=!burrowToggle;
             player.sendMessage(Text.of("Burrow: " + burrowToggle));
         }
@@ -214,7 +246,34 @@ public class EarthMagicHandler implements IMagicHandler {
 
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int earthLevel = magicData.getMagicLevel(0);
+        if (earthLevel>=3) {
+            if (burrowToggle){
+                player.sendMessage(Text.of("Cannot have both Stone Armor and Burrow toggled on."));
+                return;
+            }
 
+            stoneArmorToggle=!stoneArmorToggle;
+            player.sendMessage(Text.of("Stone Armor: " + stoneArmorToggle));
+
+            BlockPos pos = player.getBlockPos();
+            player.getWorld().playSound(null,  //So that everybody nearby can hear it
+                    pos.getX(),
+                    pos.getY(),
+                    pos.getZ(),
+                    SoundEvents.UI_STONECUTTER_TAKE_RESULT,
+                    SoundCategory.BLOCKS,
+                    1.0F,  // Volume
+                    1.0F   // Pitch
+            );
+
+            //Remove invisibility
+            if (!stoneArmorToggle){
+                player.removeStatusEffect(StatusEffects.RESISTANCE);
+            }
+        }
     }
 
     private void updateHandMiningSpeed(PlayerEntity player){
