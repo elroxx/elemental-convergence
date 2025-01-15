@@ -24,6 +24,10 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleRegistries;
+import virtuoel.pehkui.api.ScaleType;
+import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -40,10 +44,14 @@ public class EarthMagicHandler implements IMagicHandler {
     public static final float NETHERITE_PICKAXE_MULTIPLIER=10.0f; //Technically it is 9.0f, but I wanted to make it faster
     public static final float DEFAULT_PICKAXE_MULTIPLIER=1.0f;
     private boolean veinMinerToggle=false;
+    private boolean burrowToggle=false;
 
     private static final int BREAK_DELAY_TICKS = 2;
     private static final int MAX_BLOCKS = 64;
     private static final Set<BlockPos> PROCESSING_BLOCKS = new HashSet<>();
+
+    public static final float EARTH_PLAYER_SCALE = 1.33f;
+    public static final float EARTH_PLAYER_SPEED = 0.50f;
 
 
 
@@ -54,6 +62,22 @@ public class EarthMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
+        //Negative size passive + slight slowness;
+        if (player instanceof ServerPlayerEntity){
+            ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
+            ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+            //ScaleData playerScale = ScaleTypes.BASE.getScaleData(player);
+            ScaleData playerSpeed = ScaleTypes.MOTION.getScaleData(player);
+            ScaleData playerJumpHeight = ScaleTypes.JUMP_HEIGHT.getScaleData(player);
+            if (!(Math.abs(playerHeight.getScale()-EARTH_PLAYER_SCALE)<0.05f)) {
+                //playerScale.setScale(EARTH_PLAYER_SCALE);
+                playerHeight.setScale(EARTH_PLAYER_SCALE);
+                playerWidth.setScale(EARTH_PLAYER_SCALE);
+                //playerSpeed.setScale(EARTH_PLAYER_SPEED);
+                playerJumpHeight.setScale(3f);
+                System.out.println("Modified Everything");
+            }
+        }
     }
 
     @Override
@@ -110,7 +134,13 @@ public class EarthMagicHandler implements IMagicHandler {
 
     @Override
     public void handleSecondarySpell(PlayerEntity player) {
-
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int earthLevel = magicData.getMagicLevel(0);
+        if (earthLevel>=2) {
+            veinMinerToggle=!veinMinerToggle;
+            player.sendMessage(Text.of("Vein miner: " + veinMinerToggle));
+        }
     }
 
     @Override

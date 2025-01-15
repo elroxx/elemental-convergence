@@ -48,8 +48,12 @@ public class MagicEyeItem extends Item {
                 //SELECTING MAGIC HERE
                 IMagicDataSaver dataSaver = (IMagicDataSaver) player;
                 dataSaver.getMagicData().setSelectedMagic(magicIndex);
-                player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F);
-                ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(1.0f);
+
+                //RESETTING PLAYER DATA WHEN USING AN EYE
+                player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F); //Reset max health
+                ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(1.0f); //Reset mining speed
+                //Reset movement speed
+                //Reset player scale
 
                 return ActionResult.success(true);
             }
