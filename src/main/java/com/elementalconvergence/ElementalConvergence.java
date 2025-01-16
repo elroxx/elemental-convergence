@@ -3,6 +3,7 @@ package com.elementalconvergence;
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
+import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
@@ -96,6 +97,7 @@ public class ElementalConvergence implements ModInitializer {
 		registerKeybindings(); //Keybinds
 		ModBlocks.initialize(); //Blocks
 		ModEntities.initialize(); //Entities
+		ModCriterions.initialize(); //Criterions for advancements
 
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
@@ -108,6 +110,7 @@ public class ElementalConvergence implements ModInitializer {
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 				SpellManager.handlePassives(player);
+				ModCriterions.SELECTED_MAGIC_CRITERION.trigger(player);
 			}
 
 			for (String playerName : deathList){
