@@ -5,6 +5,7 @@ import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
 import com.elementalconvergence.networking.MiningSpeedPayload;
+import com.google.gson.JsonObject;
 import com.ibm.icu.number.Scale;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -33,11 +34,20 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
+import org.samo_lego.fabrictailor.FabricTailor;
+import org.samo_lego.fabrictailor.casts.TailoredPlayer;
+import org.samo_lego.fabrictailor.command.FabrictailorCommand;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleRegistries;
 import virtuoel.pehkui.api.ScaleType;
 import virtuoel.pehkui.api.ScaleTypes;
 
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 import static com.elementalconvergence.ElementalConvergence.hasAdvancement;
@@ -81,6 +91,8 @@ public class EarthMagicHandler implements IMagicHandler {
     //Particles for burrow
     private static final int PARTICLE_COUNT = 1;
     private static final double SPAWN_RADIUS = 0.5f;
+
+    private static final String STONE_SKIN_PATH="";
 
 
 
@@ -269,9 +281,21 @@ public class EarthMagicHandler implements IMagicHandler {
                     1.0F   // Pitch
             );
 
-            //Remove invisibility
+            //Custom skin setup
+            if (stoneArmorToggle){
+                TailoredPlayer tailoredPlayer = (TailoredPlayer) player;
+
+                // Your custom skin value and signature
+                String skinValue = "ewogICJ0aW1lc3RhbXAiIDogMTY1NTY0Njc4NTU5MywKICAicHJvZmlsZUlkIiA6ICIzZmM3ZmRmOTM5NjM0YzQxOTExOTliYTNmN2NjM2ZlZCIsCiAgInByb2ZpbGVOYW1lIiA6ICJZZWxlaGEiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNDBkNjhjOTI3YzFhZWIyMmM2ZjA0Yjg1NmYzYTgzYmI0ZTRhYzAxN2U3MDk1MGQ4NGQ3MmU3ZjAzODI0NTk1NyIKICAgIH0KICB9Cn0=";
+                String skinSignature = "rjMSG//n9lHjB1f8HCOQKR9uvFdUvXSHzf8+djbcje5GTvPmNPiCD3hw1D1Jn321s7vKJ1Fxa3iZvINDvISJuzDzmmdRYFz4TXvuKfnfE/aK8NjB5uAhazpgTqj5cCuxDOY1JlVPUz3z2DAMRs2bsftf9Ssr/Rwmt3fLYMFNYiYDqn+Tab6pht2EjUa8tANhhFmYB0a8lCvGOEDmn5PLyXY3eDYakQkO24MHE73HhtqqgEIVpAJSqk9Qc6fU1byXfKYl+wYjUrvJ+SEMQNDk2wvNcw6JaL+s0wzkl7X17WjP45M8lLqclyRfkzWgBFJC03Ygyv1I4+B2kFgGMUC7M36D9fKv6fkll9ppjZWz2Q8RRnqgCbbrKi7G8z26Fc9b2nHKY44uOjvM49UHnYlhWup/sqtJL7L7iRuJoiMFlMAJh7ftjErHp8TTVwrFRLsD/wEiH4Zt+Rn12kdrPYxGNs7WfH2Tm93gqTzr+83Hw2ZovpF7JvrINWjt/JBtDe2h/VtuRpJKxFs759xpX1x6xnK/mBfAzqgpsJ7fhOYc/ZyHAAypyKxrb/rTc25ZVl8p38DAw7C9hyHm3bdveShp9pA7y1NTZ9ubieadXFbBY0TxaRnhX8e+43xZSYJ/20+nm90VauaiiFHPOyiGlwojOJIOTU9ypNtJvyLl63RoJTk=";
+
+                // Set the skin and reload it
+                tailoredPlayer.fabrictailor_setSkin(skinValue, skinSignature, true);
+
+            }
             if (!stoneArmorToggle){
                 player.removeStatusEffect(StatusEffects.RESISTANCE);
+                ((TailoredPlayer) player).fabrictailor_clearSkin();
             }
         }
     }
@@ -423,5 +447,6 @@ public class EarthMagicHandler implements IMagicHandler {
             );
         }
     }
+
 
 }
