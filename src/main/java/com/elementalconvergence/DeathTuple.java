@@ -1,14 +1,17 @@
 package com.elementalconvergence;
 
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 
 public class DeathTuple {
     private int timer;
     private BlockPos deathPos;
+    private ServerWorld world;
 
-    public DeathTuple(int timer, BlockPos deathPos){
+    public DeathTuple(int timer, BlockPos deathPos, ServerWorld world){
         this.timer = timer;
         this.deathPos = deathPos;
+        this.world = world;
     }
 
     public void decrementTimer(){
@@ -31,6 +34,14 @@ public class DeathTuple {
 
     public BlockPos getDeathPos(){
         return this.deathPos;
+    }
+
+    public ServerWorld getWorld(){
+        return this.world;
+    }
+
+    public void setWorld(ServerWorld world){
+        this.world = world;
     }
 
 

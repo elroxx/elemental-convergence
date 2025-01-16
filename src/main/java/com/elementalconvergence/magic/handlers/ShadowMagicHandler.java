@@ -115,7 +115,7 @@ public class ShadowMagicHandler implements IMagicHandler {
         int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
         if (shadowLevel>=1) {
             if (victim instanceof LivingEntity) {
-                StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, 15, 0, false, false, false);
+                StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.BLINDNESS, 15, 0, false, false, false);
                 ((LivingEntity) victim).addStatusEffect(darkness);
 
                 //Drop a random item on the ground if hit (only 25% chance of happenning)
@@ -182,7 +182,7 @@ public class ShadowMagicHandler implements IMagicHandler {
             System.out.println(blockHit);
             BlockState blockHitState = world.getBlockState(blockHit);
             if (isShadowTpAble(playerPos, world) && isShadowTpAble(blockHit, world) && shadowTPCooldown == 0) {
-                System.out.println("can tp??");
+                //System.out.println("can tp??");
                 //player.setPosition(blockHit.getX()+0.5,blockHit.getY(), blockHit.getZ()+0.5);
                 //player.refreshPositionAndAngles(blockHit.getX()+0.5,blockHit.getY(), blockHit.getZ()+0.5, player.getYaw(), player.getPitch());
                 player.teleport(blockHit.getX() + 0.5, blockHit.getY(), blockHit.getZ() + 0.5, false);

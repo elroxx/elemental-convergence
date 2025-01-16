@@ -31,9 +31,11 @@ import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
@@ -53,6 +55,7 @@ import virtuoel.pehkui.api.PehkuiConfig;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Random;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
@@ -62,14 +65,18 @@ public class ElementalConvergence implements ModInitializer {
 	public static final int TICKSEC = 20;
 
 
-	private static ArrayList<ServerPlayerEntity> deathList = new ArrayList<>(); //THEY ARE INITIALIZED AUTOMATICALLY
-	private static HashMap<ServerPlayerEntity, DeathTuple> deathMap = new HashMap<>();
+	public static ArrayList<String> deathList = new ArrayList<>(); //THEY ARE INITIALIZED AUTOMATICALLY
+	public static HashMap<String, DeathTuple> deathMap = new HashMap<>();
 	private static final int DEFAULT_DEATH_TIMER = 20*60; //1 min
+	private static Random random = new Random();
+	private static final int DEATH_PARTICLES_COUNT=3; //So either no particles, 1 particle or 2 particles
 
 	// Keybindings
 	private static KeyBinding primarySpellKb;
 	private static KeyBinding secondarySpellKb;
 	private static KeyBinding tertiarySpellKb;
+
+
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -88,7 +95,7 @@ public class ElementalConvergence implements ModInitializer {
 		MagicRegistry.initialize(); //Magic Types and spells
 		registerKeybindings(); //Keybinds
 		ModBlocks.initialize(); //Blocks
-		ModEntities.initialize();
+		ModEntities.initialize(); //Entities
 
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
@@ -103,17 +110,17 @@ public class ElementalConvergence implements ModInitializer {
 				SpellManager.handlePassives(player);
 			}
 
-			for (ServerPlayerEntity player : deathList){
+			for (String playerName : deathList){
 				//TO DO: LOGIC OF PARTICLES
+				spawnDeathBlockParticles(deathMap.get(playerName).getDeathPos(), deathMap.get(playerName).getWorld());
 
-				//I PROBABLY NEED TO CHANGE EVERYTHING THAT IS SERVERPLAYERENTITY BASED, AND INSTEAD ITERATE OVER ALL SERVERPLAYERS THAT HAVE THE SAME NAME TO TP AFTER DEATH
 				//Removing from deathMap and deathList when timer is 0
-				if (deathMap.get(player).getTimer()==0){
-					deathMap.remove(player);
-					deathList.remove(player);
+				if (deathMap.get(playerName).getTimer()==0){
+					deathMap.remove(playerName);
+					deathList.remove(playerName);
 				}
 				//Reduce all deathTimers by 1.
-				deathMap.get(player).decrementTimer();
+				deathMap.get(playerName).decrementTimer();
 			}
 		});
 
@@ -151,9 +158,9 @@ public class ElementalConvergence implements ModInitializer {
 
 			if (entity instanceof ServerPlayerEntity player){
 				BlockPos deathPos = player.getBlockPos();
-
-				if (!deathList.contains(player)){
-					deathMap.put(player, new DeathTuple(DEFAULT_DEATH_TIMER, deathPos)); //This replaces the previous deathTuple too
+				String playerName= player.getName().toString();
+				if (!deathList.contains(playerName)){
+					deathMap.put(playerName, new DeathTuple(DEFAULT_DEATH_TIMER, deathPos, player.getServerWorld())); //This replaces the previous deathTuple too
 				}
 
 			}
@@ -319,5 +326,26 @@ public class ElementalConvergence implements ModInitializer {
 			return serverPlayer.getAdvancementTracker().getProgress(advancement).isDone();
 		}
 		return false;
+	}
+
+	private void spawnDeathBlockParticles(BlockPos deathPos, World world) {
+		int particlesCount = (int) (random.nextFloat()*DEATH_PARTICLES_COUNT);
+
+		if (particlesCount!=0){
+			if (world instanceof ServerWorld){
+				((ServerWorld) world).spawnParticles(
+						ParticleTypes.SOUL,
+						deathPos.getX(),
+						deathPos.getY(),
+						deathPos.getZ(),
+						particlesCount,
+						0,
+						0.5, //so that they rise a little
+						0,
+						0
+				);
+			}
+		}
+
 	}
 }

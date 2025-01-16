@@ -8,6 +8,7 @@ import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -17,15 +18,20 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.world.TeleportTarget;
 import net.minecraft.world.World;
 
 import java.util.List;
 import java.util.Random;
+
+import static com.elementalconvergence.ElementalConvergence.deathMap;
 
 public class LifeMagicHandler implements IMagicHandler {
     //LIFE ID=6
@@ -33,10 +39,12 @@ public class LifeMagicHandler implements IMagicHandler {
     public static final float GROWTH_RADIUS = 5.0f;
     public static final int REGEN_DEFAULT_COOLDOWN=50;
     public static final int GROWTH_DEFAULT_COOLDOWN=65;
-
+    //public static final int RESURRECTION_DEFAULT_COOLDOWN=20*60*3; //3 minutes
+    public static final int RESURRECTION_DEFAULT_COOLDOWN=20;
 
     private int regenCooldown=0;
     private int growthCooldown=0;
+    private int resurrectionCooldown=0;
 
     private static final Random random = new Random();
     private static final double PARTICLE_THRESHOLD =0.08;
@@ -50,6 +58,7 @@ public class LifeMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
+        //Regen Aura
         if (regenCooldown==0){
             Box regenBox = new Box(
                     player.getX()-REGEN_RADIUS,
@@ -76,10 +85,12 @@ public class LifeMagicHandler implements IMagicHandler {
             regenCooldown=REGEN_DEFAULT_COOLDOWN;
         }
 
+        //Growth Aura
         if (growthCooldown==0 && growthAuraToggle){
             applyGrowthAura(player);
             growthCooldown=GROWTH_DEFAULT_COOLDOWN;
         }
+
 
         //Cooldown management
         if (regenCooldown>0){
@@ -87,6 +98,9 @@ public class LifeMagicHandler implements IMagicHandler {
         }
         if (growthCooldown>0){
             growthCooldown--;
+        }
+        if (resurrectionCooldown>0){
+            resurrectionCooldown--;
         }
     }
 
@@ -131,7 +145,7 @@ public class LifeMagicHandler implements IMagicHandler {
     public void handlePrimarySpell(PlayerEntity player) {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
-        int lifeLevel = magicData.getMagicLevel(0);
+        int lifeLevel = magicData.getMagicLevel(6);
         if (lifeLevel>=1) {
             growthAuraToggle=!growthAuraToggle;
             player.sendMessage(Text.of("Growth Aura: " + growthAuraToggle));
@@ -140,6 +154,37 @@ public class LifeMagicHandler implements IMagicHandler {
 
     @Override
     public void handleSecondarySpell(PlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int lifeLevel = magicData.getMagicLevel(6);
+        if (lifeLevel>=3) {
+            //TRYING TO RES
+            if (resurrectionCooldown==0){
+                BlockPos playerPos = player.getBlockPos();
+                for (String deathName : ElementalConvergence.deathList){
+                    BlockPos deathPos = deathMap.get(deathName).getDeathPos();
+                    ServerWorld deathWorld = deathMap.get(deathName).getWorld();
+                    //Check if on a deathblock on the right world
+                    if (deathPos.equals(playerPos) && deathWorld.equals(player.getWorld())){
+                        //THE POSITION MATCH! REZ THE PEOPLE
+                        MinecraftServer server = player.getServer();
+                        for (ServerPlayerEntity serverPlayer : server.getPlayerManager().getPlayerList()){
+                            if (serverPlayer.getName().toString().equals(deathName)){
+                                //Teleport the player that was found with the same name
+                                serverPlayer.teleport((ServerWorld) player.getWorld(), deathPos.getX(), deathPos.getY(), deathPos.getZ(), player.getYaw(), player.getPitch());
+                                //Destroy the deathPos particle
+                                deathMap.get(deathName).setTimer(0);
+
+                                //PLAYSOUND HERE TOO
+
+                                //If we successfully rez someone, we put on cooldown
+                                resurrectionCooldown=RESURRECTION_DEFAULT_COOLDOWN;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
     }
 
