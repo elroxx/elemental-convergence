@@ -190,6 +190,11 @@ public class EarthMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleKill(PlayerEntity player, Entity victim) {
+
+    }
+
+    @Override
     public void handleMine(PlayerEntity player) {
         updateHandMiningSpeed(player); //THIS IS THE PASSIVE SO NO LVL REQUIREMENTS NEEDED
     }

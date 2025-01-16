@@ -49,6 +49,18 @@ public class SpellManager {
         }
     }
 
+    public static void handleKill(PlayerEntity player, Entity victim) {
+        if (!(player instanceof ServerPlayerEntity)) return;
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
+
+        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        if (handler != null) {
+            handler.handleKill(player, victim);
+        }
+    }
+
     public static void handleMine(PlayerEntity player){
         if (!(player instanceof ServerPlayerEntity)) return;
 
@@ -72,6 +84,8 @@ public class SpellManager {
             handler.handleBlockBreak(player, pos, state, entity);
         }
     }
+
+
 
 
     public static void handleKeyPress(ServerPlayerEntity player, int spellNumber) {

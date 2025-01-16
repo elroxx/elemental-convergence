@@ -12,6 +12,7 @@ public interface IMagicHandler {
     void handleRightClick(PlayerEntity player);
     void handlePassive(PlayerEntity player);
     void handleAttack(PlayerEntity player, Entity victim);
+    void handleKill(PlayerEntity player, Entity victim);
     void handleMine(PlayerEntity player);
     void handleBlockBreak(PlayerEntity player, BlockPos pos, BlockState state, BlockEntity entity);
 

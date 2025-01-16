@@ -23,6 +23,11 @@ public class AirMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleKill(PlayerEntity player, Entity victim) {
+
+    }
+
+    @Override
     public void handleMine(PlayerEntity player) {
 
     }

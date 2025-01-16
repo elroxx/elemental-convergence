@@ -16,6 +16,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
@@ -26,7 +27,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
@@ -45,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import virtuoel.pehkui.api.PehkuiConfig;
 
 import java.util.Optional;
 
@@ -116,6 +120,15 @@ public class ElementalConvergence implements ModInitializer {
 				SpellManager.handleAttack(player, entity);
 			}
 			return ActionResult.PASS;
+		});
+
+		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
+			if (damageSource.getAttacker() instanceof PlayerEntity player){
+				World world = player.getWorld();
+				if (!world.isClient()) {
+					SpellManager.handleKill(player, entity);
+				}
+			}
 		});
 
 		//ON MINE

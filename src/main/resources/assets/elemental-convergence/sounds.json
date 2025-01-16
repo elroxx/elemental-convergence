@@ -1,0 +1,8 @@
+{
+  "life_death_sound": {
+    "subtitle": "subtitles.elemental-convergence.entity_death_sound",
+    "sounds": [
+      "elemental-convergence:life_death_sound"
+    ]
+  }
+}

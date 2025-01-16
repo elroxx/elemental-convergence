@@ -10,8 +10,13 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 
 public class ModEntities {
+
+    public static final Identifier DEATH_SOUND_ID = ElementalConvergence.id("life_death_sound");
+    public static final SoundEvent DEATH_SOUND_EVENT = SoundEvent.of(DEATH_SOUND_ID);
 
     // Entity Registration
     public static final EntityType<ShadowballEntity> SHADOWBALL = Registry.register(
@@ -19,7 +24,7 @@ public class ModEntities {
             ElementalConvergence.id("shadowball"),
             EntityType.Builder.<ShadowballEntity>create(ShadowballEntity::new, SpawnGroup.MISC)
                     .dimensions(0.25f, 0.25f) // Same size as snowball
-                    .build("shadowball")
+                    .build()
     );
 
     // Register method to register the entity type with the game
@@ -32,5 +37,11 @@ public class ModEntities {
         EntityRendererRegistry.register(SHADOWBALL, (context) ->
                 new FlyingItemEntityRenderer<>(context));
         System.out.println("ModEntities initialized");
+        registerSounds();
+        System.out.println("Sounds initialized");
+    }
+
+    public static void registerSounds() {
+        Registry.register(Registries.SOUND_EVENT, DEATH_SOUND_ID, DEATH_SOUND_EVENT);
     }
 }
