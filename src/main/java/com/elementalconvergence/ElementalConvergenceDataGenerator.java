@@ -67,6 +67,22 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.criterion("no_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(), -1)))
 					.build(consumer, ElementalConvergence.MOD_ID + "/root");
 
+			//EARTH MAGIC SELECTED
+			AdvancementEntry earthSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.COARSE_DIRT,
+							Text.literal("Earth Magic"),
+							Text.literal("You are imbued with earth magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion("earth_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							0)))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, ElementalConvergence.MOD_ID + ":earth_magic_selected");
 		}
 	}
 }

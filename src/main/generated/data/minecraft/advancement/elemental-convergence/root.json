@@ -9,12 +9,12 @@
   },
   "display": {
     "background": "minecraft:textures/block/sculk.png",
-    "description": "You should select a magic type!",
+    "description": "Select your first magic with /magic INDEX",
     "icon": {
       "count": 1,
       "id": "minecraft:potion"
     },
-    "title": "Muggle"
+    "title": "Elemental Convergence"
   },
   "requirements": [
     [
