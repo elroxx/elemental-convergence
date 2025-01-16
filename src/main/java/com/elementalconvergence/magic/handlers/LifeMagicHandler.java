@@ -22,6 +22,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -176,6 +177,16 @@ public class LifeMagicHandler implements IMagicHandler {
                                 deathMap.get(deathName).setTimer(0);
 
                                 //PLAYSOUND HERE TOO
+                                player.getWorld().playSound(
+                                        null,
+                                        player.getX(),
+                                        player.getY(),
+                                        player.getZ(),
+                                        SoundEvents.ENTITY_ZOMBIE_VILLAGER_CURE,
+                                        SoundCategory.PLAYERS,
+                                        1.0f,
+                                        1.0f
+                                );
 
                                 //If we successfully rez someone, we put on cooldown
                                 resurrectionCooldown=RESURRECTION_DEFAULT_COOLDOWN;
