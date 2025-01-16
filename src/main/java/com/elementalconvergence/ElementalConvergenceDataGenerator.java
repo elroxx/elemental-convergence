@@ -83,6 +83,34 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							0)))
 					.parent(noMagicSelectedAdvancement)
 					.build(consumer, ElementalConvergence.MOD_ID + ":earth_magic_selected");
+
+			//EARTH LVL 1
+			//EARTH LVL 2
+			//EARTH LVL 3
+
+			//AIR
+
+
+			//FIRE MAGIC SELECTED
+			AdvancementEntry fireSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.BLAZE_POWDER,
+							Text.literal("Fire Magic"),
+							Text.literal("You are imbued with fire magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion("fire_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							2)))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, ElementalConvergence.MOD_ID + ":fire_magic_selected");
+
+			//FIRE LVL 1
+			//FIRE LVL 2
+			//FIRE LVL 3
 		}
 	}
 }
