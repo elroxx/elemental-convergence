@@ -50,6 +50,8 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import virtuoel.pehkui.api.PehkuiConfig;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Optional;
 
 public class ElementalConvergence implements ModInitializer {
@@ -59,6 +61,10 @@ public class ElementalConvergence implements ModInitializer {
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
 	public static final int TICKSEC = 20;
 
+
+	private static ArrayList<ServerPlayerEntity> deathList = new ArrayList<>(); //THEY ARE INITIALIZED AUTOMATICALLY
+	private static HashMap<ServerPlayerEntity, DeathTuple> deathMap = new HashMap<>();
+	private static final int DEFAULT_DEATH_TIMER = 20*60; //1 min
 
 	// Keybindings
 	private static KeyBinding primarySpellKb;
@@ -96,6 +102,19 @@ public class ElementalConvergence implements ModInitializer {
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 				SpellManager.handlePassives(player);
 			}
+
+			for (ServerPlayerEntity player : deathList){
+				//TO DO: LOGIC OF PARTICLES
+
+				//I PROBABLY NEED TO CHANGE EVERYTHING THAT IS SERVERPLAYERENTITY BASED, AND INSTEAD ITERATE OVER ALL SERVERPLAYERS THAT HAVE THE SAME NAME TO TP AFTER DEATH
+				//Removing from deathMap and deathList when timer is 0
+				if (deathMap.get(player).getTimer()==0){
+					deathMap.remove(player);
+					deathList.remove(player);
+				}
+				//Reduce all deathTimers by 1.
+				deathMap.get(player).decrementTimer();
+			}
 		});
 
 		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) -> {
@@ -129,6 +148,16 @@ public class ElementalConvergence implements ModInitializer {
 					SpellManager.handleKill(player, entity);
 				}
 			}
+
+			if (entity instanceof ServerPlayerEntity player){
+				BlockPos deathPos = player.getBlockPos();
+
+				if (!deathList.contains(player)){
+					deathMap.put(player, new DeathTuple(DEFAULT_DEATH_TIMER, deathPos)); //This replaces the previous deathTuple too
+				}
+
+			}
+
 		});
 
 		//ON MINE
