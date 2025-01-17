@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:fire_lvl1",
+  "parent": "elemental-convergence:fire_lvl1",
   "criteria": {
     "fire_criterion_lvl2": {
       "conditions": {
@@ -13,15 +13,15 @@
     },
     "fire_has_lvl2": {
       "conditions": {
-        "advancementName": "fire_lvl2",
+        "advancementName": "elemental-convergence:fire_lvl2",
         "criterionName": "fire_criterion_lvl2",
-        "parentAdvancement": "fire_lvl1"
+        "parentAdvancement": "elemental-convergence:fire_lvl1"
       },
       "trigger": "minecraft:elemental-convergence/has_parent"
     },
     "has_fire_selected_concurrent": {
       "conditions": {
-        "advancementName": "fire_lvl2",
+        "advancementName": "elemental-convergence:fire_lvl2",
         "criterionName": "fire_criterion_lvl2",
         "magicIndex": 2
       },

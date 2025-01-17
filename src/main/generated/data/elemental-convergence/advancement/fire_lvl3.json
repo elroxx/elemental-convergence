@@ -1,47 +1,47 @@
 {
-  "parent": "elemental-convergence:fire_magic_selected",
+  "parent": "elemental-convergence:fire_lvl2",
   "criteria": {
-    "fire_criterion_lvl1": {
+    "fire_criterion_lvl3": {
       "conditions": {
         "items": [
           {
-            "items": "minecraft:campfire"
+            "items": "minecraft:fire_coral_fan"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "fire_has_lvl1": {
+    "fire_has_lvl3": {
       "conditions": {
-        "advancementName": "fire_lvl1",
-        "criterionName": "fire_criterion_lvl1",
-        "parentAdvancement": "elemental-convergence:fire_magic_selected"
+        "advancementName": "elemental-convergence:fire_lvl3",
+        "criterionName": "fire_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:fire_lvl2"
       },
       "trigger": "minecraft:elemental-convergence/has_parent"
     },
     "has_fire_selected_concurrent": {
       "conditions": {
-        "advancementName": "fire_lvl1",
-        "criterionName": "fire_criterion_lvl1",
+        "advancementName": "elemental-convergence:fire_lvl3",
+        "criterionName": "fire_criterion_lvl3",
         "magicIndex": 2
       },
       "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
     }
   },
   "display": {
-    "description": "Obtain a campfire",
+    "description": "Obtain a fire coral fan",
     "icon": {
       "count": 1,
-      "id": "minecraft:campfire"
+      "id": "minecraft:fire_coral_block"
     },
-    "title": "Fire Level 1"
+    "title": "Fire Level 3"
   },
   "requirements": [
     [
-      "fire_criterion_lvl1"
+      "fire_criterion_lvl3"
     ],
     [
-      "fire_has_lvl1"
+      "fire_has_lvl3"
     ],
     [
       "has_fire_selected_concurrent"

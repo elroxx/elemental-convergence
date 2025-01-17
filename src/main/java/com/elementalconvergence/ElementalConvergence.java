@@ -7,6 +7,7 @@ import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
 import com.elementalconvergence.mixin.PlayerDataMixin;
@@ -115,6 +116,7 @@ public class ElementalConvergence implements ModInitializer {
 				ModCriterions.SELECTED_MAGIC_CRITERION.trigger(player);
 				ModCriterions.HAS_PARENT_CRITERION.trigger(player);
 				ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.trigger(player);
+				LevelManager.handleLevelUp(player);
 			}
 
 			for (String playerName : deathList){

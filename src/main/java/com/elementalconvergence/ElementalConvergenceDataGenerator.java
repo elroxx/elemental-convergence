@@ -150,7 +150,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			AdvancementEntry lifeSelectedAdvancement = Advancement.Builder.create()
 					.display(
 							Items.FLOWERING_AZALEA_LEAVES,
-							Text.literal("Life Magic (2)"),
+							Text.literal("Life Magic (6)"),
 							Text.literal("You are imbued with life magic"),
 							null,
 							AdvancementFrame.TASK,
@@ -184,7 +184,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			String goodMagicPicked = "has_fire_selected_concurrent";
 			String achievementTitle="Fire Level ";
 			String CN="fire_criterion_lvl";
-			String advName="fire_lvl";
+			String advName=ElementalConvergence.MOD_ID+":fire_lvl";
 			String haslvl="fire_has_lvl";
 			String previousAdvName;
 			AdvancementEntry previousAdvEntry;
