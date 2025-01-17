@@ -114,6 +114,7 @@ public class ElementalConvergence implements ModInitializer {
 				SpellManager.handlePassives(player);
 				ModCriterions.SELECTED_MAGIC_CRITERION.trigger(player);
 				ModCriterions.HAS_PARENT_CRITERION.trigger(player);
+				ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.trigger(player);
 			}
 
 			for (String playerName : deathList){

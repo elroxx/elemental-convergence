@@ -3,6 +3,8 @@
   "criteria": {
     "has_no_magic": {
       "conditions": {
+        "advancementName": "elemental-convergence:life_magic_selected",
+        "criterionName": "life_magic_selected",
         "parentAdvancement": "elemental-convergence:root"
       },
       "trigger": "minecraft:elemental-convergence/has_parent"
@@ -20,7 +22,7 @@
       "count": 1,
       "id": "minecraft:flowering_azalea_leaves"
     },
-    "title": "Life Magic (6)"
+    "title": "Life Magic (2)"
   },
   "requirements": [
     [

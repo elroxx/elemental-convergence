@@ -6,6 +6,14 @@
         "requiredMagic": 0
       },
       "trigger": "minecraft:elemental-convergence/selected_magic"
+    },
+    "has_no_magic": {
+      "conditions": {
+        "advancementName": "elemental-convergence:earth_magic_selected",
+        "criterionName": "earth_magic_selected",
+        "parentAdvancement": "elemental-convergence:root"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
     }
   },
   "display": {
@@ -19,6 +27,9 @@
   "requirements": [
     [
       "earth_magic_selected"
+    ],
+    [
+      "has_no_magic"
     ]
   ],
   "sends_telemetry_event": true

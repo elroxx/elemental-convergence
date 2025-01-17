@@ -3,7 +3,6 @@ package com.elementalconvergence.criterions;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.criterion.AbstractCriterion;
 import net.minecraft.predicate.entity.LootContextPredicate;
@@ -12,7 +11,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.Optional;
 
-public class HasParentCriterion extends AbstractCriterion<HasParentCriterion.Conditions> {
+public class isSelectedMagicConcurrentCriterion extends AbstractCriterion<isSelectedMagicConcurrentCriterion.Conditions> {
 
     @Override
     public Codec<Conditions> getConditionsCodec() {
@@ -23,12 +22,12 @@ public class HasParentCriterion extends AbstractCriterion<HasParentCriterion.Con
         trigger(player, conditions -> conditions.requirementsMet(player));
     }
 
-    public record Conditions(Optional<LootContextPredicate> playerPredicate, String parentAdvancement, String criterionName, String advancementName) implements AbstractCriterion.Conditions {
-        public static final Codec<HasParentCriterion.Conditions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public record Conditions(Optional<LootContextPredicate> playerPredicate, String criterionName, String advancementName, int magicIndex) implements AbstractCriterion.Conditions {
+        public static final Codec<isSelectedMagicConcurrentCriterion.Conditions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 LootContextPredicate.CODEC.optionalFieldOf("player").forGetter(Conditions::player),
-                Codec.STRING.fieldOf("parentAdvancement").forGetter(Conditions::parentAdvancement),
                 Codec.STRING.fieldOf("criterionName").forGetter(Conditions::criterionName),
-                Codec.STRING.fieldOf("advancementName").forGetter(Conditions::advancementName)
+                Codec.STRING.fieldOf("advancementName").forGetter(Conditions::advancementName),
+                Codec.INT.fieldOf("magicIndex").forGetter(Conditions::magicIndex)
         ).apply(instance, Conditions::new));
 
         @Override
@@ -37,18 +36,26 @@ public class HasParentCriterion extends AbstractCriterion<HasParentCriterion.Con
         }
 
         public boolean requirementsMet(ServerPlayerEntity player) {
-            //elemental-convergence:root
-            //System.out.println(parentAdvancement);
-            Identifier id = Identifier.of(parentAdvancement);
-            AdvancementEntry advancementParent = player.getServer().getAdvancementLoader().get(id);
 
-            boolean parentSuccess=player.getAdvancementTracker().getProgress(advancementParent).isDone();
+            Identifier id = Identifier.of(advancementName);
+            AdvancementEntry advancementToTrack = player.getServer().getAdvancementLoader().get(id);
 
-            if (!parentSuccess){
+
+            boolean criterionHasBeenObtained = player.getAdvancementTracker().getProgress(advancementToTrack).getCriterionProgress(criterionName).isObtained();
+
+
+            IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+            int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
+
+            if (criterionHasBeenObtained && selectedMagic==magicIndex) {
+                return true;
+            }else if (criterionHasBeenObtained){
                 clearingCriterion(player);
+                return false;
+            }else{
+                return false;
             }
 
-            return parentSuccess;
         }
 
         public void clearingCriterion(ServerPlayerEntity player){
