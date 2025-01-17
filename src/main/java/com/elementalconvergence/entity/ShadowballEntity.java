@@ -55,7 +55,7 @@ public class ShadowballEntity extends SnowballEntity {
                 IMagicDataSaver dataSaver = (IMagicDataSaver) owner;
                 MagicData magicData = dataSaver.getMagicData();
                 int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
-                if (shadowLevel >= 1) {
+                if (shadowLevel >= 3) {
                     // Handle entity hits
                     if (hitResult.getType() == HitResult.Type.ENTITY) {
                         Entity entity = ((EntityHitResult) hitResult).getEntity();

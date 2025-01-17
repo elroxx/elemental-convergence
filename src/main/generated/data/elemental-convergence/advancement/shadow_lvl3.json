@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:shadow_lvl2",
+  "criteria": {
+    "has_shadow_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:shadow_lvl3",
+        "criterionName": "shadow_criterion_lvl3",
+        "magicIndex": 4
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "shadow_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:sculk_catalyst"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "shadow_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:shadow_lvl3",
+        "criterionName": "shadow_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:shadow_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Obtain a sculk catalyst",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:sculk_vein"
+    },
+    "title": "Shadow Level 3"
+  },
+  "requirements": [
+    [
+      "shadow_criterion_lvl3"
+    ],
+    [
+      "shadow_has_lvl3"
+    ],
+    [
+      "has_shadow_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

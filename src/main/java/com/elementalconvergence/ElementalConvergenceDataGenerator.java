@@ -142,6 +142,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//SHADOW LVL 1
 			//SHADOW LVL 2
 			//SHADOW LVL 3
+			generateShadowLevelsAdvancements(shadowSelectedCN, shadowSelectedAdvName, shadowSelectedAdvancement, consumer);
 
 			//LIGHT
 
@@ -169,6 +170,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//LIFE LVL 1
 			//LIFE LVL 2
 			//LIFE LVL 3
+			generateLifeLevelsAdvancements(lifeSelectedCN, lifeSelectedAdvName, lifeSelectedAdvancement, consumer);
 
 			//DEATH
 		}
@@ -335,6 +337,172 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							CN + lvl, advName + lvl, magicIndex)))
 					.parent(previousAdvEntry)
 					.build(consumer, advName + lvl);
+
+
+		}
+
+		public void generateShadowLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+
+			int magicIndex=4;
+			String goodMagicPicked = "has_shadow_selected_concurrent";
+			String achievementTitle="Shadow Level ";
+			String CN="shadow_criterion_lvl";
+			String advName=ElementalConvergence.MOD_ID+":shadow_lvl";
+			String haslvl="shadow_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName=selectedAdvName;
+			previousAdvEntry=selectedAdvEntry;
+			lvl=1;
+			AdvancementEntry shadowAdv1 = Advancement.Builder.create()
+					.display(
+							Items.INK_SAC,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Loot an ink sac"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.INK_SAC))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=shadowAdv1;
+			lvl=2;
+			AdvancementEntry shadowAdv2 = Advancement.Builder.create()
+					.display(
+							Items.OMINOUS_BOTTLE,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Loot an ominous bottle"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.OMINOUS_BOTTLE))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=shadowAdv2;
+			lvl=3;
+			AdvancementEntry shadowAdv3 = Advancement.Builder.create()
+					.display(
+							Items.SCULK_VEIN,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain a sculk catalyst"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.SCULK_CATALYST))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+		}
+
+		public void generateLifeLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+
+			int magicIndex=6;
+			String goodMagicPicked = "has_life_selected_concurrent";
+			String achievementTitle="Life Level ";
+			String CN="life_criterion_lvl";
+			String advName=ElementalConvergence.MOD_ID+":life_lvl";
+			String haslvl="life_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName=selectedAdvName;
+			previousAdvEntry=selectedAdvEntry;
+			lvl=1;
+			AdvancementEntry lifeAdv1 = Advancement.Builder.create()
+					.display(
+							Items.MOSS_BLOCK,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain a moss block"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.MOSS_BLOCK))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=lifeAdv1;
+			lvl=2;
+			AdvancementEntry lifeAdv2 = Advancement.Builder.create()
+					.display(
+							Items.COCOA_BEANS,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Harvest cocoa beans"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.COCOA_BEANS))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=lifeAdv2;
+			lvl=3;
+			AdvancementEntry lifeAdv3 = Advancement.Builder.create()
+					.display(
+							Items.PITCHER_POD,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain a pitcher plant"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.PITCHER_PLANT))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
 
 
 		}
