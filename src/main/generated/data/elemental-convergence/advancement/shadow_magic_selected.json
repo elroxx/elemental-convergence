@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:elemental-convergence/root",
+  "parent": "elemental-convergence:root",
   "criteria": {
     "shadow_magic_selected": {
       "conditions": {
@@ -14,7 +14,7 @@
       "count": 1,
       "id": "elemental-convergence:shadowball"
     },
-    "title": "Shadow Magic"
+    "title": "Shadow Magic (4)"
   },
   "requirements": [
     [

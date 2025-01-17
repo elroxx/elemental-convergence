@@ -1,14 +1,18 @@
 package com.elementalconvergence;
 
+import com.elementalconvergence.criterions.HasParentCriterion;
 import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.criterions.SelectedMagicCriterion;
+import com.elementalconvergence.item.ModItems;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricAdvancementProvider;
 import net.minecraft.advancement.Advancement;
+import net.minecraft.advancement.AdvancementCriterion;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementFrame;
+import net.minecraft.advancement.criterion.CriterionConditions;
 import net.minecraft.advancement.criterion.InventoryChangedCriterion;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryWrapper;
@@ -36,23 +40,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 		@Override
 		public void generateAdvancement(RegistryWrapper.WrapperLookup wrapperLookup, Consumer<AdvancementEntry> consumer) {
 
-			//TEST ADVANCEMENT
-			/*AdvancementEntry rootAdvancement = Advancement.Builder.create()
-					.display(
-							Items.DIRT, // The display icon
-							Text.literal("Test title"), // The title
-							Text.literal("Test description"), // The description
-							Identifier.of("textures/gui/advancements/backgrounds/adventure.png"), // Background image used
-							AdvancementFrame.TASK, // Options: TASK, CHALLENGE, GOAL
-							true, // Show toast top right
-							true, // Announce to chat
-							false // Hidden in the advancement tab
-					)
-					// The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-					.criterion("got_dirt", InventoryChangedCriterion.Conditions.items(Items.DIRT))
-					.build(consumer, ElementalConvergence.MOD_ID + "/root");*/
-
-			//TEST ADVANCEMENT FOR NO MAGIC
+			//ROOT ADVANCEMENT FOR NO MAGIC
 			AdvancementEntry noMagicSelectedAdvancement = Advancement.Builder.create()
 					.display(
 							Items.POTION,
@@ -65,13 +53,13 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							false
 					)
 					.criterion("no_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(), -1)))
-					.build(consumer, ElementalConvergence.MOD_ID + "/root");
+					.build(consumer, ElementalConvergence.MOD_ID + ":root");
 
 			//EARTH MAGIC SELECTED
 			AdvancementEntry earthSelectedAdvancement = Advancement.Builder.create()
 					.display(
 							Items.COARSE_DIRT,
-							Text.literal("Earth Magic"),
+							Text.literal("Earth Magic (0)"),
 							Text.literal("You are imbued with earth magic"),
 							null,
 							AdvancementFrame.TASK,
@@ -81,6 +69,8 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					)
 					.criterion("earth_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
 							0)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							"elemental-convergence:root")))
 					.parent(noMagicSelectedAdvancement)
 					.build(consumer, ElementalConvergence.MOD_ID + ":earth_magic_selected");
 
@@ -95,7 +85,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			AdvancementEntry fireSelectedAdvancement = Advancement.Builder.create()
 					.display(
 							Items.BLAZE_POWDER,
-							Text.literal("Fire Magic"),
+							Text.literal("Fire Magic (2)"),
 							Text.literal("You are imbued with fire magic"),
 							null,
 							AdvancementFrame.TASK,
@@ -105,12 +95,66 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					)
 					.criterion("fire_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
 							2)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							"elemental-convergence:root")))
 					.parent(noMagicSelectedAdvancement)
 					.build(consumer, ElementalConvergence.MOD_ID + ":fire_magic_selected");
 
 			//FIRE LVL 1
 			//FIRE LVL 2
 			//FIRE LVL 3
+
+			//WATER
+
+			//SHADOW MAGIC SELECTED
+			AdvancementEntry shadowSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							ModItems.SHADOWBALL_ITEM,
+							Text.literal("Shadow Magic (4)"),
+							Text.literal("You are imbued with shadow magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion("shadow_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							4)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							"elemental-convergence:root")))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, ElementalConvergence.MOD_ID + ":shadow_magic_selected");
+
+			//SHADOW LVL 1
+			//SHADOW LVL 2
+			//SHADOW LVL 3
+
+			//LIGHT
+
+			//LIFE MAGIC SELECTED
+			AdvancementEntry lifeSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.FLOWERING_AZALEA_LEAVES,
+							Text.literal("Life Magic (6)"),
+							Text.literal("You are imbued with life magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion("life_magic_selected", ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							6)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							"elemental-convergence:root")))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, ElementalConvergence.MOD_ID + ":life_magic_selected");
+
+			//LIFE LVL 1
+			//LIFE LVL 2
+			//LIFE LVL 3
+
+			//DEATH
 		}
 	}
 }

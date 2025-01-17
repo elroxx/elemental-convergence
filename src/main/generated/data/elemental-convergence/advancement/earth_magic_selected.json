@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:elemental-convergence/root",
+  "parent": "elemental-convergence:root",
   "criteria": {
     "earth_magic_selected": {
       "conditions": {
@@ -14,7 +14,7 @@
       "count": 1,
       "id": "minecraft:coarse_dirt"
     },
-    "title": "Earth Magic"
+    "title": "Earth Magic (0)"
   },
   "requirements": [
     [

@@ -27,6 +27,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
+import net.minecraft.advancement.AdvancementProgress;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
@@ -37,6 +38,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
@@ -111,6 +113,7 @@ public class ElementalConvergence implements ModInitializer {
 			for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
 				SpellManager.handlePassives(player);
 				ModCriterions.SELECTED_MAGIC_CRITERION.trigger(player);
+				ModCriterions.HAS_PARENT_CRITERION.trigger(player);
 			}
 
 			for (String playerName : deathList){

@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:elemental-convergence/root",
+  "parent": "elemental-convergence:root",
   "criteria": {
     "fire_magic_selected": {
       "conditions": {
@@ -14,7 +14,7 @@
       "count": 1,
       "id": "minecraft:blaze_powder"
     },
-    "title": "Fire Magic"
+    "title": "Fire Magic (2)"
   },
   "requirements": [
     [
