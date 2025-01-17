@@ -23,6 +23,14 @@ public class ModBlocks {
             .sounds(BlockSoundGroup.SNOW)
             .nonOpaque()
             .noCollision()));*/
+
+    public static final Block ALTAR_OF_CONVERGENCE = register("altar_of_convergence",new AltarOfConvergenceBlock(Block.Settings.create()
+            .strength(3.5f)
+            .requiresTool()
+            .nonOpaque()
+            .luminance(state -> 10) // Add light emission for the glowing core
+    ));
+
     public static final Block BLACK_SNOW_LAYER = register("black_snow_layer", new BlackSnowLayerBlock(Block.Settings.create()
             .nonOpaque()
             .noCollision()));

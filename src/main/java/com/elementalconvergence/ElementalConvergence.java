@@ -96,10 +96,10 @@ public class ElementalConvergence implements ModInitializer {
 		LOGGER.info("Hello Fabric world!");
 
 		//Basic Initialization
+		ModBlocks.initialize(); //Blocks
 		ModItems.initialize(); //Items
 		MagicRegistry.initialize(); //Magic Types and spells
 		registerKeybindings(); //Keybinds
-		ModBlocks.initialize(); //Blocks
 		ModEntities.initialize(); //Entities
 		ModCriterions.initialize(); //Criterions for advancements
 
