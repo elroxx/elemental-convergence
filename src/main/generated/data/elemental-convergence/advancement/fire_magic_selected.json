@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:elemental-convergence/root",
+  "criteria": {
+    "fire_magic_selected": {
+      "conditions": {
+        "requiredMagic": 2
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    }
+  },
+  "display": {
+    "description": "You are imbued with fire magic",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:blaze_powder"
+    },
+    "title": "Fire Magic"
+  },
+  "requirements": [
+    [
+      "fire_magic_selected"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

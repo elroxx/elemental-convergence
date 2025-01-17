@@ -70,7 +70,7 @@ public class ElementalConvergence implements ModInitializer {
 	public static HashMap<String, DeathTuple> deathMap = new HashMap<>();
 	private static final int DEFAULT_DEATH_TIMER = 20*60; //1 min
 	private static Random random = new Random();
-	private static final int DEATH_PARTICLES_COUNT=3; //So either no particles, 1 particle or 2 particles
+	private static final int DEATH_PARTICLES_COUNT=4; //So either no particles, 1 particle or 2 particles
 
 	// Keybindings
 	private static KeyBinding primarySpellKb;
@@ -114,16 +114,20 @@ public class ElementalConvergence implements ModInitializer {
 			}
 
 			for (String playerName : deathList){
-				//TO DO: LOGIC OF PARTICLES
-				spawnDeathBlockParticles(deathMap.get(playerName).getDeathPos(), deathMap.get(playerName).getWorld());
+				//PARTICLES LOGIC
+				if (deathMap.get(playerName)!=null) {
+					spawnDeathBlockParticles(deathMap.get(playerName).getDeathPos(), deathMap.get(playerName).getWorld());
 
-				//Removing from deathMap and deathList when timer is 0
-				if (deathMap.get(playerName).getTimer()==0){
-					deathMap.remove(playerName);
-					deathList.remove(playerName);
+					//Reduce all deathTimers by 1.
+					deathMap.get(playerName).decrementTimer();
+
+					//Removing from deathMap and deathList when timer is 0
+					if (deathMap.get(playerName).getTimer() == 0) {
+						//deathList.remove(playerName);
+						deathMap.remove(playerName);
+						//deathList.remove(playerName);
+					}
 				}
-				//Reduce all deathTimers by 1.
-				deathMap.get(playerName).decrementTimer();
 			}
 		});
 
@@ -162,9 +166,11 @@ public class ElementalConvergence implements ModInitializer {
 			if (entity instanceof ServerPlayerEntity player){
 				BlockPos deathPos = player.getBlockPos();
 				String playerName= player.getName().toString();
-				if (!deathList.contains(playerName)){
-					deathMap.put(playerName, new DeathTuple(DEFAULT_DEATH_TIMER, deathPos, player.getServerWorld())); //This replaces the previous deathTuple too
+				if (!deathList.contains(playerName)) {
+					deathList.add(playerName);
 				}
+				deathMap.put(playerName, new DeathTuple(DEFAULT_DEATH_TIMER, deathPos, player.getServerWorld())); //This replaces the previous deathTuple too
+
 
 			}
 
@@ -338,13 +344,13 @@ public class ElementalConvergence implements ModInitializer {
 			if (world instanceof ServerWorld){
 				((ServerWorld) world).spawnParticles(
 						ParticleTypes.SOUL,
-						deathPos.getX(),
-						deathPos.getY(),
-						deathPos.getZ(),
+						deathPos.getX()+0.5,
+						deathPos.getY()+0.5,
+						deathPos.getZ()+0.5,
 						particlesCount,
-						0,
-						0.5, //so that they rise a little
-						0,
+						0.25,
+						0.25, //so that they rise a little
+						0.25,
 						0
 				);
 			}
