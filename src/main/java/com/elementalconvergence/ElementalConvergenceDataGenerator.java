@@ -85,6 +85,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//EARTH LVL 1
 			//EARTH LVL 2
 			//EARTH LVL 3
+			generateEarthLevelsAdvancements(earthSelectedCN, earthSelectedAdvName, earthSelectedAdvancement, consumer);
 
 			//AIR
 
@@ -172,20 +173,14 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//DEATH
 		}
 
-		public void generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName){
+		public void generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
 
-
-
-		}
-
-		public void generateFireLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
-
-			int magicIndex=2;
-			String goodMagicPicked = "has_fire_selected_concurrent";
-			String achievementTitle="Fire Level ";
-			String CN="fire_criterion_lvl";
-			String advName=ElementalConvergence.MOD_ID+":fire_lvl";
-			String haslvl="fire_has_lvl";
+			int magicIndex=0;
+			String goodMagicPicked = "has_earth_selected_concurrent";
+			String achievementTitle="Earth Level ";
+			String CN="earth_criterion_lvl";
+			String advName=ElementalConvergence.MOD_ID+":earth_lvl";
+			String haslvl="earth_has_lvl";
 			String previousAdvName;
 			AdvancementEntry previousAdvEntry;
 			int lvl;
@@ -194,10 +189,93 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			previousAdvName=selectedAdvName;
 			previousAdvEntry=selectedAdvEntry;
 			lvl=1;
+			AdvancementEntry earthAdv1 = Advancement.Builder.create()
+					.display(
+							Items.COPPER_BLOCK,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain a copper block"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.COPPER_BLOCK))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=earthAdv1;
+			lvl=2;
+			AdvancementEntry earthAdv2 = Advancement.Builder.create()
+					.display(
+							Items.AMETHYST_BLOCK,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain an amethyst block"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.AMETHYST_BLOCK))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=earthAdv2;
+			lvl=3;
+			AdvancementEntry earthAdv3 = Advancement.Builder.create()
+					.display(
+							Items.EMERALD,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain a deepslate emerald ore"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.DEEPSLATE_EMERALD_ORE))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+		}
+
+		public void generateFireLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = 2;
+			String goodMagicPicked = "has_fire_selected_concurrent";
+			String achievementTitle = "Fire Level ";
+			String CN = "fire_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":fire_lvl";
+			String haslvl = "fire_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
 			AdvancementEntry fireAdv1 = Advancement.Builder.create()
 					.display(
 							Items.CAMPFIRE,
-							Text.literal(achievementTitle+lvl), //title
+							Text.literal(achievementTitle + lvl), //title
 							Text.literal("Obtain a campfire"), //description
 							null,
 							AdvancementFrame.TASK,
@@ -205,22 +283,22 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							true,
 							false
 					)
-					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.CAMPFIRE))
-					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
-							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.CAMPFIRE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
-							CN+lvl,advName+lvl,magicIndex)))
+							CN + lvl, advName + lvl, magicIndex)))
 					.parent(previousAdvEntry)
-					.build(consumer, advName+lvl);
+					.build(consumer, advName + lvl);
 
 
-			previousAdvName=advName+lvl;
-			previousAdvEntry=fireAdv1;
-			lvl=2;
+			previousAdvName = advName + lvl;
+			previousAdvEntry = fireAdv1;
+			lvl = 2;
 			AdvancementEntry fireAdv2 = Advancement.Builder.create()
 					.display(
 							Items.FIRE_CHARGE,
-							Text.literal(achievementTitle+lvl), //title
+							Text.literal(achievementTitle + lvl), //title
 							Text.literal("Craft a fire charge"), //description
 							null,
 							AdvancementFrame.TASK,
@@ -228,21 +306,21 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							true,
 							false
 					)
-					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.FIRE_CHARGE))
-					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
-							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.FIRE_CHARGE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
-							CN+lvl,advName+lvl,magicIndex)))
+							CN + lvl, advName + lvl, magicIndex)))
 					.parent(previousAdvEntry)
-					.build(consumer, advName+lvl);
+					.build(consumer, advName + lvl);
 
-			previousAdvName=advName+lvl;
-			previousAdvEntry=fireAdv2;
-			lvl=3;
+			previousAdvName = advName + lvl;
+			previousAdvEntry = fireAdv2;
+			lvl = 3;
 			AdvancementEntry fireAdv3 = Advancement.Builder.create()
 					.display(
 							Items.FIRE_CORAL_BLOCK,
-							Text.literal(achievementTitle+lvl), //title
+							Text.literal(achievementTitle + lvl), //title
 							Text.literal("Obtain a fire coral fan"), //description
 							null,
 							AdvancementFrame.TASK,
@@ -250,13 +328,13 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							true,
 							false
 					)
-					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.FIRE_CORAL_FAN))
-					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
-							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.FIRE_CORAL_FAN))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
-							CN+lvl,advName+lvl,magicIndex)))
+							CN + lvl, advName + lvl, magicIndex)))
 					.parent(previousAdvEntry)
-					.build(consumer, advName+lvl);
+					.build(consumer, advName + lvl);
 
 
 		}
