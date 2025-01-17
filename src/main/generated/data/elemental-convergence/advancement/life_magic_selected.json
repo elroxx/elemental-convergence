@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:elemental-convergence/root",
+  "criteria": {
+    "life_magic_selected": {
+      "conditions": {
+        "requiredMagic": 6
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    }
+  },
+  "display": {
+    "description": "You are imbued with life magic",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:flowering_azalea_leaves"
+    },
+    "title": "Life Magic"
+  },
+  "requirements": [
+    [
+      "life_magic_selected"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

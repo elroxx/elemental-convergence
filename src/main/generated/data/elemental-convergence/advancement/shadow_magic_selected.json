@@ -1,0 +1,25 @@
+{
+  "parent": "minecraft:elemental-convergence/root",
+  "criteria": {
+    "shadow_magic_selected": {
+      "conditions": {
+        "requiredMagic": 4
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    }
+  },
+  "display": {
+    "description": "You are imbued with shadow magic",
+    "icon": {
+      "count": 1,
+      "id": "elemental-convergence:shadowball"
+    },
+    "title": "Shadow Magic"
+  },
+  "requirements": [
+    [
+      "shadow_magic_selected"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
