@@ -2,6 +2,7 @@ package com.elementalconvergence;
 
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
+import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
 import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.data.IPlayerMiningMixin;
@@ -105,6 +106,7 @@ public class ElementalConvergence implements ModInitializer {
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
 		CommandRegistrationCallback.EVENT.register(GetSelectedMagicCommand::register); //Registration of SetMagicLevelCommand
+		CommandRegistrationCallback.EVENT.register(MagicCommand::register); //Registration of starter magic Command
 
 
 		//Spell initialization depending on type of magic.
@@ -129,9 +131,7 @@ public class ElementalConvergence implements ModInitializer {
 
 					//Removing from deathMap and deathList when timer is 0
 					if (deathMap.get(playerName).getTimer() == 0) {
-						//deathList.remove(playerName);
 						deathMap.remove(playerName);
-						//deathList.remove(playerName);
 					}
 				}
 			}
@@ -145,7 +145,6 @@ public class ElementalConvergence implements ModInitializer {
 			});
 
 		//RIGHT CLICK
-		//System.out.println("TESTING PRINT");
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			if (!world.isClient()) {
 				SpellManager.handleRightClick(player);
