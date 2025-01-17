@@ -1,0 +1,51 @@
+{
+  "parent": "minecraft:fire_lvl1",
+  "criteria": {
+    "fire_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:fire_charge"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "fire_has_lvl2": {
+      "conditions": {
+        "advancementName": "fire_lvl2",
+        "criterionName": "fire_criterion_lvl2",
+        "parentAdvancement": "fire_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_fire_selected_concurrent": {
+      "conditions": {
+        "advancementName": "fire_lvl2",
+        "criterionName": "fire_criterion_lvl2",
+        "magicIndex": 2
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Craft a fire charge",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:fire_charge"
+    },
+    "title": "Fire Level 2"
+  },
+  "requirements": [
+    [
+      "fire_criterion_lvl2"
+    ],
+    [
+      "fire_has_lvl2"
+    ],
+    [
+      "has_fire_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
