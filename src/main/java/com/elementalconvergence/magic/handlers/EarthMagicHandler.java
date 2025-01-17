@@ -325,19 +325,19 @@ public class EarthMagicHandler implements IMagicHandler {
                 multiplier = DEFAULT_PICKAXE_MULTIPLIER;
             }
         }
-        else if (hasAdvancement(player, "nether/obtain_ancient_debris")) {
+        else if (hasAdvancement(player, "minecraft:nether/obtain_ancient_debris")) {
             multiplier = NETHERITE_PICKAXE_MULTIPLIER;
         }
-        else if (hasAdvancement(player, "story/mine_diamond")) {
+        else if (hasAdvancement(player, "minecraft:story/mine_diamond")) {
             multiplier = DIAMOND_PICKAXE_MULTIPLIER;
         }
-        else if (hasAdvancement(player, "story/iron_tools")) {
+        else if (hasAdvancement(player, "minecraft:story/iron_tools")) {
             multiplier = IRON_PICKAXE_MULTIPLIER;
         }
-        else if (hasAdvancement(player, "story/upgrade_tools")) {
+        else if (hasAdvancement(player, "minecraft:story/upgrade_tools")) {
             multiplier = STONE_PICKAXE_MULTIPLIER;
         }
-        else if (hasAdvancement(player, "story/mine_stone")){
+        else if (hasAdvancement(player, "minecraft:story/mine_stone")){
             multiplier = WOODEN_PICKAXE_MULTIPLIER;
         }
         // /advancement grant @a only minecraft:nether/obtain_ancient_debris

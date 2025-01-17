@@ -331,7 +331,8 @@ public class ElementalConvergence implements ModInitializer {
 			return false;
 		}
 
-		Identifier id = Identifier.of("minecraft", advancementId);
+		//Identifier id = Identifier.of("minecraft", advancementId);
+		Identifier id = Identifier.of(advancementId);
 
 		AdvancementEntry advancement = server.getAdvancementLoader().get(id);
 
