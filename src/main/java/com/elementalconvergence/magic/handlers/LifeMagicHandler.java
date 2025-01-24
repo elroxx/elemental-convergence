@@ -5,7 +5,9 @@ import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.magic.IMagicHandler;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.Fertilizable;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.session.report.ReporterEnvironment;
@@ -14,8 +16,12 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.EntityTypeTags;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.MinecraftServer;
@@ -42,20 +48,44 @@ public class LifeMagicHandler implements IMagicHandler {
     public static final int REGEN_DEFAULT_COOLDOWN=50;
     public static final int GROWTH_DEFAULT_COOLDOWN=65;
     public static final int RESURRECTION_DEFAULT_COOLDOWN=20*60*3; //3 minutes
+    public static final int GROUP_TP_DEFAULT_COOLDOWN=60;
     //public static final int RESURRECTION_DEFAULT_COOLDOWN=20;
 
     private int regenCooldown=0;
     private int growthCooldown=0;
     private int resurrectionCooldown=0;
+    private int groupTPCooldown=0;
 
     private static final Random random = new Random();
     private static final double PARTICLE_THRESHOLD =0.08;
 
     private boolean growthAuraToggle=false;
 
+    private static final Block BLOCK_FOR_GATEWAY= Blocks.END_PORTAL_FRAME;
+    private static final int GROUP_TP_RADIUS=5;
+    private static final int GATEWAY_DETECT_RANGE=100;
+    private boolean group_tp_lock=false;
+
     @Override
     public void handleRightClick(PlayerEntity player) {
+        ItemStack mainHand = player.getMainHandStack();
 
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int lifeLevel = magicData.getMagicLevel(6);
+        if (lifeLevel>=3) {
+            if (groupTPCooldown==0){
+                groupTPCooldown=GROUP_TP_DEFAULT_COOLDOWN;
+                if (mainHand.getItem() instanceof BlockItem blockItem && isFlower(blockItem.getBlock())){
+                        group_tp_lock=true;
+                        boolean success = checkForGateway(player, player.getWorld(), blockItem.getBlock());
+                        if (success){
+                            mainHand.decrement(1);
+
+                        }
+                }
+            }
+        }
     }
 
     @Override
@@ -103,6 +133,9 @@ public class LifeMagicHandler implements IMagicHandler {
         }
         if (resurrectionCooldown>0){
             resurrectionCooldown--;
+        }
+        if (groupTPCooldown>0){
+            groupTPCooldown--;
         }
     }
 
@@ -263,4 +296,61 @@ public class LifeMagicHandler implements IMagicHandler {
         }
     }
 
+
+    private boolean isFlower(Block block) {
+        return block.getDefaultState().isIn(BlockTags.SMALL_FLOWERS);
+    }
+
+    private boolean checkForGateway(PlayerEntity player, World world, Block flowerBlock) {
+        BlockPos playerPos = player.getBlockPos();
+        int radius = GATEWAY_DETECT_RANGE;
+        int maxY = world.getHeight();
+
+
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = 0; y < maxY; y++) {
+                for (int z = -radius; z <= radius; z++) {
+                    BlockPos pos = playerPos.add(x, y - playerPos.getY(), z);
+                    if (world.getBlockState(pos).getBlock() == BLOCK_FOR_GATEWAY) {
+                        if (checkFlowerSurrounding(world, pos, flowerBlock)) {
+                            teleportNearbyPlayers(world, player, pos);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean checkFlowerSurrounding(World world, BlockPos framePos, Block flowerBlock) {
+        // verify if the blocks surrounding it are good
+        BlockPos[] surroundingPositions = {
+                framePos.north(),
+                framePos.south(),
+                framePos.east(),
+                framePos.west()
+        };
+
+        for (BlockPos pos : surroundingPositions) {
+            if (world.getBlockState(pos).getBlock() != flowerBlock) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void teleportNearbyPlayers(World world, PlayerEntity sourcePlayer, BlockPos targetPos) {
+        // GET PLAYERS IN RADIUS
+        Box box = new Box(sourcePlayer.getX() - GROUP_TP_RADIUS, sourcePlayer.getY() - GROUP_TP_RADIUS, sourcePlayer.getZ() - GROUP_TP_RADIUS,
+                sourcePlayer.getX() + GROUP_TP_RADIUS, sourcePlayer.getY() + GROUP_TP_RADIUS, sourcePlayer.getZ() + GROUP_TP_RADIUS);
+
+        List<ServerPlayerEntity> nearbyPlayers = world.getEntitiesByClass(
+                ServerPlayerEntity.class, box, player -> true);
+
+        // Teleporting the players to the selected blocks
+        for (ServerPlayerEntity player : nearbyPlayers) {
+            player.teleport((ServerWorld) world,targetPos.getX() + 0.5, targetPos.getY() + 1, targetPos.getZ() + 0.5, player.getYaw(), player.getPitch());
+        }
+    }
 }
