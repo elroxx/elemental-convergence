@@ -64,7 +64,6 @@ public class LifeMagicHandler implements IMagicHandler {
     private static final Block BLOCK_FOR_GATEWAY= Blocks.END_PORTAL_FRAME;
     private static final int GROUP_TP_RADIUS=5;
     private static final int GATEWAY_DETECT_RANGE=100;
-    private boolean group_tp_lock=false;
 
     @Override
     public void handleRightClick(PlayerEntity player) {
@@ -73,15 +72,24 @@ public class LifeMagicHandler implements IMagicHandler {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int lifeLevel = magicData.getMagicLevel(6);
-        if (lifeLevel>=3) {
+        //lvl 2 ability
+        if (lifeLevel>=2) {
             if (groupTPCooldown==0){
                 groupTPCooldown=GROUP_TP_DEFAULT_COOLDOWN;
                 if (mainHand.getItem() instanceof BlockItem blockItem && isFlower(blockItem.getBlock())){
-                        group_tp_lock=true;
                         boolean success = checkForGateway(player, player.getWorld(), blockItem.getBlock());
                         if (success){
                             mainHand.decrement(1);
-
+                            player.getWorld().playSound(
+                                    null, //So that everybody hears it
+                                    player.getX(),
+                                    player.getY(),
+                                    player.getZ(),
+                                    SoundEvents.ENTITY_FOX_TELEPORT,
+                                    SoundCategory.MASTER,
+                                    1.0f,
+                                    1.0f
+                            );
                         }
                 }
             }
