@@ -35,6 +35,12 @@ public class ModBlocks {
             .nonOpaque()
             .noCollision()));
 
+    public static final Block FLOWER_GATEWAY = register("flower_gateway", new FlowerGatewayBlock(Block.Settings.create()
+            .burnable()
+            .strength(2.5f)
+    ));
+
+
     public static <T extends Block> T register(String name, T block) {
         return Registry.register(Registries.BLOCK, ElementalConvergence.id(name), block);
     }

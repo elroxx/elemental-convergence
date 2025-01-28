@@ -38,6 +38,7 @@ public class ModItems {
 
     public static final BlockItem ALTAR_ITEM = register("altar_of_convergence", new BlockItem(ModBlocks.ALTAR_OF_CONVERGENCE, new Item.Settings().maxCount(1)));
 
+    public static final BlockItem FLOWER_GATEWAY_ITEM = register("flower_gateway", new BlockItem(ModBlocks.FLOWER_GATEWAY, new Item.Settings().maxCount(8)));
 
 
     //to register every item

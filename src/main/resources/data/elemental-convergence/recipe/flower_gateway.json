@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "OEO",
+    "OSO"
+  ],
+  "key": {
+    "E": {
+      "item": "minecraft:ender_pearl"
+    },
+    "O": {
+      "item": "minecraft:oak_log"
+    },
+    "S": {
+      "item": "minecraft:oak_sapling"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:flower_gateway",
+    "count": 1
+  }
+}

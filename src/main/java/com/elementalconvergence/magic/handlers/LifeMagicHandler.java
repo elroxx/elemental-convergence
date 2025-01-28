@@ -1,6 +1,7 @@
 package com.elementalconvergence.magic.handlers;
 
 import com.elementalconvergence.ElementalConvergence;
+import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.entity.ModEntities;
@@ -61,7 +62,7 @@ public class LifeMagicHandler implements IMagicHandler {
 
     private boolean growthAuraToggle=false;
 
-    private static final Block BLOCK_FOR_GATEWAY= Blocks.END_PORTAL_FRAME;
+    private static final Block BLOCK_FOR_GATEWAY= ModBlocks.FLOWER_GATEWAY;
     private static final int GROUP_TP_RADIUS=5;
     private static final int GATEWAY_DETECT_RANGE=100;
 
@@ -358,7 +359,7 @@ public class LifeMagicHandler implements IMagicHandler {
 
         // Teleporting the players to the selected blocks
         for (ServerPlayerEntity player : nearbyPlayers) {
-            player.teleport((ServerWorld) world,targetPos.getX() + 0.5, targetPos.getY() + 1, targetPos.getZ() + 0.5, player.getYaw(), player.getPitch());
+            player.teleport((ServerWorld) world,targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, player.getYaw(), player.getPitch());
         }
     }
 }
