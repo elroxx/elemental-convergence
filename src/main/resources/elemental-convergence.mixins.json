@@ -7,7 +7,8 @@
 		"PlayerDataMixin",
 		"ServerPlayerDataMixin",
 		"ArmorFeatureRendererMixin",
-		"MobEntityMixin"
+		"MobEntityMixin",
+		"HungerManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
