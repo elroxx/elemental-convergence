@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "CDC",
+    "VVV"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:glowstone"
+    },
+    "C": {
+      "item": "minecraft:black_candle"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "V": {
+      "item": "minecraft:crying_obsidian"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:altar_of_convergence",
+    "count": 1
+  }
+}

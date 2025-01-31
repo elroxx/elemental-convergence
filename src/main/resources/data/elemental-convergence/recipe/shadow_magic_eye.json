@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B B",
+    "PEP",
+    "OSO"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:chiseled_polished_blackstone"
+    },
+    "S": {
+      "item": "minecraft:sculk"
+    },
+    "B": {
+      "item": "minecraft:black_candle"
+    },
+    "O": {
+      "item": "minecraft:obsidian"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:shadow_magic_eye",
+    "count": 1
+  }
+}

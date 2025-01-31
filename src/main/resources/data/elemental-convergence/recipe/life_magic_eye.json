@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FGF",
+    "BEB",
+    "PGP"
+  ],
+  "key": {
+    "G": {
+      "item": "minecraft:glow_berries"
+    },
+    "F": {
+      "item": "minecraft:spore_blossom"
+    },
+    "B": {
+      "item": "minecraft:bamboo"
+    },
+    "P": {
+      "item": "minecraft:pink_petals"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:life_magic_eye",
+    "count": 1
+  }
+}

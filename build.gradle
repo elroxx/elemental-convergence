@@ -16,6 +16,12 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	maven {
+		url = "https://jitpack.io"
+	}
+	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+	maven { url 'https://maven.nucleoid.xyz' }
+	maven { url 'https://masa.dy.fi/maven' }
 }
 
 fabricApi {
@@ -32,7 +38,20 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+	modApi("com.github.Virtuoel:Pehkui:${pehkui_version}", {
+		exclude group: "net.fabricmc.fabric-api"
+	})
+	modImplementation 'com.github.elroxx:FabricTailorforkForEC:v2.5.0-custom'
+
+	// Config2Brigadier
+	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
+
+	// LuckPerms
+	modImplementation(include('me.lucko:fabric-permissions-api:0.2-SNAPSHOT'))
+
+	// Carpet
+	modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
+	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
 }
 
 processResources {

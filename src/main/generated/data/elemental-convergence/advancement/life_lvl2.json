@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:life_lvl1",
+  "criteria": {
+    "has_life_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:life_lvl2",
+        "criterionName": "life_criterion_lvl2",
+        "magicIndex": 6
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "life_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:cocoa_beans"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "life_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:life_lvl2",
+        "criterionName": "life_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:life_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Harvest cocoa beans",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:cocoa_beans"
+    },
+    "title": "Life Level 2"
+  },
+  "requirements": [
+    [
+      "life_criterion_lvl2"
+    ],
+    [
+      "life_has_lvl2"
+    ],
+    [
+      "has_life_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

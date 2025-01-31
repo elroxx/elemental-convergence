@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:life_lvl2",
+  "criteria": {
+    "has_life_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:life_lvl3",
+        "criterionName": "life_criterion_lvl3",
+        "magicIndex": 6
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "life_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:pitcher_plant"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "life_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:life_lvl3",
+        "criterionName": "life_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:life_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Obtain a pitcher plant",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:pitcher_pod"
+    },
+    "title": "Life Level 3"
+  },
+  "requirements": [
+    [
+      "life_criterion_lvl3"
+    ],
+    [
+      "life_has_lvl3"
+    ],
+    [
+      "has_life_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
