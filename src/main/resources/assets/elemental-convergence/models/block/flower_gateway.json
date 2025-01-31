@@ -1,0 +1,73 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "block/oak_log",
+		"1": "block/oak_log_top",
+		"2": "block/purple_stained_glass",
+		"particle": "block/oak_log"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [0, 0, 0],
+			"to": [16, 6, 16],
+			"faces": {
+				"north": {"uv": [0, 10, 16, 16], "texture": "#0"},
+				"east": {"uv": [0, 10, 16, 16], "texture": "#0"},
+				"south": {"uv": [0, 10, 16, 16], "texture": "#0"},
+				"west": {"uv": [0, 10, 16, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		},
+		{
+			"name": "inner_rim",
+			"from": [2, 6, 2],
+			"to": [14, 8, 14],
+			"faces": {
+				"north": {"uv": [2, 8, 14, 10], "texture": "#0"},
+				"east": {"uv": [2, 8, 14, 10], "texture": "#0"},
+				"south": {"uv": [2, 8, 14, 10], "texture": "#0"},
+				"west": {"uv": [2, 8, 14, 10], "texture": "#0"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#1"}
+			}
+		},
+		{
+			"name": "portal",
+			"from": [3, 6, 3],
+			"to": [13, 7, 13],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#2"}
+			}
+		},
+		{
+			"name": "bark_detail_1",
+			"from": [1, 0, 1],
+			"to": [3, 7, 3],
+			"faces": {
+				"north": {"uv": [13, 9, 15, 16], "texture": "#0"},
+				"east": {"uv": [13, 9, 15, 16], "texture": "#0"},
+				"south": {"uv": [1, 9, 3, 16], "texture": "#0"},
+				"west": {"uv": [1, 9, 3, 16], "texture": "#0"},
+				"up": {"uv": [1, 1, 3, 3], "texture": "#1"}
+			}
+		},
+		{
+			"name": "bark_detail_2",
+			"from": [13, 0, 13],
+			"to": [15, 7, 15],
+			"faces": {
+				"north": {"uv": [1, 9, 3, 16], "texture": "#0"},
+				"east": {"uv": [13, 9, 15, 16], "texture": "#0"},
+				"south": {"uv": [13, 9, 15, 16], "texture": "#0"},
+				"west": {"uv": [13, 9, 15, 16], "texture": "#0"},
+				"up": {"uv": [13, 13, 15, 15], "texture": "#1"}
+			}
+		}
+	],
+	"display": {
+		"ground": {
+			"scale": [0.25, 0.25, 0.25]
+		}
+	}
+}

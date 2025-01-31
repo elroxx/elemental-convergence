@@ -10,5 +10,7 @@
   "item.elemental-convergence.earth_magic_eye": "Eye of Earthly Magic",
   "item.elemental-convergence.life_magic_eye": "Eye of Living Magic",
   "item.elemental-convergence.shadow_magic_eye": "Eye of Dark Magic",
-  "item.elemental-convergence.water_magic_eye": "Eye of Watery Magic"
+  "item.elemental-convergence.water_magic_eye": "Eye of Watery Magic",
+  "block.elemental-convergence.altar_of_convergence": "Altar of Convergence",
+  "block.elemental-convergence.flower_gateway": "Tree Stump"
 }

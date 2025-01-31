@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BRC",
+    "RER",
+    "CRB"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:rooted_dirt"
+    },
+    "C": {
+      "item": "minecraft:smooth_basalt"
+    },
+    "B": {
+      "item": "minecraft:blackstone"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:earth_magic_eye",
+    "count": 1
+  }
+}

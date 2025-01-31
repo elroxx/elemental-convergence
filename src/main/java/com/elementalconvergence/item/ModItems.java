@@ -3,6 +3,7 @@ package com.elementalconvergence.item;
 
 
 import com.elementalconvergence.ElementalConvergence;
+import com.elementalconvergence.block.ModBlocks;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
@@ -35,6 +36,9 @@ public class ModItems {
     public static final Item SHADOWBALL_ITEM = register("shadowball",
            new ShadowballItem(new Item.Settings().maxCount(16)));
 
+    public static final BlockItem ALTAR_ITEM = register("altar_of_convergence", new BlockItem(ModBlocks.ALTAR_OF_CONVERGENCE, new Item.Settings().maxCount(1)));
+
+    public static final BlockItem FLOWER_GATEWAY_ITEM = register("flower_gateway", new BlockItem(ModBlocks.FLOWER_GATEWAY, new Item.Settings().maxCount(8)));
 
 
     //to register every item

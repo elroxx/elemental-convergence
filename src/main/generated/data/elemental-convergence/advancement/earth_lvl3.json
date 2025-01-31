@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:earth_lvl2",
+  "criteria": {
+    "earth_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:deepslate_emerald_ore"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "earth_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:earth_lvl3",
+        "criterionName": "earth_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:earth_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_earth_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:earth_lvl3",
+        "criterionName": "earth_criterion_lvl3",
+        "magicIndex": 0
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Obtain a deepslate emerald ore",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:emerald"
+    },
+    "title": "Earth Level 3"
+  },
+  "requirements": [
+    [
+      "earth_criterion_lvl3"
+    ],
+    [
+      "earth_has_lvl3"
+    ],
+    [
+      "has_earth_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

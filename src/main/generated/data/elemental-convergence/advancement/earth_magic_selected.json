@@ -1,0 +1,36 @@
+{
+  "parent": "elemental-convergence:root",
+  "criteria": {
+    "earth_magic_selected": {
+      "conditions": {
+        "requiredMagic": 0
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    },
+    "has_no_magic": {
+      "conditions": {
+        "advancementName": "elemental-convergence:earth_magic_selected",
+        "criterionName": "earth_magic_selected",
+        "parentAdvancement": "elemental-convergence:root"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "You are imbued with earth magic",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:coarse_dirt"
+    },
+    "title": "Earth Magic (0)"
+  },
+  "requirements": [
+    [
+      "earth_magic_selected"
+    ],
+    [
+      "has_no_magic"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

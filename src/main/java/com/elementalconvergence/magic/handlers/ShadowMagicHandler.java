@@ -7,6 +7,7 @@ import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -114,7 +115,7 @@ public class ShadowMagicHandler implements IMagicHandler {
         int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
         if (shadowLevel>=1) {
             if (victim instanceof LivingEntity) {
-                StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.DARKNESS, 15, 0, false, false, false);
+                StatusEffectInstance darkness = new StatusEffectInstance(StatusEffects.BLINDNESS, 15, 0, false, false, false);
                 ((LivingEntity) victim).addStatusEffect(darkness);
 
                 //Drop a random item on the ground if hit (only 25% chance of happenning)
@@ -152,7 +153,17 @@ public class ShadowMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleKill(PlayerEntity player, Entity victim) {
+
+    }
+
+    @Override
     public void handleMine(PlayerEntity player) {
+
+    }
+
+    @Override
+    public void handleBlockBreak(PlayerEntity player, BlockPos pos, BlockState state, BlockEntity entity) {
 
     }
 
@@ -171,7 +182,7 @@ public class ShadowMagicHandler implements IMagicHandler {
             System.out.println(blockHit);
             BlockState blockHitState = world.getBlockState(blockHit);
             if (isShadowTpAble(playerPos, world) && isShadowTpAble(blockHit, world) && shadowTPCooldown == 0) {
-                System.out.println("can tp??");
+                //System.out.println("can tp??");
                 //player.setPosition(blockHit.getX()+0.5,blockHit.getY(), blockHit.getZ()+0.5);
                 //player.refreshPositionAndAngles(blockHit.getX()+0.5,blockHit.getY(), blockHit.getZ()+0.5, player.getYaw(), player.getPitch());
                 player.teleport(blockHit.getX() + 0.5, blockHit.getY(), blockHit.getZ() + 0.5, false);

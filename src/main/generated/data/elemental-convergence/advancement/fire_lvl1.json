@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:fire_magic_selected",
+  "criteria": {
+    "fire_criterion_lvl1": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:campfire"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "fire_has_lvl1": {
+      "conditions": {
+        "advancementName": "elemental-convergence:fire_lvl1",
+        "criterionName": "fire_criterion_lvl1",
+        "parentAdvancement": "elemental-convergence:fire_magic_selected"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_fire_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:fire_lvl1",
+        "criterionName": "fire_criterion_lvl1",
+        "magicIndex": 2
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Obtain a campfire",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:campfire"
+    },
+    "title": "Fire Level 1"
+  },
+  "requirements": [
+    [
+      "fire_criterion_lvl1"
+    ],
+    [
+      "fire_has_lvl1"
+    ],
+    [
+      "has_fire_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
