@@ -41,7 +41,7 @@ public class FireMagicHandler implements IMagicHandler {
     private int fireResCooldown=50;
     private int waterHurtCooldown=10;
     private int fireIndex=2; //just to keep track
-    private static final int DEFAULT_DIMSWAP_COOLDOWN=100; //5 seconds
+    private static final int DEFAULT_DIMSWAP_COOLDOWN=50; //2.5 seconds
     private int dimensionSwapCooldown=0;
     private static final int DEFAULT_FIREBALL_COOLDOWN=5; //0.25 seconds
     private int fireballCooldown=0;
