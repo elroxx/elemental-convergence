@@ -4,6 +4,7 @@ import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -11,17 +12,19 @@ import net.minecraft.util.math.BlockPos;
 public class DeathMagicHandler implements IMagicHandler {
     @Override
     public void handleRightClick(PlayerEntity player) {
-
+        
     }
 
     @Override
     public void handlePassive(PlayerEntity player) {
-        //DamageSource voidDmgSource = player.getWorld().getDamageSources().outOfWorld(); //TO IGNORE ARMOR AND SHIT
     }
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
-
+        //Lifesteal passive
+        if (victim instanceof LivingEntity){
+            player.heal(1.0f);
+        }
     }
 
     @Override
