@@ -2,6 +2,7 @@ package com.elementalconvergence.commands;
 
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.magic.MagicRegistry;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -53,6 +54,9 @@ public class GetSelectedMagicCommand {
             ServerPlayerEntity targetPlayer = EntityArgumentType.getPlayer(context, "player");
             ServerPlayerEntity sourcePlayer = context.getSource().getPlayer();
             int newIndex = IntegerArgumentType.getInteger(context, "index");
+
+            //RESET STATS
+            MagicRegistry.resetPlayerStats(targetPlayer);
 
             IMagicDataSaver dataSaver = (IMagicDataSaver) targetPlayer;
             dataSaver.getMagicData().setSelectedMagic(newIndex);

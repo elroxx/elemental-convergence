@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:smithing_transform",
+  "category": "misc",
+  "ingredients": [],
+  "base": {
+    "item": "elemental-convergence:bland_magic_eye"
+  },
+  "addition": {
+    "item": "elemental-convergence:epsilon_dust"
+  },
+  "template": {
+    "item": "elemental-convergence:bounding_sequence"
+  },
+  "result": {
+    "count": 1,
+    "id": "elemental-convergence:limiting_eye"
+  }
+}

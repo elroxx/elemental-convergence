@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 800,
+  "experience": 1.0,
+  "ingredient": {
+    "item": "elemental-convergence:limiting_eye"
+  },
+  "result": "elemental-convergence:convergent_eye"
+}

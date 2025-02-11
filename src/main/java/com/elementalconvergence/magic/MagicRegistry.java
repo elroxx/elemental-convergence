@@ -1,8 +1,13 @@
 package com.elementalconvergence.magic;
 
+import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.player.PlayerEntity;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 public class MagicRegistry {
     private static final IMagicHandler[] MAGIC_HANDLERS = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length]; // Size matches your magic types
@@ -29,5 +34,28 @@ public class MagicRegistry {
             return null;
         }
         return MAGIC_HANDLERS[magicIndex];
+    }
+
+    public static final float DEFAULT_MOVE_SPEED=0.1f;
+    public static final float DEFAULT_JUMP_HEIGHT=0.42f;
+    public static final float DEFAULT_KB_RES=0.0f;
+    public static final float BASE_SCALE = 1.0f;
+    public static void resetPlayerStats(PlayerEntity player){
+        player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F); //Reset max health
+        ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(1.0f); //Reset mining speed
+
+        player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(DEFAULT_MOVE_SPEED); //Reset move speed
+        player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH).setBaseValue(DEFAULT_JUMP_HEIGHT); //Reset jump height
+        player.getAttributeInstance(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(DEFAULT_KB_RES); //Reset knockback resistance
+
+        ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
+        ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+        ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
+        ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
+
+        playerHeight.setScale(BASE_SCALE); //Reset player scale
+        playerWidth.setScale(BASE_SCALE);
+        playerReach.setScale(BASE_SCALE); //Reset player Reach
+        playerHeldItem.setScale(BASE_SCALE); //Reset held item size
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.item.*;
+import net.minecraft.util.Rarity;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 
@@ -31,6 +32,12 @@ public class ModItems {
 
     //basic magic eye to craft other magic eyes
     public static final Item MAGIC_EYE = register("bland_magic_eye", new Item(new Item.Settings().maxCount(16)));
+
+    //Crafting components for Convergence eyes
+    public static final Item EPSILON_DUST = register("epsilon_dust", new Item(new Item.Settings().maxCount(64).rarity(Rarity.UNCOMMON)));
+    public static final Item LIMITING_EYE = register("limiting_eye", new Item(new Item.Settings().maxCount(16).rarity(Rarity.RARE)));
+    public static final Item BOUNDING_SEQUENCE = register("bounding_sequence", new Item(new Item.Settings().maxCount(64).rarity(Rarity.UNCOMMON)));
+    public static final Item CONVERGENT_EYE = register("convergent_eye", new Item(new Item.Settings().maxCount(16).rarity(Rarity.EPIC)));
 
     //Shadowball Item for the 3rd magic spell
     public static final Item SHADOWBALL_ITEM = register("shadowball",
