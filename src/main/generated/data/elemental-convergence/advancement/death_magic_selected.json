@@ -3,7 +3,7 @@
   "criteria": {
     "death_magic_selected": {
       "conditions": {
-        "requiredMagic": 6
+        "requiredMagic": 7
       },
       "trigger": "minecraft:elemental-convergence/selected_magic"
     },

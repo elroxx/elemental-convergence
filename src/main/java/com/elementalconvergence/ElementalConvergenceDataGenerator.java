@@ -187,7 +187,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							false
 					)
 					.criterion(deathSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
-							6)))
+							7)))
 					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							rootAdvName,deathSelectedCN,deathSelectedAdvName)))
 					.parent(noMagicSelectedAdvancement)
