@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:death_lvl2",
+  "criteria": {
+    "death_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:wither_rose"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "death_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:death_lvl3",
+        "criterionName": "death_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:death_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_death_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:death_lvl3",
+        "criterionName": "death_criterion_lvl3",
+        "magicIndex": 7
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Harvest a wither rose",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:wither_skeleton_skull"
+    },
+    "title": "Death Level 3"
+  },
+  "requirements": [
+    [
+      "death_criterion_lvl3"
+    ],
+    [
+      "death_has_lvl3"
+    ],
+    [
+      "has_death_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

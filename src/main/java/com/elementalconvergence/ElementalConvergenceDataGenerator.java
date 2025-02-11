@@ -172,7 +172,31 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//LIFE LVL 3
 			generateLifeLevelsAdvancements(lifeSelectedCN, lifeSelectedAdvName, lifeSelectedAdvancement, consumer);
 
-			//DEATH
+			//DEATH MAGIC SELECTED
+			String deathSelectedCN="death_magic_selected";
+			String deathSelectedAdvName=ElementalConvergence.MOD_ID + ":death_magic_selected";
+			AdvancementEntry deathSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.SKELETON_SKULL,
+							Text.literal("Death Magic (7)"),
+							Text.literal("You are imbued with death magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(deathSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							6)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,deathSelectedCN,deathSelectedAdvName)))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, deathSelectedAdvName);
+
+			//DEATH LVL 1
+			//DEATH LVL 2
+			//DEATH LVL 3
+			generateDeathLevelsAdvancements(deathSelectedCN, deathSelectedAdvName, deathSelectedAdvancement, consumer);
 		}
 
 		public void generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
@@ -497,6 +521,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							false
 					)
 					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.PITCHER_PLANT))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+		}
+
+		public void generateDeathLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+
+			int magicIndex=7;
+			String goodMagicPicked = "has_death_selected_concurrent";
+			String achievementTitle="Death Level ";
+			String CN="death_criterion_lvl";
+			String advName=ElementalConvergence.MOD_ID+":death_lvl";
+			String haslvl="death_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName=selectedAdvName;
+			previousAdvEntry=selectedAdvEntry;
+			lvl=1;
+			AdvancementEntry deathAdv1 = Advancement.Builder.create()
+					.display(
+							Items.BONE_BLOCK,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain a bone block"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.BONE_BLOCK))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=deathAdv1;
+			lvl=2;
+			AdvancementEntry deathAdv2 = Advancement.Builder.create()
+					.display(
+							Items.OMINOUS_BOTTLE,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Loot an ominous bottle"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.OMINOUS_BOTTLE))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=deathAdv2;
+			lvl=3;
+			AdvancementEntry deathAdv3 = Advancement.Builder.create()
+					.display(
+							Items.WITHER_SKELETON_SKULL,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Harvest a wither rose"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.WITHER_ROSE))
 					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName,CN+lvl,advName+lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
