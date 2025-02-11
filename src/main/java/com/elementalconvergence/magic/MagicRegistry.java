@@ -1,12 +1,14 @@
 package com.elementalconvergence.magic;
 
+import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
 
 public class MagicRegistry {
-    private static final IMagicHandler[] MAGIC_HANDLERS = new IMagicHandler[ElementalConvergence.BASE_MAGIC_ID.length]; // Size matches your magic types
+    private static final IMagicHandler[] MAGIC_HANDLERS = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length]; // Size matches your magic types
 
     public static void initialize() {
+        //base magics
         MAGIC_HANDLERS[0] = new EarthMagicHandler();
         MAGIC_HANDLERS[1] = new AirMagicHandler();
         MAGIC_HANDLERS[2] = new FireMagicHandler();
@@ -15,7 +17,10 @@ public class MagicRegistry {
         MAGIC_HANDLERS[5] = new LightMagicHandler();
         MAGIC_HANDLERS[6] = new LifeMagicHandler();
         MAGIC_HANDLERS[7] = new DeathMagicHandler();
-      
+        System.out.print("BASE MAGICREGISTRY INITIALIZED");
+
+        MAGIC_HANDLERS[RatMagicHandler.RAT_INDEX] = new RatMagicHandler();
+
         System.out.println("MAGICREGISTRY INITIALIZED");
     }
 

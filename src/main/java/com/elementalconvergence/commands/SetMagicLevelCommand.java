@@ -17,7 +17,7 @@ public class SetMagicLevelCommand {
                                 CommandManager.RegistrationEnvironment registrationEnvironment) {
         dispatcher.register(CommandManager.literal("magiclevel")
                 .requires(source -> source.hasPermissionLevel(2)) // Requires OP level 2
-                .then(CommandManager.argument("index", IntegerArgumentType.integer(0, ElementalConvergence.BASE_MAGIC_ID.length - 1))
+                .then(CommandManager.argument("index", IntegerArgumentType.integer(0, ElementalConvergence.FULL_MAGIC_ID.length - 1))
                         .then(CommandManager.argument("level", IntegerArgumentType.integer(0))
                                 .executes(SetMagicLevelCommand::run))));
     }
@@ -31,7 +31,7 @@ public class SetMagicLevelCommand {
             IMagicDataSaver dataSaver = (IMagicDataSaver) player;
             dataSaver.getMagicData().setMagicLevel(index, level);
 
-            String magicType = ElementalConvergence.BASE_MAGIC_DISPLAY[index];
+            String magicType = ElementalConvergence.FULL_MAGIC_DISPLAY[index];
             player.sendMessage(Text.of("Set " + magicType + " magic level to " + level));
             return 1;
         }

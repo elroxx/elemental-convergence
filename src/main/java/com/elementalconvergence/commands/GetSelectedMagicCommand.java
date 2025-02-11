@@ -22,7 +22,7 @@ public class GetSelectedMagicCommand {
                         .then(CommandManager.literal("get")
                                 .executes(GetSelectedMagicCommand::runGet))
                         .then(CommandManager.literal("set")
-                                .then(CommandManager.argument("index", IntegerArgumentType.integer(-1, ElementalConvergence.BASE_MAGIC_ID.length - 1))
+                                .then(CommandManager.argument("index", IntegerArgumentType.integer(-1, ElementalConvergence.FULL_MAGIC_ID.length - 1))
                                         .executes(GetSelectedMagicCommand::runSet)))));
     }
 
@@ -36,7 +36,7 @@ public class GetSelectedMagicCommand {
             if (selectedMagic == -1) {
                 message = targetPlayer.getName().getString() + " has no magic type currently selected";
             } else {
-                String magicType = ElementalConvergence.BASE_MAGIC_DISPLAY[selectedMagic];
+                String magicType = ElementalConvergence.FULL_MAGIC_DISPLAY[selectedMagic];
                 message = targetPlayer.getName().getString() + "'s currently selected magic: " + magicType;
             }
 
@@ -61,7 +61,7 @@ public class GetSelectedMagicCommand {
             if (newIndex == -1) {
                 message = "Cleared " + targetPlayer.getName().getString() + "'s selected magic";
             } else {
-                String magicType = ElementalConvergence.BASE_MAGIC_DISPLAY[newIndex];
+                String magicType = ElementalConvergence.FULL_MAGIC_DISPLAY[newIndex];
                 message = "Set " + targetPlayer.getName().getString() + "'s selected magic to " + magicType;
             }
 

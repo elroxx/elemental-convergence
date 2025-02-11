@@ -18,7 +18,7 @@ public class ServerPlayerDataMixin {
         IMagicDataSaver oldDataSaver = (IMagicDataSaver) oldPlayer;
 
         // Copy each magic level
-        for (int i = 0; i < ElementalConvergence.BASE_MAGIC_ID.length; i++) {
+        for (int i = 0; i < ElementalConvergence.FULL_MAGIC_ID.length; i++) {
             newPlayer.getMagicData().setMagicLevel(i, oldDataSaver.getMagicData().getMagicLevel(i));
         }
 

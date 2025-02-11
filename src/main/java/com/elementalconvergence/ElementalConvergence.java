@@ -72,10 +72,27 @@ import java.util.Random;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
+	public static final int TICKSEC = 20;
 
 	public static final String[] BASE_MAGIC_DISPLAY = {"Earth", "Air", "Fire", "Water", "Shadow", "Light", "Life", "Death"};
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
-	public static final int TICKSEC = 20;
+
+
+	//
+	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Rat"};
+	public static final String[] CONVERGENCE_MAGIC_ID = {"rat"};
+
+	//FOR THINGS THAT NEED ALL THE MAGICS IN THE LOGIC
+	public static final String[] FULL_MAGIC_DISPLAY = new String[BASE_MAGIC_DISPLAY.length + CONVERGENCE_MAGIC_DISPLAY.length];
+	static {
+		System.arraycopy(BASE_MAGIC_DISPLAY, 0, FULL_MAGIC_DISPLAY, 0, BASE_MAGIC_DISPLAY.length);
+		System.arraycopy(CONVERGENCE_MAGIC_DISPLAY, 0, FULL_MAGIC_DISPLAY, BASE_MAGIC_DISPLAY.length, CONVERGENCE_MAGIC_DISPLAY.length);
+	}
+	public static final String[] FULL_MAGIC_ID = new String[BASE_MAGIC_ID.length + CONVERGENCE_MAGIC_ID.length];
+	static {
+		System.arraycopy(BASE_MAGIC_ID, 0, FULL_MAGIC_ID, 0, BASE_MAGIC_ID.length);
+		System.arraycopy(CONVERGENCE_MAGIC_ID, 0, FULL_MAGIC_ID, BASE_MAGIC_ID.length, CONVERGENCE_MAGIC_ID.length);
+	}
 
 
 	public static ArrayList<String> deathList = new ArrayList<>(); //THEY ARE INITIALIZED AUTOMATICALLY
