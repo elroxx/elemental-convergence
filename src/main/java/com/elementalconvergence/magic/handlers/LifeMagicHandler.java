@@ -4,6 +4,7 @@ import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.entity.MinionZombieEntity;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.Block;
@@ -159,7 +160,8 @@ public class LifeMagicHandler implements IMagicHandler {
             boolean isZombie = victim.getType().isIn(EntityTypeTags.ZOMBIES);
             boolean isSkeleton = victim.getType().isIn(EntityTypeTags.SKELETONS);
             boolean isInanimate = !victim.isLiving();
-            if (!(isUndead || isInanimate || isZombie || isSkeleton)){
+            boolean isMinion = (victim instanceof MinionZombieEntity);
+            if (!(isUndead || isInanimate || isZombie || isSkeleton || isMinion)){
                 System.out.println();
                 player.kill();
                 player.getWorld().playSound(

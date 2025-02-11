@@ -2,8 +2,11 @@ package com.elementalconvergence.entity;
 
 import com.elementalconvergence.ElementalConvergence;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
+import net.minecraft.client.render.entity.ZombieEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
@@ -27,6 +30,16 @@ public class ModEntities {
                     .build()
     );
 
+    public static final EntityType<MinionZombieEntity> MINION_ZOMBIE = Registry.register(
+            Registries.ENTITY_TYPE,
+            ElementalConvergence.id("minion_zombie"),
+            EntityType.Builder.create(MinionZombieEntity::new, SpawnGroup.MONSTER)
+                    .dimensions(0.6f, 1.95f)
+                    .build()
+    );
+
+
+
     // Register method to register the entity type with the game
     public static <T extends Entity> EntityType<T> register(String name, EntityType<T> entityType) {
         return Registry.register(Registries.ENTITY_TYPE, ElementalConvergence.id(name), entityType);
@@ -36,12 +49,22 @@ public class ModEntities {
     public static void initialize() {
         EntityRendererRegistry.register(SHADOWBALL, (context) ->
                 new FlyingItemEntityRenderer<>(context));
+        EntityRendererRegistry.register(MINION_ZOMBIE, MinionZombieRenderer::new);
+
+        // Register the custom entity attributes
+        FabricDefaultAttributeRegistry.register(MINION_ZOMBIE, MinionZombieEntity.createMinionZombieAttributes());
+
         System.out.println("ModEntities initialized");
+
+
+
         registerSounds();
         System.out.println("Sounds initialized");
+
     }
 
     public static void registerSounds() {
         Registry.register(Registries.SOUND_EVENT, DEATH_SOUND_ID, DEATH_SOUND_EVENT);
     }
 }
+

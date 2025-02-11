@@ -12,5 +12,7 @@
   "item.elemental-convergence.shadow_magic_eye": "Eye of Dark Magic",
   "item.elemental-convergence.water_magic_eye": "Eye of Watery Magic",
   "block.elemental-convergence.altar_of_convergence": "Altar of Convergence",
-  "block.elemental-convergence.flower_gateway": "Tree Stump"
+  "block.elemental-convergence.flower_gateway": "Tree Stump",
+  "item.elemental-convergence.shadowball": "Shadow ball",
+  "entity.elemental-convergence.minion_zombie": "Minion Zombie"
 }
