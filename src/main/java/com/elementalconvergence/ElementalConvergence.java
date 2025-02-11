@@ -1,16 +1,20 @@
 package com.elementalconvergence;
 
 import com.elementalconvergence.block.ModBlocks;
+import com.elementalconvergence.commands.DeathTeleportCommand;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
 import com.elementalconvergence.criterions.ModCriterions;
+import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
+import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.magic.handlers.DeathMagicHandler;
 import com.elementalconvergence.mixin.PlayerDataMixin;
 import com.elementalconvergence.networking.MiningSpeedPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
@@ -40,8 +44,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -107,6 +115,7 @@ public class ElementalConvergence implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
 		CommandRegistrationCallback.EVENT.register(GetSelectedMagicCommand::register); //Registration of SetMagicLevelCommand
 		CommandRegistrationCallback.EVENT.register(MagicCommand::register); //Registration of starter magic Command
+		CommandRegistrationCallback.EVENT.register(DeathTeleportCommand::register); //Registration of death Teleport command
 
 
 		//Spell initialization depending on type of magic.
@@ -170,12 +179,55 @@ public class ElementalConvergence implements ModInitializer {
 
 			if (entity instanceof ServerPlayerEntity player){
 				BlockPos deathPos = player.getBlockPos();
-				String playerName= player.getName().toString();
+				String playerName= player.getName().getString();
+				//String playerName = player.getDisplayName().toString();
 				if (!deathList.contains(playerName)) {
 					deathList.add(playerName);
 				}
 				deathMap.put(playerName, new DeathTuple(DEFAULT_DEATH_TIMER, deathPos, player.getServerWorld())); //This replaces the previous deathTuple too
 
+
+				//NOW VERIFY FOR ALL DEATH PLAYERS AND BROADCAST THE DEATH POSITION
+				for (ServerPlayerEntity alivePlayer : entity.getServer().getPlayerManager().getPlayerList()){
+					IMagicDataSaver dataSaver = (IMagicDataSaver) alivePlayer;
+					MagicData magicData = dataSaver.getMagicData();
+					if (magicData.getSelectedMagic()== DeathMagicHandler.DEATH_INDEX){
+						if (magicData.getMagicLevel(DeathMagicHandler.DEATH_INDEX)<3) {
+							alivePlayer.sendMessage(Text.literal(playerName + " died at: " +
+									"X: " + deathPos.getX() +
+									", Y: " + deathPos.getY() +
+									", Z: " + deathPos.getZ()), false);
+						}else{
+// Create the message components
+							MutableText locationText = Text.empty()
+									.append(Text.literal(playerName)
+											.formatted(Formatting.DARK_RED))
+									.append(Text.literal(" died at: ")
+											.formatted(Formatting.DARK_RED))
+									.append(Text.literal(String.format("X: %d, Y: %d, Z: %d ",
+													deathPos.getX(), deathPos.getY(), deathPos.getZ()))
+											.formatted(Formatting.RED));
+
+							// Create the clickable teleport button
+							MutableText teleportButton = Text.literal("[Teleport]")
+									.formatted(Formatting.GOLD, Formatting.BOLD)
+									.styled(style -> style
+											.withClickEvent(new ClickEvent(
+													ClickEvent.Action.RUN_COMMAND,
+													String.format("/deathteleport %s", playerName)
+											))
+											.withHoverEvent(new HoverEvent(
+													HoverEvent.Action.SHOW_TEXT,
+													Text.literal("Click to teleport to death location")
+															.formatted(Formatting.YELLOW)
+											))
+									);
+
+							// Combine and send the message
+							alivePlayer.sendMessage(locationText.append(teleportButton), false);
+						}
+					}
+				}
 
 			}
 
