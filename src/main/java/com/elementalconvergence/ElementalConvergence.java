@@ -29,6 +29,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
@@ -125,11 +126,18 @@ public class ElementalConvergence implements ModInitializer {
 		//Basic Initialization
 		ModBlocks.initialize(); //Blocks
 		ModItems.initialize(); //Items
-		MagicRegistry.initialize(); //Magic Types and spells
 		registerKeybindings(); //Keybinds
 		ModEntities.initialize(); //Entities
 		ModCriterions.initialize(); //Criterions for advancements
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
+
+		//Init the MagicRegistry (magic handler is by player now)
+		MagicRegistry.initialize();
+		//Remove the magic handler of the player when the player leaves
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			MagicRegistry.removePlayer(handler.getPlayer());
+		});
+
 
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
@@ -137,8 +145,6 @@ public class ElementalConvergence implements ModInitializer {
 		CommandRegistrationCallback.EVENT.register(MagicCommand::register); //Registration of starter magic Command
 		CommandRegistrationCallback.EVENT.register(DeathTeleportCommand::register); //Registration of death Teleport command
 
-
-		//Spell initialization depending on type of magic.
 
 		//PASSIVE EACH TICK
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
@@ -272,7 +278,7 @@ public class ElementalConvergence implements ModInitializer {
 			return ActionResult.PASS;
 		});
 
-		// Register packet on both sides
+		// Register packet on both sides for spellCasting
 		PayloadTypeRegistry.playC2S().register(SpellCastPayload.ID, SpellCastPayload.CODEC);
 
 		// INIT FOR MININGSPEED PAYLOAD

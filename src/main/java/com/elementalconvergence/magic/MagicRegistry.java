@@ -10,33 +10,58 @@ import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
 public class MagicRegistry {
-    private static final IMagicHandler[] MAGIC_HANDLERS = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length]; // Size matches your magic types
+    private static final Map<UUID, IMagicHandler[]> playerMagicHandlers = new HashMap<>(); // Map so that each player has a specific magicHandler
 
-    public static void initialize() {
+    public static IMagicHandler[] createHandlersForPlayer() {
+        IMagicHandler[] magic_handlers = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length];
+
         //base magics
-        MAGIC_HANDLERS[0] = new EarthMagicHandler();
-        MAGIC_HANDLERS[1] = new AirMagicHandler();
-        MAGIC_HANDLERS[2] = new FireMagicHandler();
-        MAGIC_HANDLERS[3] = new WaterMagicHandler();
-        MAGIC_HANDLERS[4] = new ShadowMagicHandler();
-        MAGIC_HANDLERS[5] = new LightMagicHandler();
-        MAGIC_HANDLERS[6] = new LifeMagicHandler();
-        MAGIC_HANDLERS[7] = new DeathMagicHandler();
-        System.out.print("BASE MAGICREGISTRY INITIALIZED");
+        magic_handlers[0] = new EarthMagicHandler();
+        magic_handlers[1] = new AirMagicHandler();
+        magic_handlers[2] = new FireMagicHandler();
+        magic_handlers[3] = new WaterMagicHandler();
+        magic_handlers[4] = new ShadowMagicHandler();
+        magic_handlers[5] = new LightMagicHandler();
+        magic_handlers[6] = new LifeMagicHandler();
+        magic_handlers[7] = new DeathMagicHandler();
+        System.out.print("BASE MAGICREGISTRY CREATED");
 
-        MAGIC_HANDLERS[RatMagicHandler.RAT_INDEX] = new RatMagicHandler();
+        magic_handlers[RatMagicHandler.RAT_INDEX] = new RatMagicHandler();
 
-        System.out.println("MAGICREGISTRY INITIALIZED");
+        System.out.println("MAGICREGISTRY CREATED");
+
+        return magic_handlers;
     }
 
-    public static IMagicHandler getHandler(int magicIndex) {
-        if (magicIndex < 0 || magicIndex >= MAGIC_HANDLERS.length) {
+    public static IMagicHandler[] getHandlersForPlayer(PlayerEntity player) {
+        return playerMagicHandlers.computeIfAbsent(player.getUuid(), k -> createHandlersForPlayer());
+    }
+
+    public static IMagicHandler getHandler(PlayerEntity player, int magicIndex) {
+        if (magicIndex < 0 || magicIndex >= ElementalConvergence.FULL_MAGIC_ID.length) {
             return null;
         }
-        return MAGIC_HANDLERS[magicIndex];
+        IMagicHandler[] handlers = getHandlersForPlayer(player);
+        return handlers[magicIndex];
     }
 
+    // Clean up handlers when a player leaves
+    public static void removePlayer(PlayerEntity player) {
+        playerMagicHandlers.remove(player.getUuid());
+    }
+
+
+    public static void initialize() {
+        // Only to init all the static things and constants
+        ElementalConvergence.LOGGER.info("MagicRegistry system initialized");
+    }
+
+    //FOR RESETTING
     public static final float DEFAULT_MOVE_SPEED=0.1f;
     public static final float DEFAULT_JUMP_HEIGHT=0.42f;
     public static final float DEFAULT_KB_RES=0.0f;

@@ -21,7 +21,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
         //System.out.println("SelectedMagic: "+selectedMagic);
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleItemRightClick(player);
         }
@@ -33,7 +33,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleEntityRightClick(player, targetEntity);
         }
@@ -43,7 +43,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handlePassive(player);
         }
@@ -55,7 +55,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleAttack(player, victim);
         }
@@ -67,7 +67,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleKill(player, victim);
         }
@@ -79,7 +79,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleMine(player);
         }
@@ -91,7 +91,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleBlockBreak(player, pos, state, entity);
         }
@@ -108,7 +108,7 @@ public class SpellManager {
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
         // Get the appropriate magic handler
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler == null) {
             LOGGER.error("No handler found for magic type: " + selectedMagic);
             return;
