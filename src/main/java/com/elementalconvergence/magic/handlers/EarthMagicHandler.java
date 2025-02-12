@@ -92,8 +92,6 @@ public class EarthMagicHandler implements IMagicHandler {
     private static final int PARTICLE_COUNT = 1;
     private static final double SPAWN_RADIUS = 0.5f;
 
-    private static final String STONE_SKIN_PATH="";
-
 
 
 

@@ -6,6 +6,7 @@ import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
@@ -40,6 +41,7 @@ public class MagicRegistry {
     public static final float DEFAULT_JUMP_HEIGHT=0.42f;
     public static final float DEFAULT_KB_RES=0.0f;
     public static final float BASE_SCALE = 1.0f;
+
     public static void resetPlayerStats(PlayerEntity player){
         player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F); //Reset max health
         ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(1.0f); //Reset mining speed
@@ -57,5 +59,8 @@ public class MagicRegistry {
         playerWidth.setScale(BASE_SCALE);
         playerReach.setScale(BASE_SCALE); //Reset player Reach
         playerHeldItem.setScale(BASE_SCALE); //Reset held item size
+
+        ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
+        ((RatMagicHandler)MAGIC_HANDLERS[RatMagicHandler.RAT_INDEX]).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
     }
 }
