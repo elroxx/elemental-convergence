@@ -9,6 +9,7 @@ import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.LevelManager;
@@ -128,6 +129,7 @@ public class ElementalConvergence implements ModInitializer {
 		ModItems.initialize(); //Items
 		registerKeybindings(); //Keybinds
 		ModEntities.initialize(); //Entities
+		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 

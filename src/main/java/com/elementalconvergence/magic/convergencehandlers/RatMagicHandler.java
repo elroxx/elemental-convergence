@@ -37,7 +37,8 @@ public class RatMagicHandler implements IMagicHandler {
     public static final float RAT_MODE_REACH=0.7f;
     public static final float RAT_MODE_SPEED=2.75f;
     public static final float RAT_MODE_HEALTH=6.0f;
-    public static final float RAT_MODE_ATTACK=0.01f;
+
+    public static final float RAT_ATTACK=0.01f;
 
 
     public static final int RATMODE_DEFAULT_COOLDOWN=10;
@@ -81,6 +82,15 @@ public class RatMagicHandler implements IMagicHandler {
             hasSkinOn=true;
         }
 
+        //DEBUFF (aka remove completely attack damage)
+        ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
+        ScaleData playerKnockback = ScaleTypes.KNOCKBACK.getScaleData(player);
+        if (!(Math.abs(playerAttack.getScale()-RAT_ATTACK)<0.02f)){
+            playerAttack.setScale(RAT_ATTACK);
+            playerKnockback.setScale(RAT_ATTACK);
+        }
+
+
         //handle cooldowns
         if (ratModeCooldown>0){
             ratModeCooldown--;
@@ -110,7 +120,6 @@ public class RatMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
-
     }
 
     @Override
@@ -125,14 +134,12 @@ public class RatMagicHandler implements IMagicHandler {
             ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
             ScaleData playerEntityReach = ScaleTypes.ENTITY_REACH.getScaleData(player);
             ScaleData playerMotion = ScaleTypes.MOTION.getScaleData(player);
-            ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
-            ScaleData playerKnockback = ScaleTypes.KNOCKBACK.getScaleData(player);
+
 
             float heightScale=BASE_SCALE;
             float widthScale=BASE_SCALE;
             float reachScale=BASE_SCALE;
             float motionScale=BASE_SCALE;
-            float attackandKBScale=BASE_SCALE;
 
             float moveSpeed= MagicRegistry.DEFAULT_MOVE_SPEED;
             float healthScale=BASE_HEALTH;
@@ -147,7 +154,6 @@ public class RatMagicHandler implements IMagicHandler {
                 motionScale=RAT_MODE_MOTION;
                 moveSpeed=MagicRegistry.DEFAULT_MOVE_SPEED*RAT_MODE_SPEED;
                 healthScale=RAT_MODE_HEALTH;
-                attackandKBScale=RAT_MODE_ATTACK;
             }
 
             playerHeight.setScale(heightScale);
@@ -155,8 +161,6 @@ public class RatMagicHandler implements IMagicHandler {
             playerReach.setScale(reachScale);
             playerEntityReach.setScale(reachScale);
             playerMotion.setScale(motionScale);
-            playerAttack.setScale(attackandKBScale);
-            playerKnockback.setScale(attackandKBScale);
 
             player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(moveSpeed); //Speed fix after motion
             player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(healthScale);
