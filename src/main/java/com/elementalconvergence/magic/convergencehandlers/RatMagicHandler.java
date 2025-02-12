@@ -1,5 +1,6 @@
 package com.elementalconvergence.magic.convergencehandlers;
 
+import com.elementalconvergence.container.StealInventoryScreenHandler;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
@@ -9,6 +10,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import com.elementalconvergence.ElementalConvergence;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
@@ -44,7 +48,25 @@ public class RatMagicHandler implements IMagicHandler {
 
     @Override
     public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int ratLevel = magicData.getMagicLevel(RAT_INDEX);
 
+        if (targetEntity instanceof PlayerEntity targetPlayer && ratModeToggle && ratLevel>=3) {
+            //SERVER-SIDE STEAL
+            ServerPlayerEntity sourcePlayer = (ServerPlayerEntity) player;
+            sourcePlayer.openHandledScreen(new SimpleNamedScreenHandlerFactory(
+                    (syncId, inventory, p) -> new StealInventoryScreenHandler(syncId, inventory, targetPlayer.getInventory()),
+                    Text.literal(targetPlayer.getName().getString() + "'s Inventory")
+            ));
+        }
+
+        //THIS IS FOR CLIENTSIDE STEALING. USELESS HERE
+        //if (world.isClient() && entity instanceof PlayerEntity targetPlayer && player.isSneaking()) {
+        // SEND PACKETS ASKING TO OPEN INVENTORY
+        //ClientPlayNetworking.send(new OpenInventoryPayload(targetPlayer.getUuid()));
+        //return ActionResult.SUCCESS;
+        //}
     }
 
     @Override

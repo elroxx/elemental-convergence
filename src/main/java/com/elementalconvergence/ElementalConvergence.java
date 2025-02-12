@@ -77,7 +77,6 @@ public class ElementalConvergence implements ModInitializer {
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
 
 
-	//
 	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Rat"};
 	public static final String[] CONVERGENCE_MAGIC_ID = {"rat"};
 	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
@@ -188,13 +187,6 @@ public class ElementalConvergence implements ModInitializer {
 			if (!world.isClient()){
 				SpellManager.handleEntityRightClick(player, entity);
 			}
-
-			//ONLY SPELL I NEED TO HANDLE CLIENT SIDE
-			//if (world.isClient() && entity instanceof PlayerEntity targetPlayer && player.isSneaking()) {
-				// SEND PACKETS ASKING TO OPEN INVENTORY
-				//ClientPlayNetworking.send(new OpenInventoryPayload(targetPlayer.getUuid()));
-				//return ActionResult.SUCCESS;
-			//}
 			return ActionResult.PASS;
 		});
 
