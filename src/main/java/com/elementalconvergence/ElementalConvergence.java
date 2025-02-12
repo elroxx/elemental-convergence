@@ -185,11 +185,16 @@ public class ElementalConvergence implements ModInitializer {
 
 		// RIGHT CLICK ON ENTITY
 		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
-			if (world.isClient() && entity instanceof PlayerEntity targetPlayer && player.isSneaking()) {
+			if (!world.isClient()){
+				SpellManager.handleEntityRightClick(player, entity);
+			}
+
+			//ONLY SPELL I NEED TO HANDLE CLIENT SIDE
+			//if (world.isClient() && entity instanceof PlayerEntity targetPlayer && player.isSneaking()) {
 				// SEND PACKETS ASKING TO OPEN INVENTORY
 				//ClientPlayNetworking.send(new OpenInventoryPayload(targetPlayer.getUuid()));
 				//return ActionResult.SUCCESS;
-			}
+			//}
 			return ActionResult.PASS;
 		});
 

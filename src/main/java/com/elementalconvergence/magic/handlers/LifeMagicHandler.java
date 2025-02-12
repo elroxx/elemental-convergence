@@ -99,6 +99,11 @@ public class LifeMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
+    }
+
+    @Override
     public void handlePassive(PlayerEntity player) {
         //Regen Aura
         if (regenCooldown==0){

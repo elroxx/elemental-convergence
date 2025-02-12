@@ -27,6 +27,18 @@ public class SpellManager {
         }
     }
 
+    public static void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+        if (!(player instanceof ServerPlayerEntity)) return;
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
+
+        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        if (handler != null) {
+            handler.handleEntityRightClick(player, targetEntity);
+        }
+    }
+
     public static void handlePassives(ServerPlayerEntity player) {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();

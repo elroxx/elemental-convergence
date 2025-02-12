@@ -133,6 +133,11 @@ public class DeathMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
+    }
+
+    @Override
     public void handlePassive(PlayerEntity player) {
 
         //Cooldowns

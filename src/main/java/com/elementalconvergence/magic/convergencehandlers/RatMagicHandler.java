@@ -43,6 +43,11 @@ public class RatMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
+    }
+
+    @Override
     public void handlePassive(PlayerEntity player) {
         if (!hasSkinOn){
             // Set the skin and reload it

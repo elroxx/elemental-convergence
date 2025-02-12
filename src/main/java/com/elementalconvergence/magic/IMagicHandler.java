@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 public interface IMagicHandler {
     //right now only handle rightclick
     void handleItemRightClick(PlayerEntity player);
+    void handleEntityRightClick(PlayerEntity player, Entity targetEntity);
     void handlePassive(PlayerEntity player);
     void handleAttack(PlayerEntity player, Entity victim);
     void handleKill(PlayerEntity player, Entity victim);

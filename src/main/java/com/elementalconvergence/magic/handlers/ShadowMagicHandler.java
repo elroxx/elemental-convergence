@@ -51,6 +51,11 @@ public class ShadowMagicHandler implements IMagicHandler {
     }
 
     @Override
+    public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
+    }
+
+    @Override
     public void handlePassive(PlayerEntity player) {
         //Checking light level of blocks
         if (lightUpdateCooldown==0){
