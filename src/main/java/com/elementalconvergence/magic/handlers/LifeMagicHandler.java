@@ -68,7 +68,7 @@ public class LifeMagicHandler implements IMagicHandler {
     private static final int GATEWAY_DETECT_RANGE=100;
 
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
         ItemStack mainHand = player.getMainHandStack();
 
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;

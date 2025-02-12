@@ -39,7 +39,7 @@ public class RatMagicHandler implements IMagicHandler {
     //HALF JUMP HEIGHT' NO
 
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
     }
 
     @Override

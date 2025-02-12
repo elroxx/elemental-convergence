@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class SpellManager {
-    public static void handleRightClick(PlayerEntity player) {
+    public static void handleItemRightClick(PlayerEntity player) {
         if (!(player instanceof ServerPlayerEntity))
         {
             System.out.println("SHOULD NOT ENTER HERE");
@@ -23,7 +23,7 @@ public class SpellManager {
         //System.out.println("SelectedMagic: "+selectedMagic);
         IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
         if (handler != null) {
-            handler.handleRightClick(player);
+            handler.handleItemRightClick(player);
         }
     }
 

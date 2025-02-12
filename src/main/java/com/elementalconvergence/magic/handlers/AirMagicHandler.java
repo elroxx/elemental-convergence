@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class AirMagicHandler implements IMagicHandler {
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
     }
 
     @Override

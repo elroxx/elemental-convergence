@@ -10,7 +10,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class LightMagicHandler implements IMagicHandler {
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
 
     }
 

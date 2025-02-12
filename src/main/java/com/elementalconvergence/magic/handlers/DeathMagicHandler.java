@@ -42,7 +42,7 @@ public class DeathMagicHandler implements IMagicHandler {
     private int zombieCooldown=0;
 
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
         ItemStack mainHand = player.getMainHandStack();
         ServerWorld serverWorld = (ServerWorld) player.getWorld();
 

@@ -46,7 +46,7 @@ public class ShadowMagicHandler implements IMagicHandler {
     private static final float CHANCE_OF_STEAL=0.01f;
 
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
 
     }
 

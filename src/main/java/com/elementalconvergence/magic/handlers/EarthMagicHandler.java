@@ -98,7 +98,7 @@ public class EarthMagicHandler implements IMagicHandler {
 
 
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
 
     }
 

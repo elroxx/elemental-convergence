@@ -50,7 +50,7 @@ public class FireMagicHandler implements IMagicHandler {
 
 
     @Override //Spell lvl 1 here
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
         ItemStack mainHand = player.getMainHandStack();
 
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;

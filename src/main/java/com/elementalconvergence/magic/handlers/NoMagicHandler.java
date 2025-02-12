@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class NoMagicHandler implements IMagicHandler {
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
         System.out.println("HANDLERIGHTCLICKNOMAGIC");
     }
 
