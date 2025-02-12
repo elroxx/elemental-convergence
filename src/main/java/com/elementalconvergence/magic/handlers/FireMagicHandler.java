@@ -52,6 +52,7 @@ public class FireMagicHandler implements IMagicHandler {
     @Override //Spell lvl 1 here
     public void handleItemRightClick(PlayerEntity player) {
         ItemStack mainHand = player.getMainHandStack();
+        ItemStack offHand = player.getOffHandStack();
 
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
@@ -59,7 +60,9 @@ public class FireMagicHandler implements IMagicHandler {
         if (fireLevel>=1) {
 
             if (fireballCooldown == 0) {
-                if (mainHand.isOf(Items.COAL) || mainHand.isOf(Items.CHARCOAL)) {
+                if (mainHand.isOf(Items.COAL) || mainHand.isOf(Items.CHARCOAL) || offHand.isOf(Items.COAL) || offHand.isOf(Items.CHARCOAL)) {
+
+
                     double speed = 1.0;
                     int explosionPower = 3;
                     Vec3d rotation = player.getRotationVec(1.0F);
@@ -72,7 +75,11 @@ public class FireMagicHandler implements IMagicHandler {
                     player.getWorld().spawnEntity(fireball);
 
                     if (!player.getAbilities().creativeMode) {
-                        mainHand.decrement(1);
+                        if (mainHand.isOf(Items.COAL) || mainHand.isOf(Items.CHARCOAL)) {
+                            mainHand.decrement(1);
+                        }else {
+                            offHand.decrement(1);
+                        }
                     }
 
                     player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
