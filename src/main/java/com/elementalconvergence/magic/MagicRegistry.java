@@ -80,12 +80,16 @@ public class MagicRegistry {
         ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
         ScaleData playerEntityReach = ScaleTypes.ENTITY_REACH.getScaleData(player);
         ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
+        ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
+        ScaleData playerKnockback = ScaleTypes.KNOCKBACK.getScaleData(player);
 
         playerHeight.setScale(BASE_SCALE); //Reset player scale
         playerWidth.setScale(BASE_SCALE);
         playerReach.setScale(BASE_SCALE); //Reset player Reach (BLOCK)
         playerEntityReach.setScale(BASE_SCALE); //Reset player Reach (ENTITY)
         playerHeldItem.setScale(BASE_SCALE); //Reset held item size
+        playerAttack.setScale(BASE_SCALE);
+        playerKnockback.setScale(BASE_SCALE);
 
         ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
         ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
