@@ -75,7 +75,7 @@ public class ModItems {
     public static Item[] registerConvergentEyes(String baseString){
         Item[] eyes = new Item[CONVERGENCE_MAGIC_ID.length];
         for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
-            eyes[i]= register(CONVERGENCE_MAGIC_ID[i]+baseString, new MagicEyeItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC), i+BASE_MAGIC_ID.length));
+            eyes[i]= register(CONVERGENCE_MAGIC_ID[i]+baseString, new ConvergentEyeItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC), i+BASE_MAGIC_ID.length));
         }
         return eyes;
     }

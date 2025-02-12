@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:ominous_bottle"
+            "items": "minecraft:wither_skeleton_skull"
           }
         ]
       },
@@ -29,10 +29,10 @@
     }
   },
   "display": {
-    "description": "Loot an ominous bottle",
+    "description": "Loot a wither skeleton skull",
     "icon": {
       "count": 1,
-      "id": "minecraft:ominous_bottle"
+      "id": "minecraft:wither_skeleton_skull"
     },
     "title": "Death Level 2"
   },

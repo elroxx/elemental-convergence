@@ -6,5 +6,8 @@
   "ingredient": {
     "item": "elemental-convergence:limiting_eye"
   },
-  "result": "elemental-convergence:convergent_eye"
+  "result": {
+    "id": "elemental-convergence:convergent_eye",
+    "count": 1
+  }
 }

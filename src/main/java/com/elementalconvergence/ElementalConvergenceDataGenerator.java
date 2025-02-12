@@ -572,16 +572,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl=2;
 			AdvancementEntry deathAdv2 = Advancement.Builder.create()
 					.display(
-							Items.OMINOUS_BOTTLE,
+							Items.WITHER_SKELETON_SKULL,
 							Text.literal(achievementTitle+lvl), //title
-							Text.literal("Loot an ominous bottle"), //description
+							Text.literal("Loot a wither skeleton skull"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.OMINOUS_BOTTLE))
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.WITHER_SKELETON_SKULL))
 					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName,CN+lvl,advName+lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
@@ -594,7 +594,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl=3;
 			AdvancementEntry deathAdv3 = Advancement.Builder.create()
 					.display(
-							Items.WITHER_SKELETON_SKULL,
+							Items.NETHER_STAR,
 							Text.literal(achievementTitle+lvl), //title
 							Text.literal("Harvest a wither rose"), //description
 							null,

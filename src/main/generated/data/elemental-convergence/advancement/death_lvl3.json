@@ -32,7 +32,7 @@
     "description": "Harvest a wither rose",
     "icon": {
       "count": 1,
-      "id": "minecraft:wither_skeleton_skull"
+      "id": "minecraft:nether_star"
     },
     "title": "Death Level 3"
   },
