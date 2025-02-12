@@ -5,7 +5,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 
 public class PlagueEffect extends StatusEffect {
-    private static final int TICK_INTERVAL = 20;
+    public static final int TICK_INTERVAL = 30;
 
     public PlagueEffect() {
         super(

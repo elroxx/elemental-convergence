@@ -4,20 +4,20 @@ import com.elementalconvergence.ElementalConvergence;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
 
 public class ModEffects {
 
-    public static StatusEffect PLAGUE = register("plague", new PlagueEffect());
+    public static final RegistryEntry<StatusEffect> PLAGUE = register("plague", new PlagueEffect());
 
 
-
-    public static StatusEffect register(String id, StatusEffect statusEffect) {
-        Registry.register(
+    private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
+        RegistryEntry<StatusEffect> registryEntry= Registry.registerReference(
                 Registries.STATUS_EFFECT,
                 ElementalConvergence.id(id),
                 statusEffect
         );
-        return statusEffect;
+        return registryEntry;
     }
 
     public static void initialize(){

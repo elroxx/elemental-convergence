@@ -3,13 +3,22 @@ package com.elementalconvergence.magic.convergencehandlers;
 import com.elementalconvergence.container.StealInventoryScreenHandler;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.effect.PlagueEffect;
 import com.elementalconvergence.magic.IMagicHandler;
 import com.elementalconvergence.magic.MagicRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -34,12 +43,12 @@ public class RatMagicHandler implements IMagicHandler {
     public static final float RAT_MODE_HEIGHT = 0.12f;
     public static final float RAT_MODE_WIDTH = 0.3f;
     public static final float RAT_MODE_MOTION= 0.5f;
-    public static final float RAT_MODE_REACH=0.7f;
+    public static final float RAT_MODE_REACH=0.45f;
     public static final float RAT_MODE_SPEED=2.75f;
     public static final float RAT_MODE_HEALTH=6.0f;
 
     public static final float RAT_ATTACK=0.01f;
-
+    public static final int HIT_PlAGUE_DURATION= (int)(PlagueEffect.TICK_INTERVAL*3.5); //so it will hit 3 times OVER TIME
 
     public static final int RATMODE_DEFAULT_COOLDOWN=10;
     public static int ratModeCooldown=0;
@@ -99,7 +108,26 @@ public class RatMagicHandler implements IMagicHandler {
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
+        ItemStack mainHand = player.getMainHandStack();
+        int amplifier=0;
+        if (victim instanceof LivingEntity livingVictim){
+            if (mainHand.isOf(Items.WOODEN_SWORD) || mainHand.isOf(Items.WOODEN_AXE)){
+                amplifier=1;
+            }else if (mainHand.isOf(Items.STONE_SWORD) || mainHand.isOf(Items.STONE_AXE) || mainHand.isOf(Items.GOLDEN_SWORD) || mainHand.isOf(Items.GOLDEN_AXE)){
+                amplifier=2;
+            }else if (mainHand.isOf(Items.IRON_SWORD) || mainHand.isOf(Items.IRON_AXE) || mainHand.isOf(Items.TRIDENT)){
+                amplifier=3;
+            }else if (mainHand.isOf(Items.DIAMOND_SWORD) || mainHand.isOf(Items.DIAMOND_AXE) || mainHand.isOf(Items.MACE)){
+                amplifier=4;
+            }else if (mainHand.isOf(Items.NETHERITE_SWORD) || mainHand.isOf(Items.NETHERITE_AXE)){
+                amplifier=5;
+            }
 
+            //So we add 2 to the amplifier if in rat mode
+            amplifier += ratModeToggle ? 2 : 0;
+
+            livingVictim.addStatusEffect(new StatusEffectInstance(ModEffects.PLAGUE, HIT_PlAGUE_DURATION, amplifier, false, true, true));
+        }
     }
 
     @Override
