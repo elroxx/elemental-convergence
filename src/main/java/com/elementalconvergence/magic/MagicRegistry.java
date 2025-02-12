@@ -88,6 +88,6 @@ public class MagicRegistry {
         playerHeldItem.setScale(BASE_SCALE); //Reset held item size
 
         ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
-        ((RatMagicHandler)MAGIC_HANDLERS[RatMagicHandler.RAT_INDEX]).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
+        ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
     }
 }

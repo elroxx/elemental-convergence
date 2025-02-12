@@ -45,7 +45,7 @@ public class FireMagicHandler implements IMagicHandler {
     private int dimensionSwapCooldown=0;
     private static final int DEFAULT_FIREBALL_COOLDOWN=5; //0.25 seconds
     private int fireballCooldown=0;
-    private static final int DEFAULT_NAPALM_COOLDOWN=200*12; //10 seconds (so we have 120 seconds aka 2 minutes)
+    private static final int DEFAULT_NAPALM_COOLDOWN=20*60; //1*60 seconds (so we have 60 seconds aka 1 minute)
     private int napalmCooldown=0;
 
 
