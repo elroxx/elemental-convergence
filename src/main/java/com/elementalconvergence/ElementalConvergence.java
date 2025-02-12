@@ -81,6 +81,7 @@ public class ElementalConvergence implements ModInitializer {
 	//
 	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Rat"};
 	public static final String[] CONVERGENCE_MAGIC_ID = {"rat"};
+	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
 
 	//FOR THINGS THAT NEED ALL THE MAGICS IN THE LOGIC
 	public static final String[] FULL_MAGIC_DISPLAY = new String[BASE_MAGIC_DISPLAY.length + CONVERGENCE_MAGIC_DISPLAY.length];
@@ -119,6 +120,9 @@ public class ElementalConvergence implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		LOGGER.info("Hello Fabric world!");
+
+		//Init ConvergenceMagics requirements
+		initRequirementsMapForConvergence();
 
 		//Basic Initialization
 		ModBlocks.initialize(); //Blocks
@@ -163,6 +167,7 @@ public class ElementalConvergence implements ModInitializer {
 			}
 		});
 
+		//BLOCK BREAK
 		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) -> {
 				if (!world.isClient()){
 					SpellManager.handleBlockBreak(player, pos, state, entity);
@@ -186,6 +191,7 @@ public class ElementalConvergence implements ModInitializer {
 			return ActionResult.PASS;
 		});
 
+		//AFTER DEATH
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
 			if (damageSource.getAttacker() instanceof PlayerEntity player){
 				World world = player.getWorld();
@@ -215,7 +221,7 @@ public class ElementalConvergence implements ModInitializer {
 									", Y: " + deathPos.getY() +
 									", Z: " + deathPos.getZ()), false);
 						}else{
-// Create the message components
+						// Create the message components
 							MutableText locationText = Text.empty()
 									.append(Text.literal(playerName)
 											.formatted(Formatting.DARK_RED))
@@ -429,6 +435,23 @@ public class ElementalConvergence implements ModInitializer {
 						0
 				);
 			}
+		}
+
+	}
+
+	private static void initRequirementsMapForConvergence(){
+
+		ArrayList<Integer>[] arrayForRequirements = new ArrayList[CONVERGENCE_MAGIC_ID.length];
+
+		//RAT REQUIREMENTS
+		ArrayList<Integer> rat_requirements = new ArrayList<>();
+		rat_requirements.add(7); //DEATH
+		rat_requirements.add(6); //LIFE
+		arrayForRequirements[0]=rat_requirements;
+
+
+		for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
+			convergenceRequirementsMap.put(CONVERGENCE_MAGIC_ID[i], arrayForRequirements[i]);
 		}
 
 	}

@@ -25,7 +25,7 @@ public class ModItems {
     public static final Item BLANK_SCROLL = register("blank_scroll", new Item(new Item.Settings()));
 
     //all scrolls
-    public static final Item[] INFO_SCROLLS = registerScrolls("_info_scroll");
+    //public static final Item[] INFO_SCROLLS = registerScrolls("_info_scroll");
 
     //all magic eyes
     public static final Item[] MAGIC_EYES = registerMagicEyes("_magic_eye");

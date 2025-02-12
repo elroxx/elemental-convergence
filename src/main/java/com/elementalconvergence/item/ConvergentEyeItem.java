@@ -3,6 +3,7 @@ package com.elementalconvergence.item;
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.MagicRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,8 +13,14 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
+
+import java.util.ArrayList;
+
+import static com.elementalconvergence.ElementalConvergence.FULL_MAGIC_ID;
+import static com.elementalconvergence.ElementalConvergence.convergenceRequirementsMap;
 
 public class ConvergentEyeItem extends Item {
     private final int magicIndex;
@@ -25,6 +32,7 @@ public class ConvergentEyeItem extends Item {
         super(settings);
         this.magicIndex = magicIndex;
         this.magicString = ElementalConvergence.FULL_MAGIC_DISPLAY[magicIndex];
+
     }
 
     public String getMagicType() {
@@ -40,11 +48,28 @@ public class ConvergentEyeItem extends Item {
 
             // Check if the clicked block is an altar of convergence
             if (clickedBlock.getBlock() == ModBlocks.ALTAR_OF_CONVERGENCE) {
+                //VERIFYING THEY ARE FULLFILLING ALL REQUIREMENTS
+                IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+                MagicData magicData = dataSaver.getMagicData();
+                ArrayList<Integer> magicIndexes = convergenceRequirementsMap.get(FULL_MAGIC_ID[magicIndex]);
+                if (magicIndexes == null) {
+                    return ActionResult.success(true); //FAIL COZ NO REQUIREMENTS
+                }
+
+                // Check each magic index requirement
+                for (Integer magicIndex : magicIndexes) {
+                    int currentLevel = magicData.getMagicLevel(magicIndex);
+                    if (currentLevel < 3) {  // Check if level is at least 3
+                        player.sendMessage(Text.of("You have not maxed all requirements for this convergence magic"));
+                        return ActionResult.success(true);
+                    }
+                }
+
+
                 // Removing the item
                 context.getStack().setCount(0);
 
                 //SELECTING MAGIC HERE
-                IMagicDataSaver dataSaver = (IMagicDataSaver) player;
                 dataSaver.getMagicData().setSelectedMagic(magicIndex);
 
                 //RESETTING PLAYER DATA WHEN USING AN EYE
