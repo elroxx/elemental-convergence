@@ -138,6 +138,7 @@ public class EarthMagicHandler implements IMagicHandler {
             ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
             ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
             ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
+            ScaleData playerEntityReach = ScaleTypes.ENTITY_REACH.getScaleData(player);
             ScaleData playerStep = ScaleTypes.STEP_HEIGHT.getScaleData(player);
             ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
 
@@ -145,6 +146,7 @@ public class EarthMagicHandler implements IMagicHandler {
                 playerHeight.setScale(scaleModifier);
                 playerWidth.setScale(scaleModifier);
                 playerReach.setScale(reachModifier);
+                playerEntityReach.setScale(reachModifier);
                 playerStep.setScale(stepModifier);
                 playerHeldItem.setScale(heldItemModifier);
                 //System.out.println("Modified Everything");

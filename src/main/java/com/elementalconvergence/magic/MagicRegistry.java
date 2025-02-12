@@ -53,11 +53,13 @@ public class MagicRegistry {
         ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
         ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
         ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
+        ScaleData playerEntityReach = ScaleTypes.ENTITY_REACH.getScaleData(player);
         ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
 
         playerHeight.setScale(BASE_SCALE); //Reset player scale
         playerWidth.setScale(BASE_SCALE);
-        playerReach.setScale(BASE_SCALE); //Reset player Reach
+        playerReach.setScale(BASE_SCALE); //Reset player Reach (BLOCK)
+        playerEntityReach.setScale(BASE_SCALE); //Reset player Reach (ENTITY)
         playerHeldItem.setScale(BASE_SCALE); //Reset held item size
 
         ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
