@@ -16,7 +16,9 @@ import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
 import com.elementalconvergence.magic.handlers.DeathMagicHandler;
 import com.elementalconvergence.mixin.PlayerDataMixin;
+import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
+import com.elementalconvergence.networking.OpenInventoryPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
 import net.fabricmc.api.ModInitializer;
 
@@ -25,10 +27,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
@@ -131,6 +130,7 @@ public class ElementalConvergence implements ModInitializer {
 		registerKeybindings(); //Keybinds
 		ModEntities.initialize(); //Entities
 		ModCriterions.initialize(); //Criterions for advancements
+		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
@@ -175,12 +175,22 @@ public class ElementalConvergence implements ModInitializer {
 				return true;
 			});
 
-		//RIGHT CLICK
+		//RIGHT CLICK WITH ITEM
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			if (!world.isClient()) {
 				SpellManager.handleRightClick(player);
 			}
 			return TypedActionResult.pass(player.getStackInHand(hand));
+		});
+
+		// RIGHT CLICK ON ENTITY
+		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+			if (world.isClient() && entity instanceof PlayerEntity targetPlayer && player.isSneaking()) {
+				// SEND PACKETS ASKING TO OPEN INVENTORY
+				ClientPlayNetworking.send(new OpenInventoryPayload(targetPlayer.getUuid()));
+				return ActionResult.SUCCESS;
+			}
+			return ActionResult.PASS;
 		});
 
 		// On HIT
