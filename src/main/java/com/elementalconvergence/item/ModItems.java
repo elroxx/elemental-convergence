@@ -42,6 +42,8 @@ public class ModItems {
 
     public static final Item[] CONVERGENT_EYES = registerConvergentEyes("_convergent_eye");
 
+    public static final Item ROTTEN_CORPSE = register("rotten_corpse", new Item(new Item.Settings().maxCount(4)));
+
     //Shadowball Item for the 3rd magic spell
     public static final Item SHADOWBALL_ITEM = register("shadowball",
            new ShadowballItem(new Item.Settings().maxCount(16)));

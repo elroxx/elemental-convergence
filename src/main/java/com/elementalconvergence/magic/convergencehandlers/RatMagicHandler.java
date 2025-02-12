@@ -5,6 +5,7 @@ import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.effect.PlagueEffect;
+import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import com.elementalconvergence.magic.MagicRegistry;
 import net.minecraft.block.BlockState;
@@ -24,6 +25,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import com.elementalconvergence.ElementalConvergence;
+import net.minecraft.util.math.Box;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -51,12 +53,45 @@ public class RatMagicHandler implements IMagicHandler {
     public static final int HIT_PlAGUE_DURATION= (int)(PlagueEffect.TICK_INTERVAL*3.5); //so it will hit 3 times OVER TIME
 
     public static final int RATMODE_DEFAULT_COOLDOWN=10;
-    public static int ratModeCooldown=0;
+    private static int ratModeCooldown=0;
     private boolean ratModeToggle=false;
-    //HALF JUMP HEIGHT' NO
+
+    public static final int CONTAMINATE_DEFAULT_COOLDOWN=20; //1 sec
+    private static int contaminateCooldown=0;
+    private static final float ACTIVATION_RADIUS=12.0f;
+    private static final float SPREAD_RADIUS=5.0f;
+
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
+        ItemStack mainHand = player.getMainHandStack();
+        ItemStack offHand = player.getOffHandStack();
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int ratLevel = magicData.getMagicLevel(RAT_INDEX);
+
+        if ((mainHand.isOf(ModItems.ROTTEN_CORPSE) || offHand.isOf(ModItems.ROTTEN_CORPSE)) &&contaminateCooldown==0 && ratLevel>=1){
+            contaminateCooldown=CONTAMINATE_DEFAULT_COOLDOWN;
+            if (mainHand.isOf(ModItems.ROTTEN_CORPSE)){
+                mainHand.decrement(1);
+            }else{
+                offHand.decrement(1);
+            }
+
+            Box activationBox = player.getBoundingBox().expand(ACTIVATION_RADIUS);
+            player.getWorld().getEntitiesByClass(LivingEntity.class, activationBox, nearbyEntity ->
+                    !nearbyEntity.equals(player) && nearbyEntity.hasStatusEffect(ModEffects.PLAGUE)
+            ).forEach(nearbyEntity -> {
+                Box spreadBox = nearbyEntity.getBoundingBox().expand(SPREAD_RADIUS);
+                int amplifier = nearbyEntity.getStatusEffect(ModEffects.PLAGUE).getAmplifier();
+                nearbyEntity.getWorld().getEntitiesByClass(LivingEntity.class, activationBox, targetEntity ->
+                        !targetEntity.equals(nearbyEntity)
+                ).forEach(targetEntity -> {
+                    targetEntity.addStatusEffect(new StatusEffectInstance(ModEffects.PLAGUE, HIT_PlAGUE_DURATION, amplifier, false, true, true));
+                });
+            });
+        }
     }
 
     @Override
@@ -103,6 +138,9 @@ public class RatMagicHandler implements IMagicHandler {
         //handle cooldowns
         if (ratModeCooldown>0){
             ratModeCooldown--;
+        }
+        if (contaminateCooldown>0){
+            contaminateCooldown--;
         }
     }
 
