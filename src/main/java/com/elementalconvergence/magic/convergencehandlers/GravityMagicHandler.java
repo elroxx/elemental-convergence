@@ -38,12 +38,18 @@ public class GravityMagicHandler implements IMagicHandler {
     public static final int GRAVITY_INDEX= (BASE_MAGIC_ID.length-1)+2;
 
     private Direction wantedDirection = Direction.UP;
+    public static final double GRAVITY_GRAVITY_STRENGTH = 0.165;
 
     public static final int GRAVITY_CHECK_INTERVAL = 40; //so check every 2 seconds
     private int gravityCheckCooldown = 0;
 
-    public static final int GRAVITY_CONTROL_COOLDOWN = 20; //1 sec
+    public static final int GRAVITY_CONTROL_COOLDOWN = 10; //1 sec
     private int gravityControlCooldown = 0;
+
+    public static final int GRAVITY_INSTABILITY_COOLDOWN = 10;
+    private int gravityInstabilityCooldown = 0;
+
+    public static final int GRAVITY_INSTABILITY_DEFAULT_DURATION=20*60; // so its 1 minute long by default
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -52,7 +58,39 @@ public class GravityMagicHandler implements IMagicHandler {
 
     @Override
     public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+        ItemStack mainHand = player.getMainHandStack();
+        int selectedSlot = player.getInventory().selectedSlot;
 
+        //Selected slot does not make sense
+        if (selectedSlot>=6){
+            return;
+        }
+        //Not a living entity
+        if (!(targetEntity instanceof LivingEntity)){
+            return;
+        }
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int gravityLevel = magicData.getMagicLevel(GRAVITY_INDEX);
+
+        if (gravityLevel>=3 && mainHand.isOf(ModItems.GRAVITY_SHARD) && gravityInstabilityCooldown==0){
+            //cooldown
+            gravityInstabilityCooldown=GRAVITY_INSTABILITY_COOLDOWN;
+
+            //consume an item
+            if (!player.getAbilities().creativeMode) {
+                mainHand.decrement(1);
+            }
+
+            //Actual gravity swap
+            ((LivingEntity) targetEntity).addStatusEffect(new StatusEffectInstance(ModEffects.GRAVITY_INSTABILITY, GRAVITY_INSTABILITY_DEFAULT_DURATION, selectedSlot, false, true, true));
+
+            //playsound
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_VEX_DEATH, SoundCategory.PLAYERS, 1.0F, 0.5F);
+
+        }
     }
 
     @Override
@@ -63,6 +101,11 @@ public class GravityMagicHandler implements IMagicHandler {
             if (!currentDirection.equals(wantedDirection)) {
                 GravityChangerAPI.setBaseGravityDirection(player, wantedDirection);
             }
+            //buff (0.165 normal gravity aka its the moon gravity)
+            double currentgStrength = GravityChangerAPI.getBaseGravityStrength(player);
+            if (Math.abs(currentgStrength-GRAVITY_GRAVITY_STRENGTH)>=0.01){
+                GravityChangerAPI.setBaseGravityStrength(player, GRAVITY_GRAVITY_STRENGTH);
+            }
             gravityCheckCooldown=GRAVITY_CHECK_INTERVAL;
         }
 
@@ -72,6 +115,9 @@ public class GravityMagicHandler implements IMagicHandler {
         }
         if (gravityControlCooldown>0){
             gravityControlCooldown--;
+        }
+        if (gravityInstabilityCooldown>0){
+            gravityInstabilityCooldown--;
         }
     }
 
