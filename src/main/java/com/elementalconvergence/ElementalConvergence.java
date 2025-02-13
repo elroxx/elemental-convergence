@@ -464,6 +464,12 @@ public class ElementalConvergence implements ModInitializer {
 		rat_requirements.add(6); //LIFE
 		arrayForRequirements[0]=rat_requirements;
 
+		//GRAVITY REQUIREMENTS
+		ArrayList<Integer> gravity_requirements = new ArrayList<>();
+		gravity_requirements.add(0); //EARTH
+		gravity_requirements.add(4); //SHADOW
+		arrayForRequirements[1]=gravity_requirements;
+
 
 		for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
 			convergenceRequirementsMap.put(CONVERGENCE_MAGIC_ID[i], arrayForRequirements[i]);

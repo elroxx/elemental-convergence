@@ -5,6 +5,7 @@ import com.elementalconvergence.magic.convergencehandlers.GravityMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
+import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
@@ -95,5 +96,8 @@ public class MagicRegistry {
 
         ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
         ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
+
+        //Resetting the gravity of the player
+        GravityChangerAPI.resetGravity(player);
     }
 }
