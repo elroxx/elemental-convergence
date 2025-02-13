@@ -1,6 +1,7 @@
 package com.elementalconvergence.magic;
 
 import com.elementalconvergence.data.IPlayerMiningMixin;
+import com.elementalconvergence.magic.convergencehandlers.GravityMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
@@ -32,6 +33,7 @@ public class MagicRegistry {
         System.out.print("BASE MAGICREGISTRY CREATED");
 
         magic_handlers[RatMagicHandler.RAT_INDEX] = new RatMagicHandler();
+        magic_handlers[GravityMagicHandler.GRAVITY_INDEX] = new GravityMagicHandler();
 
         System.out.println("MAGICREGISTRY CREATED");
 

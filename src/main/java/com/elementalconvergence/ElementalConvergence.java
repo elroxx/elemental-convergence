@@ -79,8 +79,8 @@ public class ElementalConvergence implements ModInitializer {
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
 
 
-	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague"};
-	public static final String[] CONVERGENCE_MAGIC_ID = {"rat"};
+	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity"};
+	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity"};
 	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
 
 	//FOR THINGS THAT NEED ALL THE MAGICS IN THE LOGIC

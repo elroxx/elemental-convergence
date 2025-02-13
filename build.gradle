@@ -22,6 +22,27 @@ repositories {
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 	maven { url 'https://maven.nucleoid.xyz' }
 	maven { url 'https://masa.dy.fi/maven' }
+	//ALL THE FOLLOWING ARE FOR GRAVITY CHANGER
+	maven {
+		url "https://maven.shedaniel.me/"
+	}
+	maven {
+		url "https://maven.terraformersmc.com/"
+	}
+	maven {
+		name = 'Ladysnake'
+		url = 'https://maven.ladysnake.org/releases'
+	}
+	maven {
+		url = "https://maven.parchmentmc.org"
+	}
+	maven {
+		name = "Modrinth"
+		url = "https://api.modrinth.com/maven"
+		content {
+			includeGroup "maven.modrinth"
+		}
+	}
 }
 
 fabricApi {
@@ -42,7 +63,6 @@ dependencies {
 		exclude group: "net.fabricmc.fabric-api"
 	})
 	modImplementation 'com.github.elroxx:FabricTailorforkForEC:v2.5.0-custom'
-
 	// Config2Brigadier
 	modImplementation(include("com.github.samolego.Config2Brigadier:config2brigadier-fabric:${project.c2b_lib_version}"))
 
@@ -52,6 +72,13 @@ dependencies {
 	// Carpet
 	modCompileOnly("com.github.gnembon:fabric-carpet:${project.carpet_core_version}")
 	modCompileOnly('com.github.samolego.Taterzens:taterzens-fabric:1.11.6')
+
+
+	modImplementation 'com.github.elroxx:GravityChangerforkForEC:v1.0'
+	modApi("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+		exclude(group: "net.fabricmc.fabric-api")
+	}
+	modImplementation "maven.modrinth:modmenu:${modmenu_version}"
 }
 
 processResources {
