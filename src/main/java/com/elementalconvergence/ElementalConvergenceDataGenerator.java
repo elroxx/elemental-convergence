@@ -5,6 +5,7 @@ import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.criterions.SelectedMagicCriterion;
 import com.elementalconvergence.criterions.isSelectedMagicConcurrentCriterion;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -196,7 +197,33 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//DEATH LVL 1
 			//DEATH LVL 2
 			//DEATH LVL 3
-			generateDeathLevelsAdvancements(deathSelectedCN, deathSelectedAdvName, deathSelectedAdvancement, consumer);
+			AdvancementEntry deathLevel3 = generateDeathLevelsAdvancements(deathSelectedCN, deathSelectedAdvName, deathSelectedAdvancement, consumer);
+
+			//RAT MAGIC SELECTED
+			String ratSelectedCN="rat_magic_selected";
+			String ratSelectedAdvName=ElementalConvergence.MOD_ID + ":rat_magic_selected";
+			AdvancementEntry ratSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.FERMENTED_SPIDER_EYE,
+							Text.literal("Plague Convergence Magic"),
+							Text.literal("Convergence of Death and Life Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(ratSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							8)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,ratSelectedCN,ratSelectedAdvName)))
+					.parent(deathLevel3)
+					.build(consumer, ratSelectedAdvName);
+
+			//RAT LVL 1
+			//RAT LVL 2
+			//RAT LVL 3
+			generateRatLevelsAdvancements(ratSelectedCN, ratSelectedAdvName, ratSelectedAdvancement, consumer);
 		}
 
 		public void generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
@@ -531,7 +558,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 
 		}
 
-		public void generateDeathLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+		public AdvancementEntry generateDeathLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
 
 			int magicIndex=7;
 			String goodMagicPicked = "has_death_selected_concurrent";
@@ -610,6 +637,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							CN+lvl,advName+lvl,magicIndex)))
 					.parent(previousAdvEntry)
 					.build(consumer, advName+lvl);
+
+			return deathAdv3;
+		}
+
+		public void generateRatLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = RatMagicHandler.RAT_INDEX;
+			String goodMagicPicked = "has_rat_selected_concurrent";
+			String achievementTitle = "Plague Level ";
+			String CN = "rat_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":rat_lvl";
+			String haslvl = "rat_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry ratAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.ROTTEN_CORPSE,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a rotten corpse"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.ROTTEN_CORPSE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = ratAdv1;
+			lvl = 2;
+			AdvancementEntry ratAdv2 = Advancement.Builder.create()
+					.display(
+							Items.NETHER_WART,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Harvest nether warts"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.NETHER_WART))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = ratAdv2;
+			lvl = 3;
+			AdvancementEntry ratAdv3 = Advancement.Builder.create()
+					.display(
+							Items.RIB_ARMOR_TRIM_SMITHING_TEMPLATE,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Obtain the rib armor trim"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.RIB_ARMOR_TRIM_SMITHING_TEMPLATE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
 
 
 		}
