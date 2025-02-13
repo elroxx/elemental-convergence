@@ -1,7 +1,8 @@
-// 1.21.1	2025-02-12T17:44:38.4002461	Elemental Convergence/Advancements
+// 1.21.1	2025-02-13T14:57:45.8706087	Elemental Convergence/Advancements
 d46d4983174a34838b71378564f0e237c86fc442 data\elemental-convergence\advancement\earth_lvl2.json
 073293a2f3037b161dbbb6e01bf94f2f59115d99 data\elemental-convergence\advancement\root.json
 b2fed419b864401a9f71c4cb8c2a8d1e379cc9f4 data\elemental-convergence\advancement\death_lvl2.json
+0b39ebf2121ef43c9d91654435dd452a7e4081c0 data\elemental-convergence\advancement\gravity_lvl1.json
 1afe5dbf9bcd1fab4f0fda07852e51c901228e9b data\elemental-convergence\advancement\rat_lvl2.json
 7b1eba4f141140824b367f1e74fe20aed73fda52 data\elemental-convergence\advancement\shadow_lvl2.json
 2da3a8fc0365ae5d91dfb6bb31b4aa685e50efdc data\elemental-convergence\advancement\life_lvl2.json
@@ -18,8 +19,11 @@ aa39f9dbf463b81a42b6c4b0755a788c465b422b data\elemental-convergence\advancement\
 c16b3c9f50214977fc17b9dcaa8dacf0baabf568 data\elemental-convergence\advancement\shadow_magic_selected.json
 87891f3d3a3d058af1bd23b130e879b2d3ce13a8 data\elemental-convergence\advancement\fire_lvl2.json
 5f9107f5cbcb9bcfd6a6e5e2fafb35866f05e358 data\elemental-convergence\advancement\earth_lvl3.json
+527ac829150232896bb2b1201220bb4f778db760 data\elemental-convergence\advancement\gravity_lvl3.json
 97aa316f84a838c6008c912fe85749ecdd0f729d data\elemental-convergence\advancement\earth_magic_selected.json
 7fef63824e19e86c48289289c3dae3993f8bc00b data\elemental-convergence\advancement\death_magic_selected.json
+826da987829ecb42d1f162c61b8347858259f9c1 data\elemental-convergence\advancement\gravity_magic_selected.json
+3f805684435d398a073b19a87ce9b3c554b52c19 data\elemental-convergence\advancement\gravity_lvl2.json
 9e9f7e88c68dc88505794ac14f2f3a3f5e821100 data\elemental-convergence\advancement\earth_lvl1.json
 d7e27123aadbb4ae88d0f2df042732e656628aa1 data\elemental-convergence\advancement\life_lvl1.json
 1d4b8f0e5d7e8a5cc7fd347b60eff90e7e0be33b data\elemental-convergence\advancement\fire_lvl3.json

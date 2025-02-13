@@ -5,6 +5,7 @@ import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.criterions.SelectedMagicCriterion;
 import com.elementalconvergence.criterions.isSelectedMagicConcurrentCriterion;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.magic.convergencehandlers.GravityMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -86,7 +87,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//EARTH LVL 1
 			//EARTH LVL 2
 			//EARTH LVL 3
-			generateEarthLevelsAdvancements(earthSelectedCN, earthSelectedAdvName, earthSelectedAdvancement, consumer);
+			AdvancementEntry earthLevel3 = generateEarthLevelsAdvancements(earthSelectedCN, earthSelectedAdvName, earthSelectedAdvancement, consumer);
 
 			//AIR
 
@@ -115,7 +116,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//FIRE LVL 1
 			//FIRE LVL 2
 			//FIRE LVL 3
-			generateFireLevelsAdvancements(fireSelectedCN, fireSelectedAdvName, fireSelectedAdvancement, consumer);
+			AdvancementEntry fireLevel3 = generateFireLevelsAdvancements(fireSelectedCN, fireSelectedAdvName, fireSelectedAdvancement, consumer);
 
 			//WATER
 
@@ -143,7 +144,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//SHADOW LVL 1
 			//SHADOW LVL 2
 			//SHADOW LVL 3
-			generateShadowLevelsAdvancements(shadowSelectedCN, shadowSelectedAdvName, shadowSelectedAdvancement, consumer);
+			AdvancementEntry shadowLevel3 = generateShadowLevelsAdvancements(shadowSelectedCN, shadowSelectedAdvName, shadowSelectedAdvancement, consumer);
 
 			//LIGHT
 
@@ -171,7 +172,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//LIFE LVL 1
 			//LIFE LVL 2
 			//LIFE LVL 3
-			generateLifeLevelsAdvancements(lifeSelectedCN, lifeSelectedAdvName, lifeSelectedAdvancement, consumer);
+			AdvancementEntry lifeLevel3 = generateLifeLevelsAdvancements(lifeSelectedCN, lifeSelectedAdvName, lifeSelectedAdvancement, consumer);
 
 			//DEATH MAGIC SELECTED
 			String deathSelectedCN="death_magic_selected";
@@ -223,10 +224,36 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//RAT LVL 1
 			//RAT LVL 2
 			//RAT LVL 3
-			generateRatLevelsAdvancements(ratSelectedCN, ratSelectedAdvName, ratSelectedAdvancement, consumer);
+			AdvancementEntry ratLevel3 =generateRatLevelsAdvancements(ratSelectedCN, ratSelectedAdvName, ratSelectedAdvancement, consumer);
+
+			//GRAVITY MAGIC SELECTED
+			String gravitySelectedCN="gravity_magic_selected";
+			String gravitySelectedAdvName=ElementalConvergence.MOD_ID + ":gravity_magic_selected";
+			AdvancementEntry gravitySelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.CHORUS_FLOWER,
+							Text.literal("Gravity Convergence Magic"),
+							Text.literal("Convergence of Earth and Shadow Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(gravitySelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							9)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,gravitySelectedCN,gravitySelectedAdvName)))
+					.parent(shadowLevel3)
+					.build(consumer, gravitySelectedAdvName);
+
+			//GRAVITY LVL 1
+			//GRAVITY LVL 2
+			//GRAVITY LVL 3
+			AdvancementEntry gravityLevel3 = generateGravityLevelsAdvancements(gravitySelectedCN, gravitySelectedAdvName, gravitySelectedAdvancement, consumer);
 		}
 
-		public void generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
 
 			int magicIndex=0;
 			String goodMagicPicked = "has_earth_selected_concurrent";
@@ -306,10 +333,10 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.parent(previousAdvEntry)
 					.build(consumer, advName+lvl);
 
-
+			return earthAdv3;
 		}
 
-		public void generateFireLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+		public AdvancementEntry generateFireLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
 
 			int magicIndex = 2;
 			String goodMagicPicked = "has_fire_selected_concurrent";
@@ -389,10 +416,10 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.parent(previousAdvEntry)
 					.build(consumer, advName + lvl);
 
-
+			return fireAdv3;
 		}
 
-		public void generateShadowLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+		public AdvancementEntry generateShadowLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
 
 			int magicIndex=4;
 			String goodMagicPicked = "has_shadow_selected_concurrent";
@@ -472,10 +499,10 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.parent(previousAdvEntry)
 					.build(consumer, advName+lvl);
 
-
+			return shadowAdv3;
 		}
 
-		public void generateLifeLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+		public AdvancementEntry generateLifeLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
 
 			int magicIndex=6;
 			String goodMagicPicked = "has_life_selected_concurrent";
@@ -555,7 +582,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.parent(previousAdvEntry)
 					.build(consumer, advName+lvl);
 
-
+			return lifeAdv3;
 		}
 
 		public AdvancementEntry generateDeathLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
@@ -641,7 +668,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			return deathAdv3;
 		}
 
-		public void generateRatLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+		public AdvancementEntry generateRatLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
 
 			int magicIndex = RatMagicHandler.RAT_INDEX;
 			String goodMagicPicked = "has_rat_selected_concurrent";
@@ -721,7 +748,90 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.parent(previousAdvEntry)
 					.build(consumer, advName + lvl);
 
+			return ratAdv3;
+		}
 
+		public AdvancementEntry generateGravityLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = GravityMagicHandler.GRAVITY_INDEX;
+			String goodMagicPicked = "has_gravity_selected_concurrent";
+			String achievementTitle = "Gravity Level ";
+			String CN = "gravity_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":gravity_lvl";
+			String haslvl = "gravity_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry gravityAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.GRAVITY_SHARD,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a gravity shard"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.GRAVITY_SHARD))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = gravityAdv1;
+			lvl = 2;
+			AdvancementEntry gravityAdv2 = Advancement.Builder.create()
+					.display(
+							Items.DAMAGED_ANVIL,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Damage an anvil and mine it"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.DAMAGED_ANVIL))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = gravityAdv2;
+			lvl = 3;
+			AdvancementEntry gravityAdv3 = Advancement.Builder.create()
+					.display(
+							Items.NETHERITE_BLOCK,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a Netherite block"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.NETHERITE_BLOCK))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return gravityAdv3;
 		}
 	}
 }
