@@ -1,6 +1,7 @@
 package com.elementalconvergence.effect;
 
 import com.elementalconvergence.ElementalConvergence;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
@@ -9,6 +10,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 public class ModEffects {
 
     public static final RegistryEntry<StatusEffect> PLAGUE = register("plague", new PlagueEffect());
+    public static final RegistryEntry<StatusEffect> GRAVITY_INSTABILITY = register("gravity_instability", new GravityInstabilityEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
