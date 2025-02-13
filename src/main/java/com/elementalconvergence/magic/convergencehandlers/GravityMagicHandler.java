@@ -22,6 +22,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -168,6 +170,9 @@ public class GravityMagicHandler implements IMagicHandler {
                 wantedDirection=newDirection;
                 GravityChangerAPI.setBaseGravityDirection(player, newDirection);
                 gravityControlCooldown=GRAVITY_CONTROL_COOLDOWN;
+
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.ENTITY_ALLAY_ITEM_GIVEN, SoundCategory.PLAYERS, 1.0F, 1.0F);
             }
         }
     }

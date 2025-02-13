@@ -44,6 +44,8 @@ public class ModItems {
 
     public static final Item ROTTEN_CORPSE = register("rotten_corpse", new Item(new Item.Settings().maxCount(4)));
 
+    public static final Item GRAVITY_SHARD = register("gravity_shard", new TooltipItem(new Item.Settings().maxCount(64).rarity(Rarity.RARE), "item.elemental-convergence.gravity_shard.tooltip"));
+
     //Shadowball Item for the 3rd magic spell
     public static final Item SHADOWBALL_ITEM = register("shadowball",
            new ShadowballItem(new Item.Settings().maxCount(16)));
