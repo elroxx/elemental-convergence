@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RPR",
+    "DEL",
+    "RPR"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:rotten_flesh"
+    },
+    "P": {
+      "item": "minecraft:poisonous_potato"
+    },
+    "D": {
+      "item": "elemental-convergence:death_magic_eye"
+    },
+    "L": {
+      "item": "elemental-convergence:life_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:rat_convergent_eye",
+    "count": 1
+  }
+}
