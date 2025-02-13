@@ -14,23 +14,29 @@ import gravity_changer.mob_effect.GravityPotion;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
+
+import java.util.List;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 
@@ -43,16 +49,42 @@ public class GravityMagicHandler implements IMagicHandler {
     public static final int GRAVITY_CHECK_INTERVAL = 40; //so check every 2 seconds
     private int gravityCheckCooldown = 0;
 
-    public static final int GRAVITY_CONTROL_COOLDOWN = 10; //1 sec
+    public static final int GRAVITY_CONTROL_COOLDOWN = 10; //0.5 sec
     private int gravityControlCooldown = 0;
 
     public static final int GRAVITY_INSTABILITY_COOLDOWN = 10;
     private int gravityInstabilityCooldown = 0;
 
+    public static final int VACUUM_DEFAULT_COOLDOWN = 100;
+    private int vacuumCooldown = 0;
+    private static final int VACUUM_DURATION = 20*5; // 5 secs
+    private static final double VACUUM_RANGE = 20.0;
+
     public static final int GRAVITY_INSTABILITY_DEFAULT_DURATION=20*60; // so its 1 minute long by default
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
+        ItemStack mainHand = player.getMainHandStack();
+        ItemStack offHand = player.getOffHandStack();
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int gravityLevel = magicData.getMagicLevel(GRAVITY_INDEX);
+        if (gravityLevel>=1 && (mainHand.isOf(Items.HOPPER) || offHand.isOf(Items.HOPPER))){
+            //set cooldown
+            vacuumCooldown=VACUUM_DEFAULT_COOLDOWN;
+
+            //consume item
+            if (mainHand.isOf(Items.HOPPER)){
+                mainHand.decrement(1);
+            }else{
+                offHand.decrement(1);
+            }
+
+            // vacuum time
+            startItemVacuum(player);
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BLOCK_ENDER_CHEST_OPEN, SoundCategory.PLAYERS, 0.6F, 0.5F);
+
+        }
 
     }
 
@@ -118,6 +150,9 @@ public class GravityMagicHandler implements IMagicHandler {
         }
         if (gravityInstabilityCooldown>0){
             gravityInstabilityCooldown--;
+        }
+        if (vacuumCooldown>0){
+            vacuumCooldown--;
         }
     }
 
@@ -233,4 +268,26 @@ public class GravityMagicHandler implements IMagicHandler {
 
     }
 
+    private void startItemVacuum(PlayerEntity player) {
+        new Thread(() -> {
+            for (int i = 0; i < VACUUM_DURATION / 5; i++) { // Run for 5 seconds
+                Vec3d pos = player.getPos();
+                Box box = new Box(
+                        pos.x - VACUUM_RANGE, pos.y - VACUUM_RANGE, pos.z - VACUUM_RANGE,
+                        pos.x + VACUUM_RANGE, pos.y + VACUUM_RANGE, pos.z + VACUUM_RANGE
+                );
+                List<ItemEntity> items = player.getWorld().getEntitiesByClass(ItemEntity.class, box, item -> true);
+                for (ItemEntity item : items) {
+                    Vec3d direction = pos.subtract(item.getPos()).normalize().multiply(0.5);
+                    item.setVelocity(direction);
+                }
+
+                try {
+                    Thread.sleep(250); // Update every 5 ticks
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }).start();
+    }
 }
