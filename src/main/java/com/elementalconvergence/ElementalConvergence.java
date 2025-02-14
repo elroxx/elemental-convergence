@@ -21,6 +21,7 @@ import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
 import com.elementalconvergence.networking.OpenInventoryPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
+import gravity_changer.mixin.EntityCollisionContextMixin;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -35,6 +36,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;

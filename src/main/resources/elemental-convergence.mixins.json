@@ -9,7 +9,8 @@
 		"ArmorFeatureRendererMixin",
 		"MobEntityMixin",
 		"HungerManagerMixin",
-		"LivingEntityMixin"
+		"LivingEntityMixin",
+		"AbstractBlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

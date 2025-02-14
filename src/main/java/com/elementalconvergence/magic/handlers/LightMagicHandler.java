@@ -5,10 +5,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
 public class LightMagicHandler implements IMagicHandler {
+    public static final int LIGHT_INDEX=5;
+
     @Override
     public void handleItemRightClick(PlayerEntity player) {
 
@@ -21,7 +22,6 @@ public class LightMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
-
     }
 
     @Override
