@@ -99,5 +99,7 @@ public class MagicRegistry {
 
         //Resetting the gravity of the player
         GravityChangerAPI.resetGravity(player);
+
+        player.clearStatusEffects();
     }
 }

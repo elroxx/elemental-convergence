@@ -1,9 +1,11 @@
 package com.elementalconvergence.magic.handlers;
 
+import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -22,6 +24,10 @@ public class LightMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
+        //BUFF
+        if (!player.hasStatusEffect(ModEffects.LIGHT_PHASING)){
+            player.addStatusEffect(new StatusEffectInstance(ModEffects.LIGHT_PHASING, -1, 0, false, false, false));
+        }
     }
 
     @Override

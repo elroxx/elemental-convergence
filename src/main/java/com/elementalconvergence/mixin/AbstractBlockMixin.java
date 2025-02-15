@@ -2,6 +2,7 @@ package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.effect.ModEffects;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.EntityShapeContext;
@@ -35,17 +36,19 @@ public class AbstractBlockMixin {
                 //VERIFYING TOO MANY THINGS
                 //System.out.println("entity");
                 Entity entity = entityContext.getEntity();
-                if (entity instanceof ServerPlayerEntity player) {
-                    IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+                if (entity instanceof PlayerEntity player) {
+                    /*IMagicDataSaver dataSaver = (IMagicDataSaver) player;
                     MagicData magicData = dataSaver.getMagicData();
                     int selectedMagic=magicData.getSelectedMagic();
-                    System.out.println(selectedMagic);
+                    System.out.println(selectedMagic);*/
                     //PROBLEM: I GET FOR SOME REASON A LOT OF -1
                     // THE -1 ARE THE CLIENTPLAYERENTITY
                     //I NEED TO PUT THE magicData.getSelectedMagic() there too!. never have to use it tho
-                    if (magicData.getSelectedMagic()==5) {
+                    //if (magicData.getSelectedMagic()==5) {
+                    if (player.hasStatusEffect(ModEffects.LIGHT_PHASING)) {
                         cir.setReturnValue(VoxelShapes.empty());
                     }
+                    //}
                 }
             }
         }
