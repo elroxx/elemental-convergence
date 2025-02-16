@@ -12,6 +12,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> PLAGUE = register("plague", new PlagueEffect());
     public static final RegistryEntry<StatusEffect> GRAVITY_INSTABILITY = register("gravity_instability", new GravityInstabilityEffect());
     public static final RegistryEntry<StatusEffect> LIGHT_PHASING = register("light_phasing", new LightPhasingEffect());
+    public static final RegistryEntry<StatusEffect> FULL_BLINDNESS = register("full_blindness", new FullBlindnessEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {

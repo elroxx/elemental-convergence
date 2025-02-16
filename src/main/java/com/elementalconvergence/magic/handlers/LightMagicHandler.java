@@ -28,6 +28,18 @@ public class LightMagicHandler implements IMagicHandler {
         if (!player.hasStatusEffect(ModEffects.LIGHT_PHASING)){
             player.addStatusEffect(new StatusEffectInstance(ModEffects.LIGHT_PHASING, -1, 0, false, false, false));
         }
+        //DEBUFF
+
+        if (player.getWorld().getLightLevel(player.getBlockPos())<5){
+            if (!player.hasStatusEffect(ModEffects.FULL_BLINDNESS)){
+                player.addStatusEffect(new StatusEffectInstance(ModEffects.FULL_BLINDNESS, -1, 0, false, false, false));
+            }
+        }
+        else{
+            if (player.hasStatusEffect(ModEffects.FULL_BLINDNESS)){
+                player.removeStatusEffect(ModEffects.FULL_BLINDNESS);
+            }
+        }
     }
 
     @Override

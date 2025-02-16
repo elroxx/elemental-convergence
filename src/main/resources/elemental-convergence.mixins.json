@@ -10,7 +10,8 @@
 		"MobEntityMixin",
 		"HungerManagerMixin",
 		"LivingEntityMixin",
-		"AbstractBlockMixin"
+		"AbstractBlockMixin",
+		"GameRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
