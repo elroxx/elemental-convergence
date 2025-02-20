@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LIL",
+    "WEW",
+    "SGS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:shroomlight"
+    },
+    "W": {
+      "item": "minecraft:sea_lantern"
+    },
+    "G": {
+      "item": "minecraft:glowstone"
+    },
+    "L": {
+      "item": "minecraft:lantern"
+    },
+    "I": {
+      "item": "minecraft:glow_lichen"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:light_magic_eye",
+    "count": 1
+  }
+}
