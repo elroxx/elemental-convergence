@@ -122,7 +122,7 @@ public class DeathMagicHandler implements IMagicHandler {
                     }
 
                     serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
-                            SoundEvents.ENTITY_ZOMBIE_AMBIENT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                            SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
                     zombieCooldown=ZOMBIE_DEFAULT_COOLDOWN;
 

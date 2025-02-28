@@ -14,20 +14,30 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 public class LightMagicHandler implements IMagicHandler {
     public static final int LIGHT_INDEX=5;
+    public static final int LIGHT_THRESHOLD=4;
 
     public static final int GLOW_DEFAULT_COOLDOWN = 10;
     public static final int GLOW_DEFAULT_DURATION = 20*60*2; //2 minute glowing
     private int glowCooldown = 0;
+
+    private static final int TP_DISTANCE = 12;
+    public static final int TP_DEFAULT_COOLDOWN = 30; //1.5 secs
+    private int tpCooldown = 0;
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -92,7 +102,7 @@ public class LightMagicHandler implements IMagicHandler {
         }
         //DEBUFF
 
-        if (player.getWorld().getLightLevel(player.getBlockPos())<5 && !hasNearbyGlowingEntity(player)){
+        if (player.getWorld().getLightLevel(player.getBlockPos())<LIGHT_THRESHOLD && !hasNearbyGlowingEntity(player)){
             if (!player.hasStatusEffect(ModEffects.FULL_BLINDNESS)){
                 player.addStatusEffect(new StatusEffectInstance(ModEffects.FULL_BLINDNESS, -1, 0, false, false, false));
             }
@@ -106,6 +116,9 @@ public class LightMagicHandler implements IMagicHandler {
         //cooldown handling
         if (glowCooldown>0){
             glowCooldown--;
+        }
+        if (tpCooldown>0){
+            tpCooldown--;
         }
     }
 
@@ -131,6 +144,88 @@ public class LightMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int lightLevel = magicData.getMagicLevel(LIGHT_INDEX);
+        if (lightLevel>=2 && tpCooldown==0){
+            tpCooldown=TP_DEFAULT_COOLDOWN;
+
+            ServerWorld world = (ServerWorld) player.getWorld();
+
+            Vec3d lookVector = player.getRotationVector();
+
+            //ray tracing
+            Vec3d eyePos = player.getEyePos();
+            Vec3d currentPos = player.getPos();
+            Vec3d targetPos = eyePos;
+            Vec3d step = lookVector.multiply(0.5); // verify every half block
+            double distanceTraveled = 0;
+
+            while (distanceTraveled < TP_DISTANCE) {
+                targetPos = targetPos.add(step);
+                distanceTraveled += 0.5;
+
+                // see if hit block
+                BlockState targetBlockState = world.getBlockState(BlockPos.ofFloored(targetPos));
+                if (!(targetBlockState.isAir() || !targetBlockState.isOpaque())) {
+                    // go out of the block
+                    targetPos = targetPos.subtract(step);
+                    break;
+                }
+            }
+
+
+            Vec3d newPos = new Vec3d(
+                    targetPos.x,
+                    Math.ceil(targetPos.y - player.getEyeHeight(player.getPose())),
+                    targetPos.z
+            );
+
+            BlockState newPosBlockState = world.getBlockState(BlockPos.ofFloored(newPos));
+            if (!(newPosBlockState.isAir() || !newPosBlockState.isOpaque())){
+                newPos = new Vec3d(
+                        newPos.x,
+                        Math.ceil(newPos.y + player.getEyeHeight(player.getPose())),
+                        newPos.z
+                );
+            }
+
+
+            // particles on path
+            Vec3d particlePos = eyePos.subtract(0, player.getEyeHeight(player.getPose()), 0);
+            double particleDistance = 0;
+
+            while (particleDistance < distanceTraveled) {
+                Vec3d pos = particlePos.add(lookVector.multiply(particleDistance));
+
+                for (int i = 0; i < 5; i++) {
+                    double offsetX = (world.random.nextDouble() - 0.5) * 0.2;
+                    double offsetY = (world.random.nextDouble() - 0.5) * 0.2;
+                    double offsetZ = (world.random.nextDouble() - 0.5) * 0.2;
+
+                    world.spawnParticles(
+                            ParticleTypes.END_ROD,
+                            pos.x, pos.y, pos.z,
+                            1,  0.1, 0.1, 0.1,  0.1
+                    );
+                }
+                particleDistance += 1;
+            }
+
+            //tp
+            Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+            player.teleport(world, newPos.getX(), newPos.getY(), newPos.getZ(), flags, player.getYaw(), player.getPitch());
+
+
+            player.getWorld().playSound(
+                    null,
+                    currentPos.x, currentPos.y, currentPos.z,
+                    SoundEvents.ENTITY_EVOKER_CAST_SPELL,
+                    SoundCategory.PLAYERS,
+                    1.0F,
+                    2.0F
+            );
+        }
 
     }
 
@@ -155,10 +250,6 @@ public class LightMagicHandler implements IMagicHandler {
                 player.getBoundingBox().expand(radius),
                 nearbyEntity -> nearbyEntity != player // exclude current player
         );
-        if (!nearbyEntities.isEmpty()) {
-            System.out.println(nearbyEntities.get(0));
-            System.out.println(nearbyEntities.get(0).hasStatusEffect(StatusEffects.GLOWING));
-        }
 
         // nearby entities with glowing
         return nearbyEntities.stream()
