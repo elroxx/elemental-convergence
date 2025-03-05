@@ -221,7 +221,7 @@ public class LifeMagicHandler implements IMagicHandler {
                             //THE POSITION MATCH! REZ THE PEOPLE
                             MinecraftServer server = player.getServer();
                             for (ServerPlayerEntity serverPlayer : server.getPlayerManager().getPlayerList()) {
-                                if (serverPlayer.getName().toString().equals(deathName)) {
+                                if (serverPlayer.getName().getString().equals(deathName)) {
                                     //Teleport the player that was found with the same name
                                     serverPlayer.teleport((ServerWorld) player.getWorld(), deathPos.getX()+0.5, deathPos.getY(), deathPos.getZ()+0.5, player.getYaw(), player.getPitch());
                                     //Destroy the deathPos particle
