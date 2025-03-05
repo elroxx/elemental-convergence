@@ -146,7 +146,31 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//SHADOW LVL 3
 			AdvancementEntry shadowLevel3 = generateShadowLevelsAdvancements(shadowSelectedCN, shadowSelectedAdvName, shadowSelectedAdvancement, consumer);
 
-			//LIGHT
+			//LIGHT MAGIC SELECTED
+			String lightSelectedCN="light_magic_selected";
+			String lightSelectedAdvName=ElementalConvergence.MOD_ID + ":light_magic_selected";
+			AdvancementEntry lightSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.TORCH,
+							Text.literal("Light Magic (5)"),
+							Text.literal("You are imbued with light magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(lightSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							5)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,lightSelectedCN,lightSelectedAdvName)))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, lightSelectedAdvName);
+
+			//LIGHT LVL 1
+			//LIGHT LVL 2
+			//LIGHT LVL 3
+			AdvancementEntry lightLevel3 = generateLightLevelsAdvancements(lightSelectedCN, lightSelectedAdvName, lightSelectedAdvancement, consumer);
 
 			//LIFE MAGIC SELECTED
 			String lifeSelectedCN="life_magic_selected";
@@ -500,6 +524,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName+lvl);
 
 			return shadowAdv3;
+		}
+
+		public AdvancementEntry generateLightLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+
+			int magicIndex=5;
+			String goodMagicPicked = "has_light_selected_concurrent";
+			String achievementTitle="Light Level ";
+			String CN="light_criterion_lvl";
+			String advName=ElementalConvergence.MOD_ID+":light_lvl";
+			String haslvl="light_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName=selectedAdvName;
+			previousAdvEntry=selectedAdvEntry;
+			lvl=1;
+			AdvancementEntry lightAdv1 = Advancement.Builder.create()
+					.display(
+							Items.COPPER_BULB,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Craft a copper bulb"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.COPPER_BULB))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=lightAdv1;
+			lvl=2;
+			AdvancementEntry lightAdv2 = Advancement.Builder.create()
+					.display(
+							Items.SEA_LANTERN,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Loot a sea lantern"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.SEA_LANTERN))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=lightAdv2;
+			lvl=3;
+			AdvancementEntry lightAdv3 = Advancement.Builder.create()
+					.display(
+							Items.FROGSPAWN,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Obtain a pearlescent froglight"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.PEARLESCENT_FROGLIGHT))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			return lightAdv3;
 		}
 
 		public AdvancementEntry generateLifeLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){

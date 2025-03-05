@@ -3,15 +3,12 @@
   "category": "misc",
   "pattern": [
     "LIL",
-    "WEW",
+    "GEG",
     "SGS"
   ],
   "key": {
     "S": {
       "item": "minecraft:shroomlight"
-    },
-    "W": {
-      "item": "minecraft:sea_lantern"
     },
     "G": {
       "item": "minecraft:glowstone"
