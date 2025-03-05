@@ -247,7 +247,8 @@ public class GravityMagicHandler implements IMagicHandler {
                 };
             }
 
-            if (!currentDirection.equals(newDirection)) {
+            // no more down direction possible
+            if (!currentDirection.equals(newDirection) && !newDirection.equals(Direction.DOWN)) {
                 wantedDirection=newDirection;
                 GravityChangerAPI.setBaseGravityDirection(player, newDirection);
                 gravityControlCooldown=GRAVITY_CONTROL_COOLDOWN;

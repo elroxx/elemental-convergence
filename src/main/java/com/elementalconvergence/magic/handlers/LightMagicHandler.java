@@ -12,16 +12,22 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -58,7 +64,7 @@ public class LightMagicHandler implements IMagicHandler {
         MagicData magicData = dataSaver.getMagicData();
         int lightLevel = magicData.getMagicLevel(LIGHT_INDEX);
 
-        if (lightLevel>=3 && (mainHand.isOf(Items.GLOW_INK_SAC) ||  offHand.isOf(Items.GLOW_INK_SAC))&& glowCooldown==0){
+        if (lightLevel>=1 && (mainHand.isOf(Items.GLOW_INK_SAC) ||  offHand.isOf(Items.GLOW_INK_SAC))&& glowCooldown==0){
             //cooldown
             glowCooldown=GLOW_DEFAULT_COOLDOWN;
 
@@ -110,6 +116,22 @@ public class LightMagicHandler implements IMagicHandler {
         else{
             if (player.hasStatusEffect(ModEffects.FULL_BLINDNESS)){
                 player.removeStatusEffect(ModEffects.FULL_BLINDNESS);
+            }
+        }
+
+        //LVL 3 ABILITY
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int lightLevel = magicData.getMagicLevel(LIGHT_INDEX);
+
+
+        if (lightLevel>=3) {
+            if (player.isUsingSpyglass()) {
+                PlayerEntity target = getTargetedPlayer(player);
+                if (target != null) {
+                    applyBlindness(target);
+                }
             }
         }
 
@@ -254,5 +276,25 @@ public class LightMagicHandler implements IMagicHandler {
         // nearby entities with glowing
         return nearbyEntities.stream()
                 .anyMatch(nearbyEntity -> nearbyEntity.hasStatusEffect(StatusEffects.GLOWING));
+    }
+
+
+    private static PlayerEntity getTargetedPlayer(PlayerEntity user) {
+        // raycast to find the player being looked at
+        Vec3d start = user.getCameraPosVec(1.0F);
+        Vec3d direction = user.getRotationVec(1.0F);
+        Vec3d end = start.add(direction.multiply(75*50)); //range
+
+        EntityHitResult hit = ProjectileUtil.raycast(user, start, end, new Box(start, end), entity -> entity instanceof PlayerEntity, 75.0*50);
+        if (hit != null && hit.getEntity() instanceof PlayerEntity) {
+            return (PlayerEntity) hit.getEntity();
+        }
+        return null;
+    }
+
+    private void applyBlindness(PlayerEntity target) {
+        if (!target.hasStatusEffect(StatusEffects.BLINDNESS)) {
+            target.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 5 * 20, 0, false, false, true));
+        }
     }
 }
