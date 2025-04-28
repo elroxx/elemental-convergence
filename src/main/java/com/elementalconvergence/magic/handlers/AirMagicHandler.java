@@ -3,9 +3,11 @@ package com.elementalconvergence.magic.handlers;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
+import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
 import net.minecraft.item.ItemStack;
@@ -20,7 +22,9 @@ public class AirMagicHandler implements IMagicHandler {
     public static final int AIR_INDEX=1;
 
     //For passive
-    public static final float AIR_SPEED = 0.18f;
+    public static final float AIR_SPEED = 0.2f;
+    public static final float AIR_GRAVITY = 0.05f; // 1/20 grav
+    public static final float AIR_HEALTH = 8.0f;
 
     public static final int DEFAULT_WINDBALL_COOLDOWN = 10; //0.25 seconds
     private int windballCooldown = 0;
@@ -80,11 +84,15 @@ public class AirMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
-        //Buff (movement speed+ 1/10 gravity)
-
-
-
-        if (windballCooldown%6==1) {
+        //Buff (movement speed+ 1/20 gravity) and DEBUFF (less health)
+        if (!(Math.abs(player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).getBaseValue()-AIR_SPEED)<0.0005f)){
+            player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(AIR_SPEED); //SPEED
+            player.getAttributes().getCustomInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(AIR_HEALTH); //HEALTH
+        }
+        //gravity reduced
+        double currentgStrength = GravityChangerAPI.getBaseGravityStrength(player);
+        if (Math.abs(currentgStrength-AIR_GRAVITY)>=0.01){
+            GravityChangerAPI.setBaseGravityStrength(player, AIR_GRAVITY);
         }
 
         //Cooldowns
