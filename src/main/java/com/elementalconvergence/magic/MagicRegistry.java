@@ -36,7 +36,7 @@ public class MagicRegistry {
 
         magic_handlers[RatMagicHandler.RAT_INDEX] = new RatMagicHandler();
         magic_handlers[GravityMagicHandler.GRAVITY_INDEX] = new GravityMagicHandler();
-        magic_handlers[StarMagicHandler.STAR_INDEX] = new StarMagicHandler();
+        //magic_handlers[StarMagicHandler.STAR_INDEX] = new StarMagicHandler(); //star removed
 
         System.out.println("MAGICREGISTRY CREATED");
 

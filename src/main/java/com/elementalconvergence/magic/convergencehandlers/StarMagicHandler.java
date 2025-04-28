@@ -50,6 +50,7 @@ public class StarMagicHandler implements IMagicHandler {
     private int releaseTimer = 0;
     private int nextProjectileIndex = 0;
     private UUID releasingPlayerId = null;
+    private final Set<Integer> releasedProjectiles = new HashSet<>();
 
 
 
@@ -70,6 +71,7 @@ public class StarMagicHandler implements IMagicHandler {
         if (hungerCooldown==0){
             hungerCooldown=HUNGER_DEFAULT_COOLDOWN;
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.HUNGER, 119, 1, false, false, false));
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 119, 0, false, false, false));
         }
 
 
@@ -239,6 +241,7 @@ public class StarMagicHandler implements IMagicHandler {
             // All projectiles released or no projectiles left
             isReleasingProjectiles = false;
             nextProjectileIndex = 0;
+            orbit.clear(); // Clear the orbit after releasing all projectiles
             return;
         }
 
@@ -248,12 +251,29 @@ public class StarMagicHandler implements IMagicHandler {
 
         if (entity instanceof ProjectileEntity projectile) {
             // Calculate direction based on player's look vector
-            Vec3d direction = player.getRotationVector();
+            Vec3d lookDirection = player.getRotationVector();
+
+            // Get player's position (eyes)
+            Vec3d playerEyePos = player.getEyePos();
+
+            // Get projectile's current position
+            Vec3d projectilePos = projectile.getPos();
+
+            // Check if projectile is behind the player by using dot product
+            Vec3d playerToProjectile = projectilePos.subtract(playerEyePos);
+            double dotProduct = playerToProjectile.normalize().dotProduct(lookDirection);
+
+            // If projectile is behind player (negative dot product), reposition it in front
+            if (dotProduct < 0) {
+                // Position the projectile slightly in front of the player in the direction they're looking
+                Vec3d newPos = playerEyePos.add(lookDirection.multiply(1.5));
+                projectile.setPos(newPos.x, newPos.y, newPos.z);
+            }
 
             // Set velocity in the direction the player is looking
-            projectile.setVelocity(direction.x * PROJECTILE_SPEED,
-                    direction.y * PROJECTILE_SPEED,
-                    direction.z * PROJECTILE_SPEED);
+            projectile.setVelocity(lookDirection.x * PROJECTILE_SPEED,
+                    lookDirection.y * PROJECTILE_SPEED,
+                    lookDirection.z * PROJECTILE_SPEED);
 
             // Reset gravity and make it move normally again
             projectile.setNoGravity(false);
