@@ -12,10 +12,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 
 public class AirMagicHandler implements IMagicHandler {
 
@@ -26,8 +29,20 @@ public class AirMagicHandler implements IMagicHandler {
     public static final float AIR_GRAVITY = 0.05f; // 1/20 grav
     public static final float AIR_HEALTH = 8.0f;
 
+    // For lvl1
     public static final int DEFAULT_WINDBALL_COOLDOWN = 10; //0.25 seconds
     private int windballCooldown = 0;
+
+    // For lvl 2
+    public static final int AIR_MAX_LEAPS = 3;
+    public static final double LEAP_STRENGTH = 0.8; // height
+    public static final double LEAP_FORWARD_BOOST = 0.75;
+    public static final int DEFAULT_LEAP_COOLDOWN = 5; // 1/4 sec
+    public static final int DEFAULT_LEAP_RESET_COOLDOWN = 3; //just to not instant reset the grounded jump
+
+    private int jumpsUsed = 0;
+    private int leapCooldown = 0;
+    private int leapResetCooldown = 0;
 
 
 
@@ -95,12 +110,30 @@ public class AirMagicHandler implements IMagicHandler {
             GravityChangerAPI.setBaseGravityStrength(player, AIR_GRAVITY);
         }
 
+
+
+        //reset double jumps
+        boolean isCurrentlyOnGround = player.isOnGround() || player.isSubmergedInWater() || player.isClimbing();
+        if (isCurrentlyOnGround) {
+            if (leapResetCooldown==0) {
+                jumpsUsed = 0;
+            }
+            leapCooldown = 0;
+        }
+
         //Cooldowns
 
         if (windballCooldown>0){
             windballCooldown--;
         }
 
+        if (leapCooldown>0) {
+            leapCooldown--;
+        }
+
+        if (leapResetCooldown>0){
+            leapResetCooldown--;
+        }
     }
 
     @Override
@@ -126,7 +159,71 @@ public class AirMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int airLevel = magicData.getMagicLevel(AIR_INDEX);
 
+        if (airLevel >= 2 && leapCooldown <= 0) {
+            //see if still has leaps
+            boolean isOnGround = player.isOnGround() || player.isSubmergedInWater() || player.isClimbing();
+
+            if (!isOnGround && jumpsUsed >= AIR_MAX_LEAPS) {
+                return;
+            }
+
+            // If not on ground, increment jumps used
+            //if (!isOnGround) {
+            jumpsUsed++;
+            //}
+            if (isOnGround){
+                leapResetCooldown=DEFAULT_LEAP_RESET_COOLDOWN;
+            }
+
+            // compute the leap vector
+            Vec3d lookDir = player.getRotationVec(1.0f);
+            Vec3d leapVelocityHorizontalPlane = new Vec3d(
+                    lookDir.x * LEAP_FORWARD_BOOST,
+                    0,
+                    lookDir.z * LEAP_FORWARD_BOOST
+            );
+
+            // ADDING the horizontal velocity while resetting fully the vertical one
+            Vec3d horizontalVelocity = player.getVelocity().add(leapVelocityHorizontalPlane);
+            Vec3d finalVelocity = new Vec3d(
+                    horizontalVelocity.getX(),
+                    LEAP_STRENGTH,
+                    horizontalVelocity.getZ()
+                    );
+
+            player.setVelocity(finalVelocity);
+            player.velocityModified=true; //IMPORTANT COZ IF NOT THIS DOESNT CHANGE THE PLAYERS VELOCITY AT ALL
+
+            // particles
+            ServerWorld world = (ServerWorld) player.getWorld();
+
+            Random random = player.getWorld().getRandom();
+            for (int i = 0; i < 10; i++) {
+                double offsetX = random.nextGaussian() * 0.2;
+                double offsetZ = random.nextGaussian() * 0.2;
+                world.spawnParticles(
+                        ParticleTypes.CLOUD,
+                        player.getX() + offsetX, player.getY(), player.getZ() + offsetZ, 1, 0, 0, 0, 0.1
+                );
+            }
+
+            player.getWorld().playSound(
+                    null,
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
+                    SoundEvents.ENTITY_BREEZE_JUMP,
+                    SoundCategory.PLAYERS,
+                    0.8F,
+                    1.2F
+            );
+
+            leapCooldown = DEFAULT_LEAP_COOLDOWN;
+        }
     }
 
     @Override
@@ -138,4 +235,5 @@ public class AirMagicHandler implements IMagicHandler {
     public void handleTertiarySpell(PlayerEntity player) {
 
     }
+
 }
