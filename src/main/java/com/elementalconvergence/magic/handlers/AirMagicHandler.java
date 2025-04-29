@@ -7,6 +7,7 @@ import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.WindChargeEntity;
@@ -17,8 +18,12 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
+
+import java.util.List;
 
 public class AirMagicHandler implements IMagicHandler {
 
@@ -43,6 +48,10 @@ public class AirMagicHandler implements IMagicHandler {
     private int jumpsUsed = 0;
     private int leapCooldown = 0;
     private int leapResetCooldown = 0;
+
+    // For lvl 3
+    public static final int DEFAULT_WIND_BLAST_COOLDOWN = 20*3; // 3 seconds
+    private int windBlastCooldown = 0;
 
 
 
@@ -133,6 +142,10 @@ public class AirMagicHandler implements IMagicHandler {
 
         if (leapResetCooldown>0){
             leapResetCooldown--;
+        }
+
+        if (windBlastCooldown>0){
+            windBlastCooldown--;
         }
     }
 
@@ -229,11 +242,118 @@ public class AirMagicHandler implements IMagicHandler {
     @Override
     public void handleSecondarySpell(PlayerEntity player) {
 
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int airLevel = magicData.getMagicLevel(AIR_INDEX);
+
+        if (airLevel >= 3 && windBlastCooldown <= 0) {
+            ServerWorld world = (ServerWorld) player.getWorld();
+
+            pushEntities(player, world);
+
+            spawnExplosionParticles(player, world);
+
+            // sound
+            world.playSound(
+                    null,
+                    player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_BREEZE_IDLE_AIR,
+                    SoundCategory.PLAYERS,
+                    1.0F,
+                    0.5F
+            );
+            windBlastCooldown=DEFAULT_WIND_BLAST_COOLDOWN;
+        }
+
     }
 
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
 
+    }
+
+    private void pushEntities(PlayerEntity player, ServerWorld world) {
+
+        double range = 12.0;
+        double pushStrength = 5.0;
+        double coneAngle = 60.0;
+
+        // lookdirection
+        Vec3d lookDirection = player.getRotationVec(1.0F);
+        Box searchBox = player.getBoundingBox().expand(range);
+
+        List<LivingEntity> nearbyEntities = world.getEntitiesByClass(
+                LivingEntity.class,
+                searchBox,
+                entity -> entity != player // dont push player
+        );
+
+        // For each entity found
+        for (Entity entity : nearbyEntities) {
+            //vector player entity
+            Vec3d toEntity = entity.getPos().subtract(player.getPos());
+
+            // dont check behind players
+            if (toEntity.dotProduct(lookDirection) <= 0) {
+                continue;
+            }
+
+            // normalized
+            Vec3d normalizedLook = lookDirection.normalize();
+            Vec3d normalizedToEntity = toEntity.normalize();
+
+            // CONE COMPUTING
+            double dot = normalizedLook.dotProduct(normalizedToEntity);
+            double angleInRadians = Math.acos(dot);
+            double angleInDegrees = Math.toDegrees(angleInRadians);
+
+            // check if cone
+            if (angleInDegrees <= coneAngle / 2) {
+                // push depends on distance
+                double distance = toEntity.length();
+                double distanceFactor = 1.0 - (distance / range);
+                distanceFactor = Math.max(0.2, distanceFactor); // but also minimum push
+
+                // direction player looking
+                Vec3d pushVector = normalizedLook.multiply(pushStrength * distanceFactor);
+
+
+                entity.setVelocity(pushVector);
+                entity.velocityModified = true;
+            }
+        }
+    }
+
+
+    private void spawnExplosionParticles(PlayerEntity player, ServerWorld world) {
+        double particleRange = 10.0;
+        double particleSpread = 3.0;
+        int particleCount = 10;
+
+        Vec3d lookDir = player.getRotationVec(1.0F);
+        Vec3d playerPos = player.getEyePos();
+
+        for (int i = 0; i < particleCount; i++) {
+            double distance = player.getRandom().nextDouble() * particleRange;
+            double offsetX = (player.getRandom().nextDouble() - 0.5) * 2 * particleSpread * (distance / particleRange);
+            double offsetY = (player.getRandom().nextDouble() - 0.5) * 2 * particleSpread * (distance / particleRange);
+            double offsetZ = (player.getRandom().nextDouble() - 0.5) * 2 * particleSpread * (distance / particleRange);
+
+            // pos
+            Vec3d particlePos = playerPos.add(
+                    lookDir.x * distance + offsetX,
+                    lookDir.y * distance + offsetY,
+                    lookDir.z * distance + offsetZ
+            );
+
+            world.spawnParticles(
+                    ParticleTypes.EXPLOSION,
+                    particlePos.x, particlePos.y, particlePos.z,
+                    1,
+                    0.0, 0.0, 0.0,
+                    0.0
+            );
+        }
     }
 
 }

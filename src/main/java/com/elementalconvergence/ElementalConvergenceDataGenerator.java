@@ -91,6 +91,32 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 
 			//AIR
 
+			//AIR MAGIC SELECTED
+			String airSelectedCN="air_magic_selected";
+			String airSelectedAdvName=ElementalConvergence.MOD_ID + ":air_magic_selected";
+			AdvancementEntry airSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.FEATHER,
+							Text.literal("Air Magic (1)"),
+							Text.literal("You are imbued with air magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(airSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							1)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,airSelectedCN,airSelectedAdvName)))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, airSelectedAdvName);
+
+			//AIR LVL 1
+			//AIR LVL 2
+			//AIR LVL 3
+			AdvancementEntry airLevel3 = generateAirLevelsAdvancements(airSelectedCN, airSelectedAdvName, airSelectedAdvancement, consumer);
+
 
 			//FIRE MAGIC SELECTED
 			String fireSelectedCN="fire_magic_selected";
@@ -358,6 +384,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName+lvl);
 
 			return earthAdv3;
+		}
+
+		public AdvancementEntry generateAirLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
+
+			int magicIndex=1;
+			String goodMagicPicked = "has_air_selected_concurrent";
+			String achievementTitle="Air Level ";
+			String CN="air_criterion_lvl";
+			String advName=ElementalConvergence.MOD_ID+":air_lvl";
+			String haslvl="air_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName=selectedAdvName;
+			previousAdvEntry=selectedAdvEntry;
+			lvl=1;
+			AdvancementEntry airAdv1 = Advancement.Builder.create()
+					.display(
+							Items.FIREWORK_ROCKET,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Craft a firework"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.FIREWORK_ROCKET))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=airAdv1;
+			lvl=2;
+			AdvancementEntry airAdv2 = Advancement.Builder.create()
+					.display(
+							Items.RABBIT_FOOT,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Loot a rabbit's foot"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.RABBIT_FOOT))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			previousAdvName=advName+lvl;
+			previousAdvEntry=airAdv2;
+			lvl=3;
+			AdvancementEntry airAdv3 = Advancement.Builder.create()
+					.display(
+							Items.WIND_CHARGE,
+							Text.literal(achievementTitle+lvl), //title
+							Text.literal("Loot a breeze rod"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN+lvl, InventoryChangedCriterion.Conditions.items(Items.BREEZE_ROD))
+					.criterion(haslvl+lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName,CN+lvl,advName+lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN+lvl,advName+lvl,magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName+lvl);
+
+			return airAdv3;
 		}
 
 		public AdvancementEntry generateFireLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
