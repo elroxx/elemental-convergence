@@ -35,6 +35,13 @@ public class WaterMagicHandler implements IMagicHandler {
             player.addStatusEffect(new StatusEffectInstance(ModEffects.GILLS, -1, 0, false, false, false));
         }
 
+        //BUFF
+        if (!player.hasStatusEffect(StatusEffects.CONDUIT_POWER) && player.isTouchingWaterOrRain()){
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.CONDUIT_POWER, -1, 2, false, false, false)); //add if in water or rain
+        } else if (player.hasStatusEffect(StatusEffects.CONDUIT_POWER) && !player.isTouchingWaterOrRain()) {
+            player.removeStatusEffect(StatusEffects.CONDUIT_POWER); //remove if not in water or rain
+        }
+
         //Debuff
         //handlePlayerBreathing(player);
 
