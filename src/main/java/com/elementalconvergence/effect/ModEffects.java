@@ -14,6 +14,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> LIGHT_PHASING = register("light_phasing", new LightPhasingEffect());
     public static final RegistryEntry<StatusEffect> FULL_BLINDNESS = register("full_blindness", new FullBlindnessEffect());
     public static final RegistryEntry<StatusEffect> GILLS = register("gills", new GillsEffect());
+    public static final RegistryEntry<StatusEffect> DROWNING = register("drowning", new DrowningEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
