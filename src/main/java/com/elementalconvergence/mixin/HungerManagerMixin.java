@@ -10,6 +10,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static com.elementalconvergence.magic.convergencehandlers.SteamMagicHandler.STEAM_INDEX;
+
 @Mixin(net.minecraft.entity.player.HungerManager.class)
 public class HungerManagerMixin {
     @Shadow private float saturationLevel;
@@ -46,7 +48,7 @@ public class HungerManagerMixin {
         }
 
         boolean bl = player.getWorld().getGameRules().getBoolean(GameRules.NATURAL_REGENERATION);
-        if (bl && this.saturationLevel > 0.0F && player.canFoodHeal() && this.foodLevel >= 20 && dataSaver.getMagicData().getSelectedMagic()!=7) {
+        if (bl && this.saturationLevel > 0.0F && player.canFoodHeal() && this.foodLevel >= 20 && dataSaver.getMagicData().getSelectedMagic()!=7 && dataSaver.getMagicData().getSelectedMagic()!=STEAM_INDEX) {
             ++this.foodTickTimer;
             if (this.foodTickTimer >= 10) {
                 float f = Math.min(this.saturationLevel, 6.0F);
@@ -54,7 +56,7 @@ public class HungerManagerMixin {
                 this.addExhaustion(f);
                 this.foodTickTimer = 0;
             }
-        } else if (bl && this.foodLevel >= 18 && player.canFoodHeal() && dataSaver.getMagicData().getSelectedMagic()!=7) {
+        } else if (bl && this.foodLevel >= 18 && player.canFoodHeal() && dataSaver.getMagicData().getSelectedMagic()!=7 && dataSaver.getMagicData().getSelectedMagic()!=STEAM_INDEX) {
             ++this.foodTickTimer;
             if (this.foodTickTimer >= 80) {
                 player.heal(1.0F);

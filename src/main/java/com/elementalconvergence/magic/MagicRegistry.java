@@ -4,6 +4,7 @@ import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.magic.convergencehandlers.GravityMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.StarMagicHandler;
+import com.elementalconvergence.magic.convergencehandlers.SteamMagicHandler;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
 import gravity_changer.api.GravityChangerAPI;
@@ -36,6 +37,7 @@ public class MagicRegistry {
 
         magic_handlers[RatMagicHandler.RAT_INDEX] = new RatMagicHandler();
         magic_handlers[GravityMagicHandler.GRAVITY_INDEX] = new GravityMagicHandler();
+        magic_handlers[SteamMagicHandler.STEAM_INDEX] = new SteamMagicHandler();
         //magic_handlers[StarMagicHandler.STAR_INDEX] = new StarMagicHandler(); //star removed
 
         System.out.println("MAGICREGISTRY CREATED");

@@ -22,6 +22,10 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class SteamMagicHandler implements IMagicHandler {
     public static final int STEAM_INDEX= (BASE_MAGIC_ID.length-1)+3; //this is 10
 
+    private Vec3d lastPosition =null;
+    private int horizontalBlocksMoved = 0;
+    public int HORIZONTAL_BLOCK_COUNTER_DEFAULT=12;
+
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -39,6 +43,33 @@ public class SteamMagicHandler implements IMagicHandler {
         if (!player.hasStatusEffect(StatusEffects.RESISTANCE)){
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,-1, 9, false, false, false));
         }
+
+        //Debuff (also no natural health regen)
+        if (lastPosition==null){
+            lastPosition=player.getPos();
+        }
+        Vec3d currentPos = player.getPos();
+
+        // horizontal distance (no y axis)
+        double dx = currentPos.x - lastPosition.x;
+        double dz = currentPos.z - lastPosition.z;
+        double horizontalDistanceMoved = Math.sqrt(dx * dx + dz * dz);
+
+        if (horizontalDistanceMoved >= 1.0) {
+            // 1hp of dmg
+            //player.damage(player.getDamageSources().outOfWorld(), 1.0F);
+            this.horizontalBlocksMoved++;
+            lastPosition=currentPos;
+        }
+
+        if (horizontalBlocksMoved>=HORIZONTAL_BLOCK_COUNTER_DEFAULT){
+            //1hp of dmg
+            if (!player.isCreative()) {
+                player.damage(player.getDamageSources().outOfWorld(), 1.0F);
+            }
+            horizontalBlocksMoved=0;
+        }
+
 
     }
 
