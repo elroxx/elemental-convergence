@@ -94,7 +94,7 @@ public abstract class LivingEntityMixin {
                     if (respirationLevel > 0) {
                         if (RANDOM.nextInt(respirationLevel + 1) > 0) {
                             // Skip air loss this tick
-                            ci.cancel();
+                            //ci.cancel();
                             return;
                         }
                     }
@@ -109,7 +109,7 @@ public abstract class LivingEntityMixin {
                 }
 
                 // GOES BACK TO NORMAL BREATHING LOGIC
-                ci.cancel();
+                //ci.cancel();
             }
         }
     }

@@ -11,6 +11,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -35,18 +36,7 @@ public class WaterMagicHandler implements IMagicHandler {
 
     private boolean toggleDolphin = false;
 
-    public void onNautilusEnchant(PlayerEntity player, ItemStack offHand){
-        offHand.decrement(1);
 
-        player.getWorld().playSound(
-                null,
-                player.getX(), player.getY(), player.getZ(),
-                SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE,
-                SoundCategory.PLAYERS,
-                1.0F,
-                1.0F
-        );
-    }
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -111,11 +101,60 @@ public class WaterMagicHandler implements IMagicHandler {
             }
         }
 
+        //OFFHAND FOR THE PLAYER
+        if (waterLevel>=3) {
+            if (offHand.isOf(Items.WATER_BUCKET)) {
+                if (player.hasStatusEffect(ModEffects.DROWNING)){
+                    player.removeStatusEffect(ModEffects.DROWNING);
+                }
+                player.addStatusEffect(new StatusEffectInstance(ModEffects.DROWNING,  60 * 20, 0, false, true, true));
+
+                player.getWorld().playSound(
+                        null,
+                        player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.ITEM_BUCKET_EMPTY_AXOLOTL,
+                        SoundCategory.PLAYERS,
+                        1.0F,
+                        0.75F
+                );
+                int offhandIndex = 40;
+                player.getInventory().setStack(offhandIndex, new ItemStack(Items.BUCKET));
+            }
+        }
+
     }
 
     @Override
     public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+        ItemStack mainHand = player.getMainHandStack();
+        ItemStack offHand = player.getOffHandStack();
 
+        //MAIN HAND IS ONLY FOR ENTITY RIGHT CLICK (SO THAT IT IS STILL EASY TO WATERBUCKET CLUTCH)
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int waterLevel = magicData.getMagicLevel(WATER_INDEX);
+        if (waterLevel>=3) {
+            if (mainHand.isOf(Items.WATER_BUCKET)) {
+                if (targetEntity instanceof LivingEntity livingEntity) {
+                    if (livingEntity.hasStatusEffect(ModEffects.DROWNING)){
+                        livingEntity.removeStatusEffect(ModEffects.DROWNING);
+                    }
+
+                    livingEntity.addStatusEffect(new StatusEffectInstance(ModEffects.DROWNING, 30 * 20, 0, false, true, true));
+
+                    player.getWorld().playSound(
+                            null,
+                            player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.ITEM_BUCKET_EMPTY_FISH,
+                            SoundCategory.PLAYERS,
+                            1.0F,
+                            0.75F
+                    );
+
+                    player.getInventory().setStack(player.getInventory().selectedSlot, new ItemStack(Items.BUCKET));
+                }
+            }
+        }
     }
 
     @Override
@@ -195,4 +234,17 @@ public class WaterMagicHandler implements IMagicHandler {
 
     }
 
+
+    public void onNautilusEnchant(PlayerEntity player, ItemStack offHand){
+        offHand.decrement(1);
+
+        player.getWorld().playSound(
+                null,
+                player.getX(), player.getY(), player.getZ(),
+                SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE,
+                SoundCategory.PLAYERS,
+                1.0F,
+                1.0F
+        );
+    }
 }
