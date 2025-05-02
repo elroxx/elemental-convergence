@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SOS",
+    "BEB",
+    "SRS"
+  ],
+  "key": {
+    "O": {
+      "item": "minecraft:ominous_bottle"
+    },
+    "R": {
+      "item": "minecraft:respawn_anchor"
+    },
+    "S": {
+      "item": "minecraft:soul_sand"
+    },
+    "B": {
+      "item": "minecraft:bone_block"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:death_magic_eye",
+    "count": 1
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PTP",
+    "SES",
+    "WWW"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:sea_pickle"
+    },
+    "S": {
+      "item": "minecraft:prismarine_shard"
+    },
+    "W": {
+      "item": "minecraft:water_bucket"
+    },
+    "T": {
+      "item": "minecraft:turtle_scute"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:water_magic_eye",
+    "count": 1
+  }
+}

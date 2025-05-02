@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:rat_lvl1",
+  "criteria": {
+    "has_rat_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:rat_lvl2",
+        "criterionName": "rat_criterion_lvl2",
+        "magicIndex": 8
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "rat_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:nether_wart"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "rat_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:rat_lvl2",
+        "criterionName": "rat_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:rat_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Harvest nether warts",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:nether_wart"
+    },
+    "title": "Plague Level 2"
+  },
+  "requirements": [
+    [
+      "rat_criterion_lvl2"
+    ],
+    [
+      "rat_has_lvl2"
+    ],
+    [
+      "has_rat_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

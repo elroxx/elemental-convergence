@@ -1,6 +1,7 @@
 package com.elementalconvergence;
 
 import com.elementalconvergence.data.IPlayerMiningMixin;
+import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -15,5 +16,8 @@ public class ElementalConvergenceClient implements ClientModInitializer {
                 ((IPlayerMiningMixin)context.client().player).setMiningSpeedMultiplier(payload.multiplier());
             });
         });
+
+        //Init inventory stealing packets
+        InventoryNetworking.registerS2CPackets();
     }
 }

@@ -1,36 +1,46 @@
 package com.elementalconvergence;
 
 import com.elementalconvergence.block.ModBlocks;
+import com.elementalconvergence.commands.DeathTeleportCommand;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
 import com.elementalconvergence.criterions.ModCriterions;
+import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
+import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.magic.handlers.DeathMagicHandler;
 import com.elementalconvergence.mixin.PlayerDataMixin;
+import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
+import com.elementalconvergence.networking.OpenInventoryPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
+import gravity_changer.mixin.EntityCollisionContextMixin;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
-import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.LivingEntity;
@@ -40,8 +50,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
@@ -64,10 +78,27 @@ import java.util.Random;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
+	public static final int TICKSEC = 20;
 
 	public static final String[] BASE_MAGIC_DISPLAY = {"Earth", "Air", "Fire", "Water", "Shadow", "Light", "Life", "Death"};
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
-	public static final int TICKSEC = 20;
+
+	//star was removed
+	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity"};
+	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity"};
+	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
+
+	//FOR THINGS THAT NEED ALL THE MAGICS IN THE LOGIC
+	public static final String[] FULL_MAGIC_DISPLAY = new String[BASE_MAGIC_DISPLAY.length + CONVERGENCE_MAGIC_DISPLAY.length];
+	static {
+		System.arraycopy(BASE_MAGIC_DISPLAY, 0, FULL_MAGIC_DISPLAY, 0, BASE_MAGIC_DISPLAY.length);
+		System.arraycopy(CONVERGENCE_MAGIC_DISPLAY, 0, FULL_MAGIC_DISPLAY, BASE_MAGIC_DISPLAY.length, CONVERGENCE_MAGIC_DISPLAY.length);
+	}
+	public static final String[] FULL_MAGIC_ID = new String[BASE_MAGIC_ID.length + CONVERGENCE_MAGIC_ID.length];
+	static {
+		System.arraycopy(BASE_MAGIC_ID, 0, FULL_MAGIC_ID, 0, BASE_MAGIC_ID.length);
+		System.arraycopy(CONVERGENCE_MAGIC_ID, 0, FULL_MAGIC_ID, BASE_MAGIC_ID.length, CONVERGENCE_MAGIC_ID.length);
+	}
 
 
 	public static ArrayList<String> deathList = new ArrayList<>(); //THEY ARE INITIALIZED AUTOMATICALLY
@@ -95,21 +126,32 @@ public class ElementalConvergence implements ModInitializer {
 		// Proceed with mild caution.
 		LOGGER.info("Hello Fabric world!");
 
+		//Init ConvergenceMagics requirements
+		initRequirementsMapForConvergence();
+
 		//Basic Initialization
 		ModBlocks.initialize(); //Blocks
 		ModItems.initialize(); //Items
-		MagicRegistry.initialize(); //Magic Types and spells
 		registerKeybindings(); //Keybinds
 		ModEntities.initialize(); //Entities
+		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
+		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
+
+		//Init the MagicRegistry (magic handler is by player now)
+		MagicRegistry.initialize();
+		//Remove the magic handler of the player when the player leaves
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			MagicRegistry.removePlayer(handler.getPlayer());
+		});
+
 
 		// COMMANDS SECTION
 		CommandRegistrationCallback.EVENT.register(SetMagicLevelCommand::register); //Registration of SetMagicLevelCommand
 		CommandRegistrationCallback.EVENT.register(GetSelectedMagicCommand::register); //Registration of SetMagicLevelCommand
 		CommandRegistrationCallback.EVENT.register(MagicCommand::register); //Registration of starter magic Command
+		CommandRegistrationCallback.EVENT.register(DeathTeleportCommand::register); //Registration of death Teleport command
 
-
-		//Spell initialization depending on type of magic.
 
 		//PASSIVE EACH TICK
 		ServerTickEvents.START_SERVER_TICK.register(server -> {
@@ -137,6 +179,7 @@ public class ElementalConvergence implements ModInitializer {
 			}
 		});
 
+		//BLOCK BREAK
 		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) -> {
 				if (!world.isClient()){
 					SpellManager.handleBlockBreak(player, pos, state, entity);
@@ -144,12 +187,20 @@ public class ElementalConvergence implements ModInitializer {
 				return true;
 			});
 
-		//RIGHT CLICK
+		//RIGHT CLICK WITH ITEM
 		UseItemCallback.EVENT.register((player, world, hand) -> {
 			if (!world.isClient()) {
-				SpellManager.handleRightClick(player);
+				SpellManager.handleItemRightClick(player);
 			}
 			return TypedActionResult.pass(player.getStackInHand(hand));
+		});
+
+		// RIGHT CLICK ON ENTITY
+		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+			if (!world.isClient()){
+				SpellManager.handleEntityRightClick(player, entity);
+			}
+			return ActionResult.PASS;
 		});
 
 		// On HIT
@@ -160,6 +211,7 @@ public class ElementalConvergence implements ModInitializer {
 			return ActionResult.PASS;
 		});
 
+		//AFTER DEATH
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
 			if (damageSource.getAttacker() instanceof PlayerEntity player){
 				World world = player.getWorld();
@@ -170,12 +222,55 @@ public class ElementalConvergence implements ModInitializer {
 
 			if (entity instanceof ServerPlayerEntity player){
 				BlockPos deathPos = player.getBlockPos();
-				String playerName= player.getName().toString();
+				String playerName= player.getName().getString();
+				//String playerName = player.getDisplayName().toString();
 				if (!deathList.contains(playerName)) {
 					deathList.add(playerName);
 				}
 				deathMap.put(playerName, new DeathTuple(DEFAULT_DEATH_TIMER, deathPos, player.getServerWorld())); //This replaces the previous deathTuple too
 
+
+				//NOW VERIFY FOR ALL DEATH PLAYERS AND BROADCAST THE DEATH POSITION
+				for (ServerPlayerEntity alivePlayer : entity.getServer().getPlayerManager().getPlayerList()){
+					IMagicDataSaver dataSaver = (IMagicDataSaver) alivePlayer;
+					MagicData magicData = dataSaver.getMagicData();
+					if (magicData.getSelectedMagic()== DeathMagicHandler.DEATH_INDEX){
+						if (magicData.getMagicLevel(DeathMagicHandler.DEATH_INDEX)<3) {
+							alivePlayer.sendMessage(Text.literal(playerName + " died at: " +
+									"X: " + deathPos.getX() +
+									", Y: " + deathPos.getY() +
+									", Z: " + deathPos.getZ()), false);
+						}else{
+						// Create the message components
+							MutableText locationText = Text.empty()
+									.append(Text.literal(playerName)
+											.formatted(Formatting.DARK_RED))
+									.append(Text.literal(" died at: ")
+											.formatted(Formatting.DARK_RED))
+									.append(Text.literal(String.format("X: %d, Y: %d, Z: %d ",
+													deathPos.getX(), deathPos.getY(), deathPos.getZ()))
+											.formatted(Formatting.RED));
+
+							// Create the clickable teleport button
+							MutableText teleportButton = Text.literal("[Teleport]")
+									.formatted(Formatting.GOLD, Formatting.BOLD)
+									.styled(style -> style
+											.withClickEvent(new ClickEvent(
+													ClickEvent.Action.RUN_COMMAND,
+													String.format("/deathteleport %s", playerName)
+											))
+											.withHoverEvent(new HoverEvent(
+													HoverEvent.Action.SHOW_TEXT,
+													Text.literal("Click to teleport to death location")
+															.formatted(Formatting.YELLOW)
+											))
+									);
+
+							// Combine and send the message
+							alivePlayer.sendMessage(locationText.append(teleportButton), false);
+						}
+					}
+				}
 
 			}
 
@@ -190,7 +285,7 @@ public class ElementalConvergence implements ModInitializer {
 			return ActionResult.PASS;
 		});
 
-		// Register packet on both sides
+		// Register packet on both sides for spellCasting
 		PayloadTypeRegistry.playC2S().register(SpellCastPayload.ID, SpellCastPayload.CODEC);
 
 		// INIT FOR MININGSPEED PAYLOAD
@@ -360,6 +455,35 @@ public class ElementalConvergence implements ModInitializer {
 						0
 				);
 			}
+		}
+
+	}
+
+	private static void initRequirementsMapForConvergence(){
+
+		ArrayList<Integer>[] arrayForRequirements = new ArrayList[CONVERGENCE_MAGIC_ID.length];
+
+		//RAT REQUIREMENTS
+		ArrayList<Integer> rat_requirements = new ArrayList<>();
+		rat_requirements.add(7); //DEATH
+		rat_requirements.add(6); //LIFE
+		arrayForRequirements[0]=rat_requirements;
+
+		//GRAVITY REQUIREMENTS
+		ArrayList<Integer> gravity_requirements = new ArrayList<>();
+		gravity_requirements.add(0); //EARTH
+		gravity_requirements.add(4); //SHADOW
+		arrayForRequirements[1]=gravity_requirements;
+
+		//STAR REQUIREMENTS //REMOVED
+		/*ArrayList<Integer> star_requirements = new ArrayList<>();
+		star_requirements.add(2); //FIRE
+		star_requirements.add(5); //LIGHT
+		arrayForRequirements[2]=star_requirements;*/
+
+
+		for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
+			convergenceRequirementsMap.put(CONVERGENCE_MAGIC_ID[i], arrayForRequirements[i]);
 		}
 
 	}

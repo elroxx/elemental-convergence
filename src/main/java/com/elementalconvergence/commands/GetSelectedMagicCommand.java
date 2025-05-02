@@ -2,6 +2,7 @@ package com.elementalconvergence.commands;
 
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.magic.MagicRegistry;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -22,7 +23,7 @@ public class GetSelectedMagicCommand {
                         .then(CommandManager.literal("get")
                                 .executes(GetSelectedMagicCommand::runGet))
                         .then(CommandManager.literal("set")
-                                .then(CommandManager.argument("index", IntegerArgumentType.integer(-1, ElementalConvergence.BASE_MAGIC_ID.length - 1))
+                                .then(CommandManager.argument("index", IntegerArgumentType.integer(-1, ElementalConvergence.FULL_MAGIC_ID.length - 1))
                                         .executes(GetSelectedMagicCommand::runSet)))));
     }
 
@@ -36,7 +37,7 @@ public class GetSelectedMagicCommand {
             if (selectedMagic == -1) {
                 message = targetPlayer.getName().getString() + " has no magic type currently selected";
             } else {
-                String magicType = ElementalConvergence.BASE_MAGIC_DISPLAY[selectedMagic];
+                String magicType = ElementalConvergence.FULL_MAGIC_DISPLAY[selectedMagic];
                 message = targetPlayer.getName().getString() + "'s currently selected magic: " + magicType;
             }
 
@@ -54,6 +55,9 @@ public class GetSelectedMagicCommand {
             ServerPlayerEntity sourcePlayer = context.getSource().getPlayer();
             int newIndex = IntegerArgumentType.getInteger(context, "index");
 
+            //RESET STATS
+            MagicRegistry.resetPlayerStats(targetPlayer);
+
             IMagicDataSaver dataSaver = (IMagicDataSaver) targetPlayer;
             dataSaver.getMagicData().setSelectedMagic(newIndex);
 
@@ -61,7 +65,7 @@ public class GetSelectedMagicCommand {
             if (newIndex == -1) {
                 message = "Cleared " + targetPlayer.getName().getString() + "'s selected magic";
             } else {
-                String magicType = ElementalConvergence.BASE_MAGIC_DISPLAY[newIndex];
+                String magicType = ElementalConvergence.FULL_MAGIC_DISPLAY[newIndex];
                 message = "Set " + targetPlayer.getName().getString() + "'s selected magic to " + magicType;
             }
 

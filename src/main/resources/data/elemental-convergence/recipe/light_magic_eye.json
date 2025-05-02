@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LIL",
+    "GEG",
+    "SGS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:shroomlight"
+    },
+    "G": {
+      "item": "minecraft:glowstone"
+    },
+    "L": {
+      "item": "minecraft:lantern"
+    },
+    "I": {
+      "item": "minecraft:glow_lichen"
+    },
+    "E": {
+      "item": "elemental-convergence:bland_magic_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:light_magic_eye",
+    "count": 1
+  }
+}

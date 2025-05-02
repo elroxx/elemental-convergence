@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "HES",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:anvil"
+    },
+    "G": {
+      "item": "elemental-convergence:gravity_shard"
+    },
+    "S": {
+      "item": "elemental-convergence:shadow_magic_eye"
+    },
+    "H": {
+      "item": "elemental-convergence:earth_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:gravity_convergent_eye",
+    "count": 1
+  }
+}

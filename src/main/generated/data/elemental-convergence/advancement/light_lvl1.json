@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:light_magic_selected",
+  "criteria": {
+    "has_light_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:light_lvl1",
+        "criterionName": "light_criterion_lvl1",
+        "magicIndex": 5
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "light_criterion_lvl1": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:copper_bulb"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "light_has_lvl1": {
+      "conditions": {
+        "advancementName": "elemental-convergence:light_lvl1",
+        "criterionName": "light_criterion_lvl1",
+        "parentAdvancement": "elemental-convergence:light_magic_selected"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Craft a copper bulb",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:copper_bulb"
+    },
+    "title": "Light Level 1"
+  },
+  "requirements": [
+    [
+      "light_criterion_lvl1"
+    ],
+    [
+      "light_has_lvl1"
+    ],
+    [
+      "has_light_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

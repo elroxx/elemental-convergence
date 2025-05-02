@@ -23,7 +23,7 @@ public class LevelManager {
         if (currentLevel==3){
             return;
         }
-        String advToCheck= ElementalConvergence.MOD_ID+":"+ElementalConvergence.BASE_MAGIC_ID[selectedMagic]+"_lvl"+(currentLevel+1);
+        String advToCheck= ElementalConvergence.MOD_ID+":"+ElementalConvergence.FULL_MAGIC_ID[selectedMagic]+"_lvl"+(currentLevel+1);
         //System.out.println(advToCheck);
         //System.out.println(ElementalConvergence.hasAdvancement(player, advToCheck));
         if (ElementalConvergence.hasAdvancement(player, advToCheck)){

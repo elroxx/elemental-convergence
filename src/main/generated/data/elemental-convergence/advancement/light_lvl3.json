@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:light_lvl2",
+  "criteria": {
+    "has_light_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:light_lvl3",
+        "criterionName": "light_criterion_lvl3",
+        "magicIndex": 5
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "light_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:pearlescent_froglight"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "light_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:light_lvl3",
+        "criterionName": "light_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:light_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Obtain a pearlescent froglight",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:frogspawn"
+    },
+    "title": "Light Level 3"
+  },
+  "requirements": [
+    [
+      "light_criterion_lvl3"
+    ],
+    [
+      "light_has_lvl3"
+    ],
+    [
+      "has_light_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
