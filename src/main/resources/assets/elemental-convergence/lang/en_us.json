@@ -29,5 +29,6 @@
   "effect.elemental-convergence.light_phasing": "Light Phasing",
   "effect.elemental-convergence.full_blindness": "Full Blindness",
   "effect.elemental-convergence.gills": "Gills",
-  "effect.elemental-convergence.drowning": "Drowning"
+  "effect.elemental-convergence.drowning": "Drowning",
+  "item.elemental-convergence.steam_convergent_eye": "Steam Convergent Eye"
 }
