@@ -44,6 +44,35 @@ import java.util.Random;
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
 
+    // Shadow methods needed for the breathing logic
+    @Shadow protected int playerHitTimer;
+    @Shadow @Nullable protected PlayerEntity attackingPlayer;
+    @Shadow @Nullable protected LivingEntity attacking;
+    @Shadow protected int lastAttackedTime;
+    //@Shadow public boolean inPowderSnow;
+    @Shadow protected int hurtTime;
+    //@Shadow protected int timeUntilRegen;
+    @Shadow protected int deathTime;
+    @Shadow protected float lookDirection;
+    @Shadow protected float prevLookDirection;
+    @Shadow protected float bodyYaw;
+    @Shadow protected float prevBodyYaw;
+    @Shadow protected float headYaw;
+    @Shadow protected float prevHeadYaw;
+    //@Shadow protected abstract boolean isWet();
+    //@Shadow protected abstract void extinguishWithSound();
+    @Shadow protected abstract boolean isDead();
+    //@Shadow public abstract World getWorld();
+    @Shadow protected abstract void updatePostDeath();
+    @Shadow protected abstract void tickStatusEffects();
+    //@Shadow public abstract float getYaw();
+    //@Shadow public abstract float getPitch();
+    @Shadow protected abstract boolean isAlive();
+    @Shadow public abstract void setAttacker(@Nullable LivingEntity attacker);
+    @Shadow @Nullable
+    private LivingEntity attacker;
+    //@Shadow public int age;
+
     @Inject(method = "onStatusEffectRemoved", at = @At("HEAD"))
     private void onStatusEffectEnd(StatusEffectInstance effect, CallbackInfo ci) {
         RegistryEntry<StatusEffect> statusEffect = effect.getEffectType();
@@ -94,7 +123,7 @@ public abstract class LivingEntityMixin {
                     if (respirationLevel > 0) {
                         if (RANDOM.nextInt(respirationLevel + 1) > 0) {
                             // Skip air loss this tick
-                            //ci.cancel();
+                            ci.cancel();
                             return;
                         }
                     }
@@ -109,7 +138,49 @@ public abstract class LivingEntityMixin {
                 }
 
                 // GOES BACK TO NORMAL BREATHING LOGIC
-                //ci.cancel();
+                ci.cancel();
+
+                if (this.isAlive() && (((LivingEntity)(Object)this).isWet() || ((LivingEntity)(Object)this).inPowderSnow)) {
+                    ((LivingEntity)(Object)this).extinguishWithSound();
+                }
+
+                if (this.hurtTime > 0) {
+                    --this.hurtTime;
+                }
+
+                if (((LivingEntity)(Object)this).timeUntilRegen > 0 && !((LivingEntity) (Object)this instanceof ServerPlayerEntity)) {
+                    --((LivingEntity)(Object)this).timeUntilRegen;
+                }
+
+                if (this.isDead() && ((LivingEntity)(Object)this).getWorld().shouldUpdatePostDeath((LivingEntity) (Object)this)) {
+                    this.updatePostDeath();
+                }
+
+                if (playerHitTimer > 0) {
+                    --this.playerHitTimer;
+                } else {
+                    this.attackingPlayer = null;
+                }
+
+                if (this.attacking != null && !this.attacking.isAlive()) {
+                    this.attacking = null;
+                }
+
+                if (this.attacker != null) {
+                    if (!this.attacker.isAlive()) {
+                        this.setAttacker((LivingEntity)null);
+                    } else if (((LivingEntity)(Object)this).age - this.lastAttackedTime > 100) {
+                        this.setAttacker((LivingEntity)null);
+                    }
+                }
+
+                this.tickStatusEffects();
+                this.prevLookDirection = this.lookDirection;
+                this.prevBodyYaw = this.bodyYaw;
+                this.prevHeadYaw = this.headYaw;
+                ((LivingEntity)(Object)this).getWorld().getProfiler().pop();
+
+
             }
         }
     }
