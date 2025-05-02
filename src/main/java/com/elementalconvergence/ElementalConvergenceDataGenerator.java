@@ -146,6 +146,33 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 
 			//WATER
 
+			//WATER MAGIC SELECTED
+			String waterSelectedCN="water_magic_selected";
+			String waterSelectedAdvName=ElementalConvergence.MOD_ID + ":water_magic_selected";
+			AdvancementEntry waterSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.WATER_BUCKET,
+							Text.literal("Water Magic (3)"),
+							Text.literal("You are imbued with water magic"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(waterSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							3)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,waterSelectedCN,waterSelectedAdvName)))
+					.parent(noMagicSelectedAdvancement)
+					.build(consumer, waterSelectedAdvName);
+
+			//WATER LVL 1
+			//WATER LVL 2
+			//WATER LVL 3
+			AdvancementEntry waterLevel3 = generateWaterLevelsAdvancements(waterSelectedCN, waterSelectedAdvName, waterSelectedAdvancement, consumer);
+
+
 			//SHADOW MAGIC SELECTED
 			String shadowSelectedCN="shadow_magic_selected";
 			String shadowSelectedAdvName=ElementalConvergence.MOD_ID + ":shadow_magic_selected";
@@ -550,6 +577,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return fireAdv3;
+		}
+
+		public AdvancementEntry generateWaterLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = 3;
+			String goodMagicPicked = "has_water_selected_concurrent";
+			String achievementTitle = "Water Level ";
+			String CN = "water_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":water_lvl";
+			String haslvl = "water_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry waterAdv1 = Advancement.Builder.create()
+					.display(
+							Items.PRISMARINE_CRYSTALS,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Obtain a prismarine crystal"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.PRISMARINE_CRYSTALS))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = waterAdv1;
+			lvl = 2;
+			AdvancementEntry waterAdv2 = Advancement.Builder.create()
+					.display(
+							Items.TUBE_CORAL_BLOCK,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Mine and loot a tube coral block"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.TUBE_CORAL_BLOCK))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = waterAdv2;
+			lvl = 3;
+			AdvancementEntry waterAdv3 = Advancement.Builder.create()
+					.display(
+							Items.CONDUIT,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Loot a heart of the sea"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.HEART_OF_THE_SEA))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return waterAdv3;
 		}
 
 		public AdvancementEntry generateShadowLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
