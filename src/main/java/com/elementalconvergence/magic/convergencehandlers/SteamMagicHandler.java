@@ -20,7 +20,7 @@ import java.util.*;
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 
 public class SteamMagicHandler implements IMagicHandler {
-    public static final int STEAM_INDEX= (BASE_MAGIC_ID.length-1)+3;
+    public static final int STEAM_INDEX= (BASE_MAGIC_ID.length-1)+3; //this is 10
 
 
     @Override
@@ -35,6 +35,10 @@ public class SteamMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
+        //BUFF (invulnerable except to negative valued explosion, the void and /kill)
+        if (!player.hasStatusEffect(StatusEffects.RESISTANCE)){
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE,-1, 9, false, false, false));
+        }
 
     }
 
