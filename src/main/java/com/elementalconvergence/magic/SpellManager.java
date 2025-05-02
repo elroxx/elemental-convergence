@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import static com.mojang.text2speech.Narrator.LOGGER;
 
 public class SpellManager {
-    public static void handleRightClick(PlayerEntity player) {
+    public static void handleItemRightClick(PlayerEntity player) {
         if (!(player instanceof ServerPlayerEntity))
         {
             System.out.println("SHOULD NOT ENTER HERE");
@@ -21,9 +21,21 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
         //System.out.println("SelectedMagic: "+selectedMagic);
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
-            handler.handleRightClick(player);
+            handler.handleItemRightClick(player);
+        }
+    }
+
+    public static void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+        if (!(player instanceof ServerPlayerEntity)) return;
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
+
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
+        if (handler != null) {
+            handler.handleEntityRightClick(player, targetEntity);
         }
     }
 
@@ -31,7 +43,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handlePassive(player);
         }
@@ -43,7 +55,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleAttack(player, victim);
         }
@@ -55,7 +67,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleKill(player, victim);
         }
@@ -67,7 +79,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleMine(player);
         }
@@ -79,7 +91,7 @@ public class SpellManager {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler != null) {
             handler.handleBlockBreak(player, pos, state, entity);
         }
@@ -96,7 +108,7 @@ public class SpellManager {
         int selectedMagic = dataSaver.getMagicData().getSelectedMagic();
 
         // Get the appropriate magic handler
-        IMagicHandler handler = MagicRegistry.getHandler(selectedMagic);
+        IMagicHandler handler = MagicRegistry.getHandler(player, selectedMagic);
         if (handler == null) {
             LOGGER.error("No handler found for magic type: " + selectedMagic);
             return;

@@ -17,12 +17,6 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 
 public class ModBlocks {
-    /*public static final Block BLACK_SNOW_LAYER = register("living_shadow_layer",new BlackSnowLayerBlock(FabricBlockSettings.create()
-            .mapColor(MapColor.BLACK)
-            .strength(0.1f)
-            .sounds(BlockSoundGroup.SNOW)
-            .nonOpaque()
-            .noCollision()));*/
 
     public static final Block ALTAR_OF_CONVERGENCE = register("altar_of_convergence",new AltarOfConvergenceBlock(Block.Settings.create()
             .strength(3.5f)

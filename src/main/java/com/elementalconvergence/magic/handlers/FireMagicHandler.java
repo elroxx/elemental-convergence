@@ -41,17 +41,18 @@ public class FireMagicHandler implements IMagicHandler {
     private int fireResCooldown=50;
     private int waterHurtCooldown=10;
     private int fireIndex=2; //just to keep track
-    private static final int DEFAULT_DIMSWAP_COOLDOWN=100; //5 seconds
+    private static final int DEFAULT_DIMSWAP_COOLDOWN=50; //2.5 seconds
     private int dimensionSwapCooldown=0;
     private static final int DEFAULT_FIREBALL_COOLDOWN=5; //0.25 seconds
     private int fireballCooldown=0;
-    private static final int DEFAULT_NAPALM_COOLDOWN=200*12; //10 seconds (so we have 120 seconds aka 2 minutes)
+    private static final int DEFAULT_NAPALM_COOLDOWN=20*60; //1*60 seconds (so we have 60 seconds aka 1 minute)
     private int napalmCooldown=0;
 
 
     @Override //Spell lvl 1 here
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
         ItemStack mainHand = player.getMainHandStack();
+        ItemStack offHand = player.getOffHandStack();
 
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
@@ -59,7 +60,9 @@ public class FireMagicHandler implements IMagicHandler {
         if (fireLevel>=1) {
 
             if (fireballCooldown == 0) {
-                if (mainHand.isOf(Items.COAL) || mainHand.isOf(Items.CHARCOAL)) {
+                if (mainHand.isOf(Items.COAL) || mainHand.isOf(Items.CHARCOAL) || offHand.isOf(Items.COAL) || offHand.isOf(Items.CHARCOAL)) {
+
+
                     double speed = 1.0;
                     int explosionPower = 3;
                     Vec3d rotation = player.getRotationVec(1.0F);
@@ -72,7 +75,11 @@ public class FireMagicHandler implements IMagicHandler {
                     player.getWorld().spawnEntity(fireball);
 
                     if (!player.getAbilities().creativeMode) {
-                        mainHand.decrement(1);
+                        if (mainHand.isOf(Items.COAL) || mainHand.isOf(Items.CHARCOAL)) {
+                            mainHand.decrement(1);
+                        }else {
+                            offHand.decrement(1);
+                        }
                     }
 
                     player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -81,6 +88,11 @@ public class FireMagicHandler implements IMagicHandler {
                 }
             }
         }
+    }
+
+    @Override
+    public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
     }
 
     @Override

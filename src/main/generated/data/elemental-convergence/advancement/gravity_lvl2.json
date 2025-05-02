@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:gravity_lvl1",
+  "criteria": {
+    "gravity_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:damaged_anvil"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "gravity_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:gravity_lvl2",
+        "criterionName": "gravity_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:gravity_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_gravity_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:gravity_lvl2",
+        "criterionName": "gravity_criterion_lvl2",
+        "magicIndex": 9
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Damage an anvil and mine it",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:damaged_anvil"
+    },
+    "title": "Gravity Level 2"
+  },
+  "requirements": [
+    [
+      "gravity_criterion_lvl2"
+    ],
+    [
+      "gravity_has_lvl2"
+    ],
+    [
+      "has_gravity_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

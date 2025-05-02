@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:water_lvl1",
+  "criteria": {
+    "has_water_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:water_lvl2",
+        "criterionName": "water_criterion_lvl2",
+        "magicIndex": 3
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "water_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:tube_coral_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "water_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:water_lvl2",
+        "criterionName": "water_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:water_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Mine and loot a tube coral block",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:tube_coral_block"
+    },
+    "title": "Water Level 2"
+  },
+  "requirements": [
+    [
+      "water_criterion_lvl2"
+    ],
+    [
+      "water_has_lvl2"
+    ],
+    [
+      "has_water_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:water_lvl2",
+  "criteria": {
+    "has_water_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:water_lvl3",
+        "criterionName": "water_criterion_lvl3",
+        "magicIndex": 3
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "water_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:heart_of_the_sea"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "water_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:water_lvl3",
+        "criterionName": "water_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:water_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Loot a heart of the sea",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:conduit"
+    },
+    "title": "Water Level 3"
+  },
+  "requirements": [
+    [
+      "water_criterion_lvl3"
+    ],
+    [
+      "water_has_lvl3"
+    ],
+    [
+      "has_water_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

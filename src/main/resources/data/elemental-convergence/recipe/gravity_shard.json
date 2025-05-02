@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "AWA",
+    " A "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "W": {
+      "item": "minecraft:warped_wart_block"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:gravity_shard",
+    "count": 4
+  }
+}

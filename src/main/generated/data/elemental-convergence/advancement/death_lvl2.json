@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:death_lvl1",
+  "criteria": {
+    "death_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:wither_skeleton_skull"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "death_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:death_lvl2",
+        "criterionName": "death_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:death_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_death_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:death_lvl2",
+        "criterionName": "death_criterion_lvl2",
+        "magicIndex": 7
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Loot a wither skeleton skull",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:wither_skeleton_skull"
+    },
+    "title": "Death Level 2"
+  },
+  "requirements": [
+    [
+      "death_criterion_lvl2"
+    ],
+    [
+      "death_has_lvl2"
+    ],
+    [
+      "has_death_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

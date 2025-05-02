@@ -4,6 +4,7 @@ import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.entity.MinionZombieEntity;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.Block;
@@ -67,7 +68,7 @@ public class LifeMagicHandler implements IMagicHandler {
     private static final int GATEWAY_DETECT_RANGE=100;
 
     @Override
-    public void handleRightClick(PlayerEntity player) {
+    public void handleItemRightClick(PlayerEntity player) {
         ItemStack mainHand = player.getMainHandStack();
 
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
@@ -95,6 +96,11 @@ public class LifeMagicHandler implements IMagicHandler {
                 }
             }
         }
+    }
+
+    @Override
+    public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
     }
 
     @Override
@@ -159,7 +165,8 @@ public class LifeMagicHandler implements IMagicHandler {
             boolean isZombie = victim.getType().isIn(EntityTypeTags.ZOMBIES);
             boolean isSkeleton = victim.getType().isIn(EntityTypeTags.SKELETONS);
             boolean isInanimate = !victim.isLiving();
-            if (!(isUndead || isInanimate || isZombie || isSkeleton)){
+            boolean isMinion = (victim instanceof MinionZombieEntity);
+            if (!(isUndead || isInanimate || isZombie || isSkeleton || isMinion)){
                 System.out.println();
                 player.kill();
                 player.getWorld().playSound(
@@ -214,7 +221,7 @@ public class LifeMagicHandler implements IMagicHandler {
                             //THE POSITION MATCH! REZ THE PEOPLE
                             MinecraftServer server = player.getServer();
                             for (ServerPlayerEntity serverPlayer : server.getPlayerManager().getPlayerList()) {
-                                if (serverPlayer.getName().toString().equals(deathName)) {
+                                if (serverPlayer.getName().getString().equals(deathName)) {
                                     //Teleport the player that was found with the same name
                                     serverPlayer.teleport((ServerWorld) player.getWorld(), deathPos.getX()+0.5, deathPos.getY(), deathPos.getZ()+0.5, player.getYaw(), player.getPitch());
                                     //Destroy the deathPos particle

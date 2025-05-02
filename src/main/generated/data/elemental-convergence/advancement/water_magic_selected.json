@@ -1,0 +1,36 @@
+{
+  "parent": "elemental-convergence:root",
+  "criteria": {
+    "has_no_magic": {
+      "conditions": {
+        "advancementName": "elemental-convergence:water_magic_selected",
+        "criterionName": "water_magic_selected",
+        "parentAdvancement": "elemental-convergence:root"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "water_magic_selected": {
+      "conditions": {
+        "requiredMagic": 3
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    }
+  },
+  "display": {
+    "description": "You are imbued with water magic",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:water_bucket"
+    },
+    "title": "Water Magic (3)"
+  },
+  "requirements": [
+    [
+      "water_magic_selected"
+    ],
+    [
+      "has_no_magic"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

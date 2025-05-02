@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:air_lvl2",
+  "criteria": {
+    "air_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:breeze_rod"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "air_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:air_lvl3",
+        "criterionName": "air_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:air_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_air_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:air_lvl3",
+        "criterionName": "air_criterion_lvl3",
+        "magicIndex": 1
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Loot a breeze rod",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:wind_charge"
+    },
+    "title": "Air Level 3"
+  },
+  "requirements": [
+    [
+      "air_criterion_lvl3"
+    ],
+    [
+      "air_has_lvl3"
+    ],
+    [
+      "has_air_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

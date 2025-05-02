@@ -4,17 +4,27 @@ import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class NoMagicHandler implements IMagicHandler {
     @Override
-    public void handleRightClick(PlayerEntity player) {
-        System.out.println("HANDLERIGHTCLICKNOMAGIC");
+    public void handleItemRightClick(PlayerEntity player) {
+    }
+
+    @Override
+    public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
     }
 
     @Override
     public void handlePassive(PlayerEntity player) {
+
+        if (!player.hasStatusEffect(StatusEffects.MINING_FATIGUE)){
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, -1, 9, false, false, false));
+        }
 
     }
 

@@ -5,6 +5,7 @@ import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.mixin.PlayerDataMixin;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -30,10 +31,7 @@ public class MagicEyeItem extends Item {
     private final int magicIndex;
     private final String magicString;
 
-    public static final float DEFAULT_MOVE_SPEED=0.1f;
-    public static final float DEFAULT_JUMP_HEIGHT=0.42f;
-    public static final float DEFAULT_KB_RES=0.0f;
-    public static final float BASE_SCALE = 1.0f;
+
 
     public MagicEyeItem(Settings settings, int magicIndex) {
         super(settings);
@@ -62,22 +60,7 @@ public class MagicEyeItem extends Item {
                 dataSaver.getMagicData().setSelectedMagic(magicIndex);
 
                 //RESETTING PLAYER DATA WHEN USING AN EYE
-                player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F); //Reset max health
-                ((IPlayerMiningMixin) player).setMiningSpeedMultiplier(1.0f); //Reset mining speed
-
-                player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(DEFAULT_MOVE_SPEED); //Reset move speed
-                player.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH).setBaseValue(DEFAULT_JUMP_HEIGHT); //Reset jump height
-                player.getAttributeInstance(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(DEFAULT_KB_RES); //Reset knockback resistance
-
-                ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
-                ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
-                ScaleData playerReach = ScaleTypes.BLOCK_REACH.getScaleData(player);
-                ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
-
-                playerHeight.setScale(BASE_SCALE); //Reset player scale
-                playerWidth.setScale(BASE_SCALE);
-                playerReach.setScale(BASE_SCALE); //Reset player Reach
-                playerHeldItem.setScale(BASE_SCALE); //Reset held item size
+                MagicRegistry.resetPlayerStats(player);
 
                 player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
                         SoundEvents.BLOCK_BEACON_POWER_SELECT, SoundCategory.BLOCKS, 2.0F, 1.0F);
@@ -101,5 +84,7 @@ public class MagicEyeItem extends Item {
 
         return ActionResult.PASS;
     }
+
+
 
 }

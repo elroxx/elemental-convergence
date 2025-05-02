@@ -3,15 +3,15 @@
   "category": "misc",
   "pattern": [
     "FLF",
-    "PEP",
+    "AEA",
     "BBB"
   ],
   "key": {
     "B": {
-      "item": "minecraft:breeze_rod"
+      "item": "minecraft:slime_block"
     },
-    "P": {
-      "item": "minecraft:phantom_membrane"
+    "A": {
+      "item": "minecraft:arrow"
     },
     "F": {
       "item": "minecraft:feather"
