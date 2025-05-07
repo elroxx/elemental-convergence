@@ -19,7 +19,10 @@ import net.minecraft.util.Identifier;
 public class ModEntities {
 
     public static final Identifier DEATH_SOUND_ID = ElementalConvergence.id("life_death_sound");
-    public static final SoundEvent DEATH_SOUND_EVENT = SoundEvent.of(DEATH_SOUND_ID);
+    public static final SoundEvent DEATH_SOUND_EVENT = SoundEvent.of(DEATH_SOUND_ID); //ALSO HAVE TO WRITE AT BOTTOM
+
+    public static final Identifier TRAINWHISTLE_SOUND_ID = ElementalConvergence.id("train_whistle_sound");
+    public static final SoundEvent TRAINWHISTLE_SOUND_EVENT = SoundEvent.of(TRAINWHISTLE_SOUND_ID);
 
     // Entity Registration
     public static final EntityType<ShadowballEntity> SHADOWBALL = Registry.register(
@@ -65,6 +68,7 @@ public class ModEntities {
 
     public static void registerSounds() {
         Registry.register(Registries.SOUND_EVENT, DEATH_SOUND_ID, DEATH_SOUND_EVENT);
+        Registry.register(Registries.SOUND_EVENT, TRAINWHISTLE_SOUND_ID, TRAINWHISTLE_SOUND_EVENT);
     }
 }
 
