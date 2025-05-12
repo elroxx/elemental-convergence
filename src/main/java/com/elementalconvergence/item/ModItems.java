@@ -55,7 +55,7 @@ public class ModItems {
 
     public static final BlockItem FLOWER_GATEWAY_ITEM = register("flower_gateway", new BlockItem(ModBlocks.FLOWER_GATEWAY, new Item.Settings().maxCount(8)));
 
-    public static final Item TRAIN_WHISTLE = register("train_whistle", new SoundCooldownItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item TRAIN_WHISTLE = register("train_whistle", new SteamWhistleItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
 
 
     //to register every item
