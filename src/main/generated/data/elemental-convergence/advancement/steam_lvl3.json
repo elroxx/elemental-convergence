@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:steam_lvl2",
+  "criteria": {
+    "has_steam_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:steam_lvl3",
+        "criterionName": "steam_criterion_lvl3",
+        "magicIndex": 10
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "steam_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:flow_banner_pattern"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "steam_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:steam_lvl3",
+        "criterionName": "steam_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:steam_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Loot a flow banner pattern",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:light_blue_banner"
+    },
+    "title": "Steam Level 3"
+  },
+  "requirements": [
+    [
+      "steam_criterion_lvl3"
+    ],
+    [
+      "steam_has_lvl3"
+    ],
+    [
+      "has_steam_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
