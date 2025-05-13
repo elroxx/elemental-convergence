@@ -89,9 +89,9 @@ public class SteamWhistleItem extends Item {
                         //CLEANSING NEGATIVE EFFECTS
                         cleanseNegativeEffects(nearbyPlayer);
 
-                        // SPEED 2
+                        // SPEED 2 for 30secs
                         nearbyPlayer.addStatusEffect(
-                                new StatusEffectInstance(StatusEffects.SPEED, 20 * 60, 1, false, true)
+                                new StatusEffectInstance(StatusEffects.SPEED, 20 * 30, 1, false, true)
                         );
 
                     }
