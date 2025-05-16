@@ -57,6 +57,8 @@ public class ModItems {
 
     public static final Item TRAIN_WHISTLE = register("train_whistle", new SteamWhistleItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
 
+    public static final Item WINE = register("wine", new WineItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+
 
     //to register every item
     public static <T extends Item> T register(String name, T item) {
