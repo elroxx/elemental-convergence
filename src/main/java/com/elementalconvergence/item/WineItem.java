@@ -6,9 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
@@ -38,11 +36,14 @@ public class WineItem extends Item {
 
             }
 
-            player.getInventory().insertStack(new ItemStack(Items.GLASS_BOTTLE)); //leaving glass bottles
         }
 
         // removed
         stack.decrement(1);
+        if (stack.isEmpty()){
+            return new ItemStack(Items.GLASS_BOTTLE); //leaving the glass bottle
+        }
+        //user.getInventory().insertStack(new ItemStack(Items.GLASS_BOTTLE)); //leaving glass bottles if the stack is bigger than 1, but useless in this case
         return stack;
     }
 
@@ -51,15 +52,13 @@ public class WineItem extends Item {
         return UseAction.DRINK;
     }
 
-    /*@Override
-    public int getMaxUseTime(ItemStack stack) {
+    @Override
+    public int getMaxUseTime(ItemStack stack, LivingEntity user) {
         return 32; // Same as a regular potion
-    }*/
+    }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        return ItemStack.EMPTY.equals(user.getStackInHand(hand)) ?
-                TypedActionResult.pass(user.getStackInHand(hand)) :
-                TypedActionResult.consume(user.getStackInHand(hand));
+        return ItemUsage.consumeHeldItem(world, user, hand);
     }
 }
