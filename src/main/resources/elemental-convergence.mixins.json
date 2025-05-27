@@ -13,7 +13,8 @@
 		"AbstractBlockMixin",
 		"GameRendererMixin",
 		"EntityMixin",
-		"ItemStackMixin"
+		"ItemStackMixin",
+		"BreadMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
