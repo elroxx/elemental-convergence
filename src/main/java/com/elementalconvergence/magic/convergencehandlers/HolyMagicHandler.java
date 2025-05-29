@@ -1,5 +1,7 @@
 package com.elementalconvergence.magic.convergencehandlers;
 
+import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
@@ -34,20 +36,26 @@ public class HolyMagicHandler implements IMagicHandler {
         ItemStack mainHand = player.getMainHandStack();
         ItemStack offHand = player.getOffHandStack();
 
-        //lvl 1 ability
-        if (mainHand.getItem().equals(Items.POTION) && !mainHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()){
-            player.setStackInHand(Hand.MAIN_HAND, new ItemStack(ModItems.WINE, 1));
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int holyLevel = magicData.getMagicLevel(HOLY_INDEX);
+        if (holyLevel>=1) {
 
-            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    net.minecraft.sound.SoundEvents.BLOCK_BREWING_STAND_BREW,
-                    net.minecraft.sound.SoundCategory.PLAYERS, 1.0f, 1.0f);
-        }
-        if (offHand.getItem().equals(Items.POTION) && !offHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()){
-            player.setStackInHand(Hand.OFF_HAND, new ItemStack(ModItems.WINE, 1));
+            //lvl 1 ability
+            if (mainHand.getItem().equals(Items.POTION) && !mainHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
+                player.setStackInHand(Hand.MAIN_HAND, new ItemStack(ModItems.WINE, 1));
 
-            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    net.minecraft.sound.SoundEvents.BLOCK_BREWING_STAND_BREW,
-                    net.minecraft.sound.SoundCategory.PLAYERS, 1.0f, 1.0f);
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        net.minecraft.sound.SoundEvents.BLOCK_BREWING_STAND_BREW,
+                        net.minecraft.sound.SoundCategory.PLAYERS, 1.0f, 1.0f);
+            }
+            if (offHand.getItem().equals(Items.POTION) && !offHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
+                player.setStackInHand(Hand.OFF_HAND, new ItemStack(ModItems.WINE, 1));
+
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        net.minecraft.sound.SoundEvents.BLOCK_BREWING_STAND_BREW,
+                        net.minecraft.sound.SoundCategory.PLAYERS, 1.0f, 1.0f);
+            }
         }
     }
 
