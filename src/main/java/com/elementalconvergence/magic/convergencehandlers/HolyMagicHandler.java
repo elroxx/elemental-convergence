@@ -2,14 +2,20 @@ package com.elementalconvergence.magic.convergencehandlers;
 
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.entity.ModEntities;
+import com.elementalconvergence.entity.PegasusEntity;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.ZombieHorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
@@ -30,32 +36,58 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class HolyMagicHandler implements IMagicHandler {
     public static final int HOLY_INDEX= (BASE_MAGIC_ID.length-1)+4;
 
+    public static final int HORSE_DEFAULT_COOLDOWN=40;
+
+    private int horseCooldown=0;
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
         ItemStack mainHand = player.getMainHandStack();
         ItemStack offHand = player.getOffHandStack();
 
+
+        //Part 2 of passive
+        if (mainHand.getItem().equals(Items.POTION) && !mainHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
+            player.setStackInHand(Hand.MAIN_HAND, new ItemStack(ModItems.WINE, 1));
+
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.BLOCK_BREWING_STAND_BREW,
+                    SoundCategory.PLAYERS, 1.0f, 1.0f);
+        }
+        if (offHand.getItem().equals(Items.POTION) && !offHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
+            player.setStackInHand(Hand.OFF_HAND, new ItemStack(ModItems.WINE, 1));
+
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.BLOCK_BREWING_STAND_BREW,
+                    SoundCategory.PLAYERS, 1.0f, 1.0f);
+        }
+
+
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int holyLevel = magicData.getMagicLevel(HOLY_INDEX);
-        if (holyLevel>=1) {
+        //LVL 2 ABILITY
+        if (holyLevel >= 2) {
+            if (mainHand.isOf(Items.GOLDEN_HORSE_ARMOR) || offHand.isOf(Items.GOLDEN_HORSE_ARMOR) && horseCooldown == 0) {
 
-            //lvl 1 ability
-            if (mainHand.getItem().equals(Items.POTION) && !mainHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
-                player.setStackInHand(Hand.MAIN_HAND, new ItemStack(ModItems.WINE, 1));
+                player.getItemCooldownManager().set(Items.GOLDEN_HORSE_ARMOR, HORSE_DEFAULT_COOLDOWN);
 
-                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                        net.minecraft.sound.SoundEvents.BLOCK_BREWING_STAND_BREW,
-                        net.minecraft.sound.SoundCategory.PLAYERS, 1.0f, 1.0f);
+                //KILL PREVIOUS OWNED
+                ServerWorld serverWorld = (ServerWorld) player.getWorld();
+                killExistingPegasus(player, serverWorld);
+
+                //SUMMON NEW
+                PegasusEntity horse = summonPegasus(player, serverWorld);
+
+
+                //PLAYSOUND
+                serverWorld.playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.ENTITY_HORSE_ANGRY, SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+
+                horseCooldown = HORSE_DEFAULT_COOLDOWN;
             }
-            if (offHand.getItem().equals(Items.POTION) && !offHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
-                player.setStackInHand(Hand.OFF_HAND, new ItemStack(ModItems.WINE, 1));
 
-                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                        net.minecraft.sound.SoundEvents.BLOCK_BREWING_STAND_BREW,
-                        net.minecraft.sound.SoundCategory.PLAYERS, 1.0f, 1.0f);
-            }
         }
     }
 
@@ -103,5 +135,46 @@ public class HolyMagicHandler implements IMagicHandler {
 
     }
 
+
+    private void killExistingPegasus(PlayerEntity player, ServerWorld world) {
+        // check all entities
+        for (PegasusEntity horse : world.getEntitiesByClass(PegasusEntity.class, player.getBoundingBox().expand(1000), entity -> true)) {
+            if (horse!=null && horse.getOwnerUuid()!=null) {
+                if (horse.getOwnerUuid().equals(player.getUuid())) {
+                    horse.refreshPositionAndAngles(horse.getX(), -200.0, horse.getZ(), horse.getYaw(), horse.getPitch());
+                }
+            }
+        }
+    }
+
+    private PegasusEntity summonPegasus(PlayerEntity player, ServerWorld world) {
+        PegasusEntity horse = new PegasusEntity(ModEntities.PEGASUS, world);
+
+        // SAME POS AS PLAYER
+        Vec3d pos = player.getPos();
+        horse.refreshPositionAndAngles(pos.x, pos.y, pos.z, player.getYaw(), 0);
+
+        // SPEED
+        EntityAttributeInstance speedAttribute = horse.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED);
+        if (speedAttribute != null) {
+            speedAttribute.setBaseValue(0.3); // default is 0.2
+        }
+
+        EntityAttributeInstance jumpAttribute = horse.getAttributeInstance(EntityAttributes.GENERIC_JUMP_STRENGTH);
+        if (jumpAttribute != null) {
+            jumpAttribute.setBaseValue(1); // default is 0.7
+        }
+
+        // Spawn the horse in the world
+        world.spawnEntity(horse);
+
+        //Saddle it
+        horse.saddle(new ItemStack(Items.SADDLE), SoundCategory.NEUTRAL);
+        horse.setTame(true);
+        //make the player the owner so that we can kill it later
+        horse.setOwnerUuid(player.getUuid());
+
+        return horse;
+    }
 
 }
