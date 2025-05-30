@@ -67,8 +67,8 @@ public class HolyMagicHandler implements IMagicHandler {
         MagicData magicData = dataSaver.getMagicData();
         int holyLevel = magicData.getMagicLevel(HOLY_INDEX);
         //LVL 2 ABILITY
-        if (holyLevel >= 2) {
-            if (mainHand.isOf(Items.GOLDEN_HORSE_ARMOR) || offHand.isOf(Items.GOLDEN_HORSE_ARMOR) && horseCooldown == 0) {
+        if (holyLevel >= 2 && horseCooldown==0) {
+            if (mainHand.isOf(Items.GOLDEN_HORSE_ARMOR) || offHand.isOf(Items.GOLDEN_HORSE_ARMOR)) {
 
                 player.getItemCooldownManager().set(Items.GOLDEN_HORSE_ARMOR, HORSE_DEFAULT_COOLDOWN);
 
@@ -99,6 +99,10 @@ public class HolyMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
+        //Cooldown management
+        if (horseCooldown>0){
+            horseCooldown--;
+        }
     }
 
     @Override
