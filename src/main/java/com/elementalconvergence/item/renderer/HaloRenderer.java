@@ -14,8 +14,12 @@ import net.minecraft.util.Identifier;
 
 public class HaloRenderer implements ArmorRenderer {
 
-    private static final Identifier HALO_TEXTURE = ElementalConvergence.id("textures/models/armor/halo.png");
+    private HaloModel haloModel;
 
+    public HaloRenderer() {
+        // Initialize the model when the renderer is created
+        this.haloModel = new HaloModel(HaloModel.getTexturedModelData().createModel());
+    }
 
     @Override
     public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, ItemStack stack,
@@ -25,8 +29,7 @@ public class HaloRenderer implements ArmorRenderer {
             return;
         }
 
-        // Load and render the custom halo model
-        HaloModel haloModel = new HaloModel();
+        // Set angles for the halo model
         haloModel.setAngles(entity, 0, 0, entity.age, 0, 0);
 
         // Apply transformations to position the halo above the head
@@ -37,12 +40,12 @@ public class HaloRenderer implements ArmorRenderer {
         matrices.translate(0, -0.75, 0);     // Move above head
         matrices.scale(1.0F, 1.0F, 1.0F);   // Adjust size if needed
 
-        // Render the halo model
+        // Render with solid yellow color using a reliable Minecraft texture
         haloModel.render(matrices,
-                vertexConsumers.getBuffer(RenderLayer.getArmorCutoutNoCull(HALO_TEXTURE)),
+                vertexConsumers.getBuffer(RenderLayer.getEntitySolid(Identifier.of("elemental-convergence", "textures/models/armor/halo.png"))),
                 light,
                 OverlayTexture.DEFAULT_UV,
-                0xFFFFFFFF);
+                0xFFFFFFFF); // Gold/yellow color
 
         matrices.pop();
     }
