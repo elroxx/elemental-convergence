@@ -16,6 +16,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> GILLS = register("gills", new GillsEffect());
     public static final RegistryEntry<StatusEffect> DROWNING = register("drowning", new DrowningEffect());
     public static final RegistryEntry<StatusEffect> EVAPORATED = register("evaporated", new EvaporatedEffect());
+    public static final RegistryEntry<StatusEffect> GUARDIAN_ANGEL = register("guardian_angel", new GuardianAngelEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
