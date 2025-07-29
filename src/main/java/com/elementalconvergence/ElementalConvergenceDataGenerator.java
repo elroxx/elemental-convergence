@@ -7,6 +7,7 @@ import com.elementalconvergence.criterions.isSelectedMagicConcurrentCriterion;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.convergencehandlers.GravityMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
+import com.elementalconvergence.magic.convergencehandlers.SteamMagicHandler;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -310,7 +311,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.display(
 							Items.CHORUS_FLOWER,
 							Text.literal("Gravity Convergence Magic"),
-							Text.literal("Convergence of Earth and Shadow Magics"),
+							Text.literal("Convergence of Shadow and Earth Magics"),
 							null,
 							AdvancementFrame.TASK,
 							true,
@@ -328,6 +329,32 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//GRAVITY LVL 2
 			//GRAVITY LVL 3
 			AdvancementEntry gravityLevel3 = generateGravityLevelsAdvancements(gravitySelectedCN, gravitySelectedAdvName, gravitySelectedAdvancement, consumer);
+
+			//STEAM MAGIC SELECTED
+			String steamSelectedCN="steam_magic_selected";
+			String steamSelectedAdvName=ElementalConvergence.MOD_ID + ":steam_magic_selected";
+			AdvancementEntry steamSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.CAULDRON,
+							Text.literal("Steam Convergence Magic"),
+							Text.literal("Convergence of Fire and Water Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(steamSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							10)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,steamSelectedCN,steamSelectedAdvName)))
+					.parent(fireLevel3)
+					.build(consumer, steamSelectedAdvName);
+
+			//STEAM LVL 1
+			//STEAM LVL 2
+			//STEAM LVL 3
+			AdvancementEntry steamLevel3 = generateSteamLevelsAdvancements(steamSelectedCN, steamSelectedAdvName, steamSelectedAdvancement, consumer);
 		}
 
 		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
@@ -1158,6 +1185,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return gravityAdv3;
+		}
+
+		public AdvancementEntry generateSteamLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = SteamMagicHandler.STEAM_INDEX;
+			String goodMagicPicked = "has_steam_selected_concurrent";
+			String achievementTitle = "Steam Level ";
+			String CN = "steam_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":steam_lvl";
+			String haslvl = "steam_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry steamAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.TRAIN_WHISTLE,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a train whistle"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.TRAIN_WHISTLE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = steamAdv1;
+			lvl = 2;
+			AdvancementEntry steamAdv2 = Advancement.Builder.create()
+					.display(
+							Items.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Loot a flow armor trim template"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = steamAdv2;
+			lvl = 3;
+			AdvancementEntry steamAdv3 = Advancement.Builder.create()
+					.display(
+							Items.LIGHT_BLUE_BANNER,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Loot a flow banner pattern"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.FLOW_BANNER_PATTERN))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return steamAdv3;
 		}
 	}
 }

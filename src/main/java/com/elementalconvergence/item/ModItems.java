@@ -5,18 +5,51 @@ package com.elementalconvergence.item;
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.block.ModBlocks;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
+import net.minecraft.client.sound.Sound;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.item.*;
 import net.minecraft.util.Rarity;
+import net.minecraft.util.Util;
+
+import java.util.EnumMap;
+import java.util.List;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 import static com.elementalconvergence.ElementalConvergence.CONVERGENCE_MAGIC_ID;
 
 public class ModItems {
+
+    //CUSTOM MATERIALS FOR ARMOR
+
+    //Halo material
+    public static final RegistryEntry<ArmorMaterial> HALO_ARMOR_MATERIAL = Registry.registerReference(
+            Registries.ARMOR_MATERIAL,
+            Identifier.of(ElementalConvergence.MOD_ID, "halo"),
+            new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                        map.put(ArmorItem.Type.HELMET, 1); // noob protection
+                        map.put(ArmorItem.Type.CHESTPLATE, 0);
+                        map.put(ArmorItem.Type.LEGGINGS, 0);
+                        map.put(ArmorItem.Type.BOOTS, 0);
+                    }),
+                    30, //enchantability
+                    SoundEvents.ITEM_ARMOR_EQUIP_GOLD, // Equip sound
+                    () -> Ingredient.ofItems(net.minecraft.item.Items.GOLD_INGOT), // Repair ingredient
+                    List.of(
+                            new ArmorMaterial.Layer(Identifier.of(ElementalConvergence.MOD_ID, "halo"))
+                    ),
+                    0.0F, // Toughness
+                    0.0F  // Knockback resistance
+            )
+    );
+
 
     public static final Item TEST_ITEM = register("test_item", new TestItem(
             new Item.Settings().maxCount(1)));
@@ -53,6 +86,13 @@ public class ModItems {
     public static final BlockItem ALTAR_ITEM = register("altar_of_convergence", new BlockItem(ModBlocks.ALTAR_OF_CONVERGENCE, new Item.Settings().maxCount(1)));
 
     public static final BlockItem FLOWER_GATEWAY_ITEM = register("flower_gateway", new BlockItem(ModBlocks.FLOWER_GATEWAY, new Item.Settings().maxCount(8)));
+
+    public static final Item TRAIN_WHISTLE = register("train_whistle", new SteamWhistleItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+
+    public static final Item WINE = register("wine", new WineItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+
+    public static final Item HALO = register("halo", new ArmorItem(HALO_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+
 
 
     //to register every item

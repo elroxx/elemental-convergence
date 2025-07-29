@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TTT",
+    "WEF",
+    "BSB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:water_bucket"
+    },
+    "S": {
+      "item": "minecraft:smoker"
+    },
+    "T": {
+      "item": "elemental-convergence:train_whistle"
+    },
+    "F": {
+      "item": "elemental-convergence:fire_magic_eye"
+    },
+    "W": {
+      "item": "elemental-convergence:water_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:steam_convergent_eye",
+    "count": 1
+  }
+}

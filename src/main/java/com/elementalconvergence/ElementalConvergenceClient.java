@@ -1,10 +1,13 @@
 package com.elementalconvergence;
 
 import com.elementalconvergence.data.IPlayerMiningMixin;
+import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.item.renderer.HaloRenderer;
 import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
 
 public class ElementalConvergenceClient implements ClientModInitializer {
 
@@ -19,5 +22,7 @@ public class ElementalConvergenceClient implements ClientModInitializer {
 
         //Init inventory stealing packets
         InventoryNetworking.registerS2CPackets();
+
+        ArmorRenderer.register(new HaloRenderer(), ModItems.HALO);
     }
 }
