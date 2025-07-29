@@ -4,5 +4,13 @@
     "sounds": [
       "elemental-convergence:life_death_sound"
     ]
+  },
+
+  "train_whistle_sound": {
+    "subtitle": "subtitles.elemental-convergence.train_whistle_sound",
+    "sounds": [
+      "elemental-convergence:train_whistle_sound"
+    ]
   }
+
 }

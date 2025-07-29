@@ -12,7 +12,9 @@
 		"LivingEntityMixin",
 		"AbstractBlockMixin",
 		"GameRendererMixin",
-		"EntityMixin"
+		"EntityMixin",
+		"ItemStackMixin",
+		"BreadMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
