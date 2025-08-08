@@ -67,7 +67,7 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin {
 
     }
 
-    @Inject(method = "canHarvest", at = @At("RETURN"), cancellable = true)
+/*    @Inject(method = "canHarvest", at = @At("RETURN"), cancellable = true)
     private void modifyHarvestLevel(BlockState block, CallbackInfoReturnable<Boolean> cir) {
         boolean original = cir.getReturnValue();
         float decimalPart = miningSpeedMultiplier - (int) miningSpeedMultiplier;
@@ -90,6 +90,8 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin {
 
         }
     }
+
+ */
 
     public void setMiningSpeedMultiplier(float miningSpeedMultiplier){
         this.miningSpeedMultiplier=miningSpeedMultiplier;
