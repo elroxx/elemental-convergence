@@ -2,6 +2,7 @@ package com.elementalconvergence.magic.convergencehandlers;
 
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.entity.PegasusEntity;
 import com.elementalconvergence.item.ModItems;
@@ -11,6 +12,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -37,8 +39,10 @@ public class HolyMagicHandler implements IMagicHandler {
     public static final int HOLY_INDEX= (BASE_MAGIC_ID.length-1)+4;
 
     public static final int HORSE_DEFAULT_COOLDOWN=40;
+    public static final int GUARDIAN_ANGEL_DEFAULT_COOLDOWN=20*60*5; //5 minutes
 
     private int horseCooldown=0;
+    private int guardianAngelCooldown=0;
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -93,7 +97,30 @@ public class HolyMagicHandler implements IMagicHandler {
 
     @Override
     public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+        //guardian angel (lvl 3)
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int holyLevel = magicData.getMagicLevel(HOLY_INDEX);
+        if (holyLevel>=3) {
+            if (player.getMainHandStack().isEmpty()) {
+                if (targetEntity instanceof PlayerEntity target) {
+                    ItemStack headStack = player.getEquippedStack(EquipmentSlot.HEAD);
+                    boolean isGAOnCooldown = player.getItemCooldownManager().isCoolingDown(ModItems.HALO);
+                    if (headStack.isOf(ModItems.HALO) && guardianAngelCooldown == 0 && !isGAOnCooldown) {
 
+                        target.addStatusEffect(new StatusEffectInstance(ModEffects.GUARDIAN_ANGEL, 20 * 60 * 2, 0, false, false, true)); // 2/5 of the cooldown duration (so 2 minutes out of 5)
+
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                                SoundEvents.BLOCK_BEACON_ACTIVATE,
+                                SoundCategory.PLAYERS, 1.0f, 2.0f);
+
+                        //setting the cooldowns again
+                        player.getItemCooldownManager().set(ModItems.HALO, GUARDIAN_ANGEL_DEFAULT_COOLDOWN);
+                        guardianAngelCooldown = GUARDIAN_ANGEL_DEFAULT_COOLDOWN;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -102,6 +129,9 @@ public class HolyMagicHandler implements IMagicHandler {
         //Cooldown management
         if (horseCooldown>0){
             horseCooldown--;
+        }
+        if (guardianAngelCooldown>0){
+            guardianAngelCooldown--;
         }
     }
 

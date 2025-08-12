@@ -561,7 +561,7 @@ public class ElementalConvergence implements ModInitializer {
 			player.addStatusEffect(new StatusEffectInstance(
 					net.minecraft.entity.effect.StatusEffects.FIRE_RESISTANCE, 800, 0)); //so no burn
 			player.addStatusEffect(new StatusEffectInstance(
-					ModEffects.WINGS, 20*30, 0, true, false, false)); //30 seconds of flight
+					ModEffects.WINGS, 20*30, 0, true, false, true)); //30 seconds of flight
 
 			return false; // to cancel death
 		}
