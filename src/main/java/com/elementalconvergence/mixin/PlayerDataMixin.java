@@ -4,12 +4,17 @@ import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.magic.handlers.EarthMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.session.report.ReporterEnvironment;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Hand;
@@ -99,6 +104,23 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin {
 
     public float getMiningSpeedMultiplier(){
         return this.miningSpeedMultiplier;
+    }
+
+
+    //For flight?
+    @Inject(method = "checkFallFlying", at = @At("HEAD"), cancellable = true)
+    private void allowElytraFlightWithEffect(CallbackInfoReturnable<Boolean> cir) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+
+        if (!player.isOnGround() && !player.isFallFlying() && !player.isTouchingWater() && !player.hasStatusEffect(StatusEffects.LEVITATION)) {
+            ItemStack itemStack = player.getEquippedStack(EquipmentSlot.CHEST);
+            if ((itemStack.isOf(Items.ELYTRA) && ElytraItem.isUsable(itemStack)) || player.hasStatusEffect(ModEffects.WINGS)) {
+                player.startFallFlying();
+                cir.setReturnValue(true);
+            }
+        }
+
+        cir.setReturnValue(false);
     }
 
 }
