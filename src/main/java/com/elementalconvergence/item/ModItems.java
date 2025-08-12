@@ -4,6 +4,7 @@ package com.elementalconvergence.item;
 
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.block.ModBlocks;
+import com.elementalconvergence.block.PrayingAltarBlock;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.client.sound.Sound;
 import net.minecraft.item.ItemGroups;
@@ -92,6 +93,8 @@ public class ModItems {
     public static final Item WINE = register("wine", new WineItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
 
     public static final Item HALO = register("halo", new ArmorItem(HALO_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+
+    public static final BlockItem PRAYING_ALTAR_ITEM = register("praying_altar", new BlockItem(ModBlocks.PRAYING_ALTAR, new Item.Settings()));
 
 
 

@@ -34,6 +34,12 @@ public class ModBlocks {
             .strength(2.5f)
     ));
 
+    public static final Block PRAYING_ALTAR = register("praying_altar", new PrayingAltarBlock(Block.Settings.create()
+            .sounds(BlockSoundGroup.STONE)
+            .dropsNothing()
+            .strength(-1.0f, 3600000.0f)
+    ));
+
 
     public static <T extends Block> T register(String name, T block) {
         return Registry.register(Registries.BLOCK, ElementalConvergence.id(name), block);
