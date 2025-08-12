@@ -531,17 +531,37 @@ public class ElementalConvergence implements ModInitializer {
 				int tpHeight=350;
 				Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
 				serverPlayer.teleport((ServerWorld) serverPlayer.getWorld(), serverPlayer.getX(), tpHeight, serverPlayer.getZ(), flags, serverPlayer.getYaw(), serverPlayer.getPitch());
+
+
+				//title part
+				Text titleText = Text.literal("Press Space to Fly")
+						.formatted(Formatting.GRAY, Formatting.BOLD);
+				Text subtitleText = Text.literal("You have 30 seconds to land somewhere")
+						.formatted(Formatting.DARK_GRAY);
+
+				serverPlayer.networkHandler.sendPacket(
+						new net.minecraft.network.packet.s2c.play.TitleS2CPacket(titleText)
+				);
+				serverPlayer.networkHandler.sendPacket(
+						new net.minecraft.network.packet.s2c.play.SubtitleS2CPacket(subtitleText)
+				);
+
+				// title display times
+				serverPlayer.networkHandler.sendPacket(
+						new net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket(10, 60, 20)
+				);
+
 			}
 
-			// Add beneficial effects like totem
-			entity.addStatusEffect(new StatusEffectInstance(
+			//effects
+			player.addStatusEffect(new StatusEffectInstance(
 					net.minecraft.entity.effect.StatusEffects.REGENERATION, 200, 10));
-			entity.addStatusEffect(new StatusEffectInstance(
+			player.addStatusEffect(new StatusEffectInstance(
 					net.minecraft.entity.effect.StatusEffects.ABSORPTION, 100, 4));
-			entity.addStatusEffect(new StatusEffectInstance(
+			player.addStatusEffect(new StatusEffectInstance(
 					net.minecraft.entity.effect.StatusEffects.FIRE_RESISTANCE, 800, 0)); //so no burn
-
-			LOGGER.info("Guardian Angel effect saved " + entity.getName().getString() + " from death!");
+			player.addStatusEffect(new StatusEffectInstance(
+					ModEffects.WINGS, 20*30, 0, true, false, false)); //30 seconds of flight
 
 			return false; // to cancel death
 		}
