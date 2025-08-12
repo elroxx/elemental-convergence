@@ -119,8 +119,6 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin {
                 cir.setReturnValue(true);
             }
         }
-
-        cir.setReturnValue(false);
     }
 
 }
