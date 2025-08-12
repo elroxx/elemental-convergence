@@ -44,12 +44,16 @@ import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
@@ -71,10 +75,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import virtuoel.pehkui.api.PehkuiConfig;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
@@ -211,6 +212,9 @@ public class ElementalConvergence implements ModInitializer {
 			return ActionResult.PASS;
 		});
 
+		//ALLOWING DEATH (guardian angel)
+		ServerLivingEntityEvents.ALLOW_DEATH.register(this::onEntityAllowDeath);
+
 		//AFTER DEATH
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
 			if (damageSource.getAttacker() instanceof PlayerEntity player){
@@ -275,6 +279,8 @@ public class ElementalConvergence implements ModInitializer {
 			}
 
 		});
+
+
 
 		//ON MINE
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) ->{
@@ -499,4 +505,48 @@ public class ElementalConvergence implements ModInitializer {
 		}
 
 	}
+
+	//TO CANCEL DEATH
+	private boolean onEntityAllowDeath(LivingEntity entity, DamageSource damageSource, float damageAmount) {
+		// if guardian angeled
+		StatusEffectInstance guardianAngelEffect = entity.getStatusEffect(ModEffects.GUARDIAN_ANGEL);
+
+		//only players
+		if (guardianAngelEffect != null && entity instanceof PlayerEntity player) {
+			// prevent death part
+			entity.setHealth(1.0f); // so that he doesnt die back to back
+
+			player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+					SoundEvents.BLOCK_BEACON_POWER_SELECT, player.getSoundCategory(), 1.0f, 2.0f);
+
+			//clear all effects (with GA included)
+			entity.clearStatusEffects();
+
+			// invulnerability
+			entity.timeUntilRegen = 40; // 2 seconds of regen time
+			entity.hurtTime = 0;
+
+			//tp
+			if (player instanceof ServerPlayerEntity serverPlayer) {
+				int tpHeight=350;
+				Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+				serverPlayer.teleport((ServerWorld) serverPlayer.getWorld(), serverPlayer.getX(), tpHeight, serverPlayer.getZ(), flags, serverPlayer.getYaw(), serverPlayer.getPitch());
+			}
+
+			// Add beneficial effects like totem
+			entity.addStatusEffect(new StatusEffectInstance(
+					net.minecraft.entity.effect.StatusEffects.REGENERATION, 200, 10));
+			entity.addStatusEffect(new StatusEffectInstance(
+					net.minecraft.entity.effect.StatusEffects.ABSORPTION, 100, 4));
+			entity.addStatusEffect(new StatusEffectInstance(
+					net.minecraft.entity.effect.StatusEffects.FIRE_RESISTANCE, 800, 0)); //so no burn
+
+			LOGGER.info("Guardian Angel effect saved " + entity.getName().getString() + " from death!");
+
+			return false; // to cancel death
+		}
+
+		return true; // else its just normal death
+	}
+
 }
