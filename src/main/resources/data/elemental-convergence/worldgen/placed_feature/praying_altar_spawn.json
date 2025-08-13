@@ -1,0 +1,10 @@
+{
+  "feature": "elemental-convergence:praying_altar_spawn",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": 1
+    }
+  ]
+
+}
