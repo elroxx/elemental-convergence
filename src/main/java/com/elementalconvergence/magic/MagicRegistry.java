@@ -36,6 +36,7 @@ public class MagicRegistry {
         magic_handlers[GravityMagicHandler.GRAVITY_INDEX] = new GravityMagicHandler();
         magic_handlers[SteamMagicHandler.STEAM_INDEX] = new SteamMagicHandler();
         magic_handlers[HolyMagicHandler.HOLY_INDEX] = new HolyMagicHandler();
+        magic_handlers[HoneyMagicHandler.HONEY_INDEX] = new HoneyMagicHandler();
         //magic_handlers[StarMagicHandler.STAR_INDEX] = new StarMagicHandler(); //star removed
 
         System.out.println("MAGICREGISTRY CREATED");
