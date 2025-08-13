@@ -42,7 +42,7 @@ public class RatMagicHandler implements IMagicHandler {
     public static final float BASE_SCALE=1.0f;
     public static final float BASE_HEALTH=20.0f;
 
-    public static final float RAT_MODE_HEIGHT = 0.12f;
+    public static final float RAT_MODE_HEIGHT = 0.15f;
     public static final float RAT_MODE_WIDTH = 0.3f;
     public static final float RAT_MODE_MOTION= 0.5f;
     public static final float RAT_MODE_REACH=0.45f;
