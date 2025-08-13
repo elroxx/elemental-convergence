@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BGB",
+    "AEL",
+    "CGC"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:candle"
+    },
+    "G": {
+      "item": "minecraft:gold_block"
+    },
+    "B": {
+      "item": "minecraft:bell"
+    },
+    "A": {
+      "item": "elemental-convergence:air_magic_eye"
+    },
+    "L": {
+      "item": "elemental-convergence:light_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:holy_convergent_eye",
+    "count": 1
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "parent": "minecraft:block/lectern",
+  "textures": {
+    "bottom": "minecraft:block/quartz_pillar_top",
+    "top": "minecraft:block/quartz_block_top",
+    "front": "minecraft:block/quartz_pillar",
+    "sides": "minecraft:block/quartz_block_top",
+    "particle": "minecraft:block/quartz_block_side",
+    "base": "minecraft:block/quartz_pillar"
+  }
+}

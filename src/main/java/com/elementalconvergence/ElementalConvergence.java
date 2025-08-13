@@ -21,6 +21,7 @@ import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
 import com.elementalconvergence.networking.OpenInventoryPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
+//import com.elementalconvergence.worldgen.ModWorldGeneration;
 import gravity_changer.mixin.EntityCollisionContextMixin;
 import net.fabricmc.api.ModInitializer;
 
@@ -29,7 +30,9 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -37,6 +40,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
@@ -44,12 +48,18 @@ import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
@@ -62,8 +72,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.Heightmap;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
+import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,10 +84,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import virtuoel.pehkui.api.PehkuiConfig;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
@@ -136,6 +146,7 @@ public class ElementalConvergence implements ModInitializer {
 		ModEntities.initialize(); //Entities
 		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
+		//ModWorldGeneration.initialize();
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 
 		//Init the MagicRegistry (magic handler is by player now)
@@ -211,6 +222,9 @@ public class ElementalConvergence implements ModInitializer {
 			return ActionResult.PASS;
 		});
 
+		//ALLOWING DEATH (guardian angel)
+		ServerLivingEntityEvents.ALLOW_DEATH.register(this::onEntityAllowDeath);
+
 		//AFTER DEATH
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
 			if (damageSource.getAttacker() instanceof PlayerEntity player){
@@ -275,6 +289,14 @@ public class ElementalConvergence implements ModInitializer {
 			}
 
 		});
+
+		ServerWorldEvents.LOAD.register((server, world) -> {
+			if (!world.isClient()) {
+				placePrayingAltar(world);
+			}
+		});
+
+
 
 		//ON MINE
 		AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) ->{
@@ -489,8 +511,8 @@ public class ElementalConvergence implements ModInitializer {
 
 		//HOLY REQUIREMENTS
 		ArrayList<Integer> holy_requirements = new ArrayList<>();
-		steam_requirements.add(1); //AIR
-		steam_requirements.add(6); //LIGHT
+		holy_requirements.add(1); //AIR
+		holy_requirements.add(5); //LIGHT
 		arrayForRequirements[3]=holy_requirements;
 
 
@@ -499,4 +521,74 @@ public class ElementalConvergence implements ModInitializer {
 		}
 
 	}
+
+	//TO CANCEL DEATH
+	private boolean onEntityAllowDeath(LivingEntity entity, DamageSource damageSource, float damageAmount) {
+		// if guardian angeled
+		StatusEffectInstance guardianAngelEffect = entity.getStatusEffect(ModEffects.GUARDIAN_ANGEL);
+
+		//only players
+		if (guardianAngelEffect != null && entity instanceof PlayerEntity player) {
+			// prevent death part
+			entity.setHealth(1.0f); // so that he doesnt die back to back
+
+			player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+					SoundEvents.BLOCK_BEACON_POWER_SELECT, player.getSoundCategory(), 1.0f, 2.0f);
+
+			//clear all effects (with GA included)
+			entity.clearStatusEffects();
+
+			// invulnerability
+			entity.timeUntilRegen = 40; // 2 seconds of regen time
+			entity.hurtTime = 0;
+
+			//tp
+			if (player instanceof ServerPlayerEntity serverPlayer) {
+				int tpHeight=350;
+				Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+				serverPlayer.teleport((ServerWorld) serverPlayer.getWorld(), serverPlayer.getX(), tpHeight, serverPlayer.getZ(), flags, serverPlayer.getYaw(), serverPlayer.getPitch());
+
+
+				//title part
+				Text titleText = Text.literal("Press Space to Fly")
+						.formatted(Formatting.GRAY, Formatting.BOLD);
+				Text subtitleText = Text.literal("You have 30 seconds to land somewhere")
+						.formatted(Formatting.DARK_GRAY);
+
+				serverPlayer.networkHandler.sendPacket(
+						new net.minecraft.network.packet.s2c.play.TitleS2CPacket(titleText)
+				);
+				serverPlayer.networkHandler.sendPacket(
+						new net.minecraft.network.packet.s2c.play.SubtitleS2CPacket(subtitleText)
+				);
+
+				// title display times
+				serverPlayer.networkHandler.sendPacket(
+						new net.minecraft.network.packet.s2c.play.TitleFadeS2CPacket(10, 60, 20)
+				);
+
+			}
+
+			//effects
+			player.addStatusEffect(new StatusEffectInstance(
+					net.minecraft.entity.effect.StatusEffects.REGENERATION, 200, 10));
+			player.addStatusEffect(new StatusEffectInstance(
+					net.minecraft.entity.effect.StatusEffects.ABSORPTION, 100, 4));
+			player.addStatusEffect(new StatusEffectInstance(
+					net.minecraft.entity.effect.StatusEffects.FIRE_RESISTANCE, 800, 0)); //so no burn
+			player.addStatusEffect(new StatusEffectInstance(
+					ModEffects.WINGS, 20*30, 0, true, false, true)); //30 seconds of flight
+
+			return false; // to cancel death
+		}
+
+		return true; // else its just normal death
+	}
+
+	private void placePrayingAltar(ServerWorld world) {
+
+		//place praying altar (ONLY SPAWNS AFTER RELOADING THE WORLD ONCE)
+		world.setBlockState(new BlockPos(0, 100, 0), ModBlocks.PRAYING_ALTAR.getDefaultState());
+	}
+
 }

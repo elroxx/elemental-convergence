@@ -14,6 +14,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.particle.ParticleTypes;
@@ -29,6 +30,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -69,8 +71,7 @@ public abstract class LivingEntityMixin {
     //@Shadow public abstract float getPitch();
     @Shadow protected abstract boolean isAlive();
     @Shadow public abstract void setAttacker(@Nullable LivingEntity attacker);
-    @Shadow @Nullable
-    private LivingEntity attacker;
+    @Shadow @Nullable private LivingEntity attacker;
     //@Shadow public int age;
 
     @Inject(method = "onStatusEffectRemoved", at = @At("HEAD"))
@@ -182,6 +183,36 @@ public abstract class LivingEntityMixin {
 
 
             }
+        }
+    }
+
+
+
+    @Inject(method = "tickFallFlying", at = @At("HEAD"), cancellable = true)
+    private void allowWingsFlightContinuation(CallbackInfo ci) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        EntityAccessor accessor = (EntityAccessor) entity;
+
+        // players with wings only
+        if (entity instanceof PlayerEntity player && player.hasStatusEffect(ModEffects.WINGS)) {
+            boolean bl = accessor.invokeGetFlag(7);
+            if (bl && !entity.isOnGround() && !entity.hasVehicle() && !entity.hasStatusEffect(StatusEffects.LEVITATION)) {
+                // no elytra durability dmg
+                bl = true;
+                int i = entity.getFallFlyingTicks() + 1;
+                if (!entity.getWorld().isClient && i % 10 == 0) {
+                    entity.emitGameEvent(GameEvent.ELYTRA_GLIDE);
+                }
+            } else {
+                bl = false;
+            }
+
+            if (!entity.getWorld().isClient) {
+                accessor.invokeSetFlag(7, bl);
+            }
+
+            // cancel the rest of the method (awesome)
+            ci.cancel();
         }
     }
 

@@ -233,6 +233,9 @@ public class EarthMagicHandler implements IMagicHandler {
             else if (state.getBlock() == Blocks.OBSIDIAN) {
                 veinMiner(player, pos, state, 8);
             }
+            else if (state.getBlock() == Blocks.NETHER_QUARTZ_ORE){
+                veinMiner(player, pos, state, 9);
+            }
         }
     }
 
@@ -358,7 +361,7 @@ public class EarthMagicHandler implements IMagicHandler {
 
     private void veinMiner(PlayerEntity player, BlockPos startPos, BlockState startState, int oreType) {
 
-        //0=coal,1=copper,2=iron,3=gold,4=redstone,5=lapis,6=emerald,7=diamond,8=obsidian
+        //0=coal,1=copper,2=iron,3=gold,4=redstone,5=lapis,6=emerald,7=diamond,8=obsidian, 9 quartz
         if (!PROCESSING_BLOCKS.add(startPos)) {
             return; // Already processing this position
         }
@@ -402,6 +405,7 @@ public class EarthMagicHandler implements IMagicHandler {
                             case 6 -> newState.isIn(BlockTags.EMERALD_ORES);
                             case 7 -> newState.isIn(BlockTags.DIAMOND_ORES);
                             case 8 -> newState.getBlock() == Blocks.OBSIDIAN;
+                            case 9 -> newState.getBlock() == Blocks.NETHER_QUARTZ_ORE;
                             default -> false;
                         };
 
