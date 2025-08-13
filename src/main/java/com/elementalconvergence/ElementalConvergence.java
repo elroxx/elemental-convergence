@@ -21,7 +21,7 @@ import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
 import com.elementalconvergence.networking.OpenInventoryPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
-import com.elementalconvergence.worldgen.ModWorldGeneration;
+//import com.elementalconvergence.worldgen.ModWorldGeneration;
 import gravity_changer.mixin.EntityCollisionContextMixin;
 import net.fabricmc.api.ModInitializer;
 
@@ -146,7 +146,7 @@ public class ElementalConvergence implements ModInitializer {
 		ModEntities.initialize(); //Entities
 		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
-		ModWorldGeneration.initialize();
+		//ModWorldGeneration.initialize();
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 
 		//Init the MagicRegistry (magic handler is by player now)
@@ -288,6 +288,12 @@ public class ElementalConvergence implements ModInitializer {
 
 			}
 
+		});
+
+		ServerWorldEvents.LOAD.register((server, world) -> {
+			if (!world.isClient()) {
+				placeGlowstone(world);
+			}
 		});
 
 
@@ -577,6 +583,12 @@ public class ElementalConvergence implements ModInitializer {
 		}
 
 		return true; // else its just normal death
+	}
+
+	private void placeGlowstone(ServerWorld world) {
+
+		//place praying altar (ONLY SPAWNS AFTER RELOADING THE WORLD ONCE)
+		world.setBlockState(new BlockPos(0, 100, 0), ModBlocks.PRAYING_ALTAR.getDefaultState());
 	}
 
 }
