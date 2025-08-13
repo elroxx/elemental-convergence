@@ -292,7 +292,7 @@ public class ElementalConvergence implements ModInitializer {
 
 		ServerWorldEvents.LOAD.register((server, world) -> {
 			if (!world.isClient()) {
-				placeGlowstone(world);
+				placePrayingAltar(world);
 			}
 		});
 
@@ -511,8 +511,8 @@ public class ElementalConvergence implements ModInitializer {
 
 		//HOLY REQUIREMENTS
 		ArrayList<Integer> holy_requirements = new ArrayList<>();
-		steam_requirements.add(1); //AIR
-		steam_requirements.add(6); //LIGHT
+		holy_requirements.add(1); //AIR
+		holy_requirements.add(5); //LIGHT
 		arrayForRequirements[3]=holy_requirements;
 
 
@@ -585,7 +585,7 @@ public class ElementalConvergence implements ModInitializer {
 		return true; // else its just normal death
 	}
 
-	private void placeGlowstone(ServerWorld world) {
+	private void placePrayingAltar(ServerWorld world) {
 
 		//place praying altar (ONLY SPAWNS AFTER RELOADING THE WORLD ONCE)
 		world.setBlockState(new BlockPos(0, 100, 0), ModBlocks.PRAYING_ALTAR.getDefaultState());
