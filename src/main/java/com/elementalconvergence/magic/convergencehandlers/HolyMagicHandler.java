@@ -54,6 +54,7 @@ public class HolyMagicHandler implements IMagicHandler {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int holyLevel = magicData.getMagicLevel(HOLY_INDEX);
+
         if (holyLevel>=1) {
             if (mainHand.getItem().equals(Items.POTION) && !mainHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
                 player.setStackInHand(Hand.MAIN_HAND, new ItemStack(ModItems.WINE, 1));
