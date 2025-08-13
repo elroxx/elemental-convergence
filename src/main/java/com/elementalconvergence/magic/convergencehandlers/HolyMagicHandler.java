@@ -50,26 +50,28 @@ public class HolyMagicHandler implements IMagicHandler {
         ItemStack offHand = player.getOffHandStack();
 
 
-        //Part 2 of passive
-        if (mainHand.getItem().equals(Items.POTION) && !mainHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
-            player.setStackInHand(Hand.MAIN_HAND, new ItemStack(ModItems.WINE, 1));
-
-            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_BREWING_STAND_BREW,
-                    SoundCategory.PLAYERS, 1.0f, 1.0f);
-        }
-        if (offHand.getItem().equals(Items.POTION) && !offHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
-            player.setStackInHand(Hand.OFF_HAND, new ItemStack(ModItems.WINE, 1));
-
-            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BLOCK_BREWING_STAND_BREW,
-                    SoundCategory.PLAYERS, 1.0f, 1.0f);
-        }
-
-
+        //lvl 1
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int holyLevel = magicData.getMagicLevel(HOLY_INDEX);
+        if (holyLevel>=1) {
+            if (mainHand.getItem().equals(Items.POTION) && !mainHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
+                player.setStackInHand(Hand.MAIN_HAND, new ItemStack(ModItems.WINE, 1));
+
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.BLOCK_BREWING_STAND_BREW,
+                        SoundCategory.PLAYERS, 1.0f, 1.0f);
+            }
+            if (offHand.getItem().equals(Items.POTION) && !offHand.get(DataComponentTypes.POTION_CONTENTS).hasEffects()) {
+                player.setStackInHand(Hand.OFF_HAND, new ItemStack(ModItems.WINE, 1));
+
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.BLOCK_BREWING_STAND_BREW,
+                        SoundCategory.PLAYERS, 1.0f, 1.0f);
+            }
+        }
+
+
         //LVL 2 ABILITY
         if (holyLevel >= 2 && horseCooldown==0) {
             if (mainHand.isOf(Items.GOLDEN_HORSE_ARMOR) || offHand.isOf(Items.GOLDEN_HORSE_ARMOR)) {
