@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:holy_lvl2",
+  "criteria": {
+    "has_holy_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:holy_lvl3",
+        "criterionName": "holy_criterion_lvl3",
+        "magicIndex": 11
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "holy_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:music_disc_creator"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "holy_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:holy_lvl3",
+        "criterionName": "holy_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:holy_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Loot the creator music disc",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:music_disc_creator"
+    },
+    "title": "Holy Level 3"
+  },
+  "requirements": [
+    [
+      "holy_criterion_lvl3"
+    ],
+    [
+      "holy_has_lvl3"
+    ],
+    [
+      "has_holy_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

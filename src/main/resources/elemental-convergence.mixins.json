@@ -14,7 +14,8 @@
 		"GameRendererMixin",
 		"EntityMixin",
 		"ItemStackMixin",
-		"BreadMixin"
+		"BreadMixin",
+		"EntityAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

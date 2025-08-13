@@ -6,6 +6,7 @@ import com.elementalconvergence.criterions.SelectedMagicCriterion;
 import com.elementalconvergence.criterions.isSelectedMagicConcurrentCriterion;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.convergencehandlers.GravityMagicHandler;
+import com.elementalconvergence.magic.convergencehandlers.HolyMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.SteamMagicHandler;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
@@ -355,6 +356,32 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//STEAM LVL 2
 			//STEAM LVL 3
 			AdvancementEntry steamLevel3 = generateSteamLevelsAdvancements(steamSelectedCN, steamSelectedAdvName, steamSelectedAdvancement, consumer);
+
+			//HOLY MAGIC SELECTED
+			String holySelectedCN="holy_magic_selected";
+			String holySelectedAdvName=ElementalConvergence.MOD_ID + ":holy_magic_selected";
+			AdvancementEntry holySelectedAdvancement = Advancement.Builder.create()
+					.display(
+							ModItems.ALTAR_ITEM,
+							Text.literal("Holy Convergence Magic"),
+							Text.literal("Convergence of Air and Light Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(holySelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							11)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName,holySelectedCN,holySelectedAdvName)))
+					.parent(airLevel3)
+					.build(consumer, holySelectedAdvName);
+
+			//HOLY LVL 1
+			//HOLY LVL 2
+			//HOLY LVL 3
+			AdvancementEntry holyLevel3 = generateHolyLevelsAdvancements(holySelectedCN, holySelectedAdvName, holySelectedAdvancement, consumer);
 		}
 
 		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer){
@@ -1268,6 +1295,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return steamAdv3;
+		}
+
+		public AdvancementEntry generateHolyLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = HolyMagicHandler.HOLY_INDEX;
+			String goodMagicPicked = "has_holy_selected_concurrent";
+			String achievementTitle = "Holy Level ";
+			String CN = "holy_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":holy_lvl";
+			String haslvl = "holy_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry holyAdv1 = Advancement.Builder.create()
+					.display(
+							Items.GOLDEN_APPLE,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a golden apple"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.GOLDEN_APPLE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = holyAdv1;
+			lvl = 2;
+			AdvancementEntry holyAdv2 = Advancement.Builder.create()
+					.display(
+							ModItems.HALO,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Craft a halo"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.HALO))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = holyAdv2;
+			lvl = 3;
+			AdvancementEntry holyAdv3 = Advancement.Builder.create()
+					.display(
+							Items.MUSIC_DISC_CREATOR,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Loot the creator music disc"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.MUSIC_DISC_CREATOR))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return holyAdv3;
 		}
 	}
 }

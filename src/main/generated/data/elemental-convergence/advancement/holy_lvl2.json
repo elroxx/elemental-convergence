@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:holy_lvl1",
+  "criteria": {
+    "has_holy_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:holy_lvl2",
+        "criterionName": "holy_criterion_lvl2",
+        "magicIndex": 11
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "holy_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "elemental-convergence:halo"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "holy_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:holy_lvl2",
+        "criterionName": "holy_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:holy_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Craft a halo",
+    "icon": {
+      "count": 1,
+      "id": "elemental-convergence:halo"
+    },
+    "title": "Holy Level 2"
+  },
+  "requirements": [
+    [
+      "holy_criterion_lvl2"
+    ],
+    [
+      "holy_has_lvl2"
+    ],
+    [
+      "has_holy_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

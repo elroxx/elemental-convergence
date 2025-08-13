@@ -4,14 +4,12 @@ import com.elementalconvergence.ElementalConvergence;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.FlyingItemEntityRenderer;
-import net.minecraft.client.render.entity.HorseEntityRenderer;
-import net.minecraft.client.render.entity.ZombieEntityRenderer;
+import net.minecraft.client.render.entity.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
@@ -51,6 +49,15 @@ public class ModEntities {
                     .build()
     );
 
+    public static final EntityType<PouletEntity> POULET = Registry.register(
+            Registries.ENTITY_TYPE,
+            ElementalConvergence.id("pouletpeto"),
+            EntityType.Builder.create(PouletEntity::new, SpawnGroup.AMBIENT)
+                    .dimensions(0.5F, 0.5F)
+                    .build()
+    );
+
+
 
 
 
@@ -73,6 +80,10 @@ public class ModEntities {
         EntityRendererRegistry.register(ModEntities.PEGASUS,
                 (EntityRendererFactory.Context context) -> new HorseEntityRenderer(context));
         FabricDefaultAttributeRegistry.register(PEGASUS, HorseEntity.createBaseHorseAttributes());
+
+        EntityRendererRegistry.register(ModEntities.POULET,
+                (EntityRendererFactory.Context context) -> new ChickenEntityRenderer(context));
+        FabricDefaultAttributeRegistry.register(POULET, ChickenEntity.createChickenAttributes());
 
         System.out.println("ModEntities initialized");
 

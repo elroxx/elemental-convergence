@@ -1,15 +1,15 @@
 package com.elementalconvergence.entity;
 
+import com.elementalconvergence.entity.goal.FollowSummonerGoal;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
-import net.minecraft.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.entity.ai.goal.RevengeGoal;
+import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -21,18 +21,20 @@ import java.util.UUID;
 
 public class MinionZombieEntity extends ZombieEntity {
 
-    private PlayerEntity summoner; // The player who summoned this minion. HE WILL GET ATTACKED IF HE DIES.
+    private PlayerEntity summoner; // The player who summoned this minion. HE WILL GET ATTACKED IF HE DIES (or rejoins as well lmao).
+    private LivingEntity summonerLastAttacker;
+    private int attackerCheckCooldown = 0;
 
     public MinionZombieEntity(EntityType<? extends ZombieEntity> entityType, World world) {
         super(entityType, world);
     }
 
-    // Register default attributes for the minion (e.g., health, attack damage)
     public static DefaultAttributeContainer.Builder createMinionZombieAttributes() {
         return HostileEntity.createHostileAttributes()
-                .add(EntityAttributes.GENERIC_MAX_HEALTH, 5.0) // Health
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.25) // Movement speed
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 5.0); // Attack damage
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 5.0) //h^p
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.33) // slightly quicker than wolf
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, 5.0) //dmg
+                .add(EntityAttributes.ZOMBIE_SPAWN_REINFORCEMENTS, 0);// dmg
     }
 
     @Override
@@ -46,16 +48,32 @@ public class MinionZombieEntity extends ZombieEntity {
             if (this.summoner == null || entity == null) {
                 return false;
             }
-
-            // ONLY ATTACK PEOPLE SUMMONER ATTACKED
+            //ATTACK PEOPLE SUMMONER ATTACKED
             return entity != this.summoner && entity == this.summoner.getAttacking();
         }));
 
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, LivingEntity.class, 10, true, false, entity -> {
+            // If summoner is null or entity is null, don't attack anything
+            if (this.summoner == null || entity == null) {
+                return false;
+            }
+
+            // Don't attack the summoner
+            if (entity == this.summoner) {
+                return false;
+            }
+
+            // ATTACK WHOEVER ATTACKED THE SUMMONER
+            return entity == this.summonerLastAttacker && this.summonerLastAttacker != null;
+        }));
+
         // GO ATTACK IN MELEE
-        this.goalSelector.add(2, new MeleeAttackGoal(this, 1.0, false));
+        this.goalSelector.add(3, new MeleeAttackGoal(this, 1.0, false));
 
         // REVENGE GOAL === HITTING WHOEVER HIT HIM
-        this.targetSelector.add(3, new RevengeGoal(this));
+        this.targetSelector.add(4, new RevengeGoal(this));
+
+        this.targetSelector.add(5, new FollowSummonerGoal(this, 1.0f, 5.0f, 100.0f));
     }
 
     @Override
@@ -70,6 +88,52 @@ public class MinionZombieEntity extends ZombieEntity {
 
     public void setSummoner(PlayerEntity summoner) {
         this.summoner = summoner;
+    }
+
+    public PlayerEntity getSummoner(){
+        return this.summoner;
+    }
+
+    public void tick() {
+        super.tick();
+
+        // Check for summoner's attacker every 10 ticks (0.5 seconds)
+        if (this.summoner != null && !this.getWorld().isClient) {
+            this.attackerCheckCooldown--;
+            if (this.attackerCheckCooldown <= 0) {
+                this.attackerCheckCooldown = 10;
+                this.checkSummonerAttacker();
+            }
+        }
+    }
+
+    private void checkSummonerAttacker() {
+        if (this.summoner == null) {
+            return;
+        }
+
+        // Check if summoner has a recent attacker
+        LivingEntity attacker = this.summoner.getAttacker();
+        if (attacker != null && attacker != this.summoner && attacker.isAlive()) {
+            // Only update if it's a different attacker or if we don't have one yet
+            if (this.summonerLastAttacker != attacker) {
+                this.summonerLastAttacker = attacker;
+
+                // Clear current target to re-evaluate
+                this.setTarget(null);
+            }
+        }
+    }
+
+    public void setSummonerAttacker(LivingEntity attacker) {
+        if (attacker != null && attacker != this.summoner && attacker.isAlive()) {
+            this.summonerLastAttacker = attacker;
+            this.setTarget(null); // Clear current target to re-evaluate
+        }
+    }
+
+    public LivingEntity getSummonerLastAttacker() {
+        return this.summonerLastAttacker;
     }
 
 
@@ -129,4 +193,7 @@ public class MinionZombieEntity extends ZombieEntity {
         this.setEquipmentDropChance(EquipmentSlot.MAINHAND, 0.0f);
     }
 
+    public final boolean cannotFollowSummoner() {
+        return this.hasVehicle() || this.mightBeLeashed() || this.getSummoner() != null && this.getSummoner().isSpectator();
+    }
 }
