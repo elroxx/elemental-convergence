@@ -129,6 +129,15 @@ public class HolyMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
+        //debuff checker
+        if (player.hasStatusEffect(ModEffects.PRAYER) && player.hasStatusEffect(StatusEffects.WEAKNESS)){
+            player.removeStatusEffect(StatusEffects.WEAKNESS);
+        }
+        if (!player.hasStatusEffect(ModEffects.PRAYER) && !player.hasStatusEffect(StatusEffects.WEAKNESS)){
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, -1, 1, false, true, true));
+        }
+
+
         //Cooldown management
         if (horseCooldown>0){
             horseCooldown--;
