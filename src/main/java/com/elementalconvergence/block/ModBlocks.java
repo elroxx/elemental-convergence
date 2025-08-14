@@ -5,8 +5,10 @@ import com.elementalconvergence.ElementalConvergence;
 //import com.elementalconvergence.item.BlackSnowballItem;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -38,6 +40,15 @@ public class ModBlocks {
             .sounds(BlockSoundGroup.STONE)
             .dropsNothing()
             .strength(-1.0f, 3600000.0f)
+    ));
+
+    public static final Block REINFORCED_HONEYCOMB = register("reinforced_honeycomb_block", new ReinforcedHoneycombBlock(Block.Settings.create()
+            .strength(-1.0f, 3600000.0f)
+            .dropsNothing()
+            .sounds(BlockSoundGroup.CORAL)
+            .dropsNothing()
+            .mapColor(MapColor.ORANGE)
+            .pistonBehavior(PistonBehavior.BLOCK)
     ));
 
 

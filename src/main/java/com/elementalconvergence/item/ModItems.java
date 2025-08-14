@@ -96,7 +96,9 @@ public class ModItems {
 
     public static final BlockItem PRAYING_ALTAR_ITEM = register("praying_altar", new BlockItem(ModBlocks.PRAYING_ALTAR, new Item.Settings()));
 
+    public static final Item PORTABLE_BEEHIVE = register("portable_beehive", new PortableBeehiveItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
 
+    public static final Item REINFORCED_HONEYCOMB_BLOCK_ITEM = register("reinforced_honeycomb_block", new BlockItem(ModBlocks.REINFORCED_HONEYCOMB, new Item.Settings()));
 
     //to register every item
     public static <T extends Item> T register(String name, T item) {

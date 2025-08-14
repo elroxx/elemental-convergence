@@ -6,6 +6,7 @@ import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
 import com.elementalconvergence.criterions.ModCriterions;
+import com.elementalconvergence.data.BeehivePlayerData;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
@@ -22,6 +23,7 @@ import com.elementalconvergence.networking.MiningSpeedPayload;
 import com.elementalconvergence.networking.OpenInventoryPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
 //import com.elementalconvergence.worldgen.ModWorldGeneration;
+import com.elementalconvergence.world.dimension.ModDimensions;
 import gravity_changer.mixin.EntityCollisionContextMixin;
 import net.fabricmc.api.ModInitializer;
 
@@ -31,6 +33,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
@@ -146,7 +149,7 @@ public class ElementalConvergence implements ModInitializer {
 		ModEntities.initialize(); //Entities
 		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
-		//ModWorldGeneration.initialize();
+		ModDimensions.initialize();
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 
 		//Init the MagicRegistry (magic handler is by player now)
@@ -290,11 +293,16 @@ public class ElementalConvergence implements ModInitializer {
 
 		});
 
+		//generating the praying altar
 		ServerWorldEvents.LOAD.register((server, world) -> {
 			if (!world.isClient()) {
 				placePrayingAltar(world);
 			}
 		});
+
+		//Set beehive player data server on server started
+		ServerLifecycleEvents.SERVER_STARTED.register(BeehivePlayerData::setServer);
+
 
 
 

@@ -7,6 +7,7 @@ import com.elementalconvergence.ElementalConvergence;
 import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
@@ -88,6 +89,8 @@ public class MagicRegistry {
         ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
         ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
         ScaleData playerKnockback = ScaleTypes.KNOCKBACK.getScaleData(player);
+        ScaleData playerMotion = ScaleTypes.MOTION.getScaleData(player);
+        ScaleData playerFlightSpeed = ScaleTypes.FLIGHT.getScaleData(player);
 
         playerHeight.setScale(BASE_SCALE); //Reset player scale
         playerWidth.setScale(BASE_SCALE);
@@ -96,12 +99,21 @@ public class MagicRegistry {
         playerHeldItem.setScale(BASE_SCALE); //Reset held item size
         playerAttack.setScale(BASE_SCALE);
         playerKnockback.setScale(BASE_SCALE);
+        playerMotion.setScale(BASE_SCALE);
+        playerFlightSpeed.setScale(BASE_SCALE);
 
         ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
         ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
+        ((HoneyMagicHandler)getHandler(player, HoneyMagicHandler.HONEY_INDEX)).resetBeeSkinToggle(); //RESET THE HASSKINON FOR Bee skin
 
         //Resetting the gravity of the player
         GravityChangerAPI.resetGravity(player);
+
+        //RESETTING CREATIVE FLIGHT ABILITY
+        if (player.getAbilities().allowFlying) {
+            player.getAbilities().allowFlying = false;
+            ((ServerPlayerEntity) player).sendAbilitiesUpdate();
+        }
 
         player.clearStatusEffects();
     }

@@ -42,7 +42,7 @@ public class HoneyMagicHandler implements IMagicHandler {
     public static final float BEE_HEIGHT = 0.10f;
     public static final float BEE_WIDTH = 0.15f;
     public static final float BEE_MOTION= 0.25f;
-    public static final float BEE_REACH=0.6f;
+    public static final float BEE_REACH=0.8f;
     public static final float BEE_HEALTH=16.0f;
     public static final float BEE_FLIGHT_SPEED=2.4f; //so 0.6 the speed of a creative player
 
@@ -126,6 +126,10 @@ public class HoneyMagicHandler implements IMagicHandler {
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
 
+    }
+
+    public void resetBeeSkinToggle(){
+        hasSkinOn=false;
     }
 
 }
