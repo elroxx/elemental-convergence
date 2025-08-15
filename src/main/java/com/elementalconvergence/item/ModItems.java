@@ -51,6 +51,27 @@ public class ModItems {
             )
     );
 
+    public static final RegistryEntry<ArmorMaterial> CROWN_ARMOR_MATERIAL = Registry.registerReference(
+            Registries.ARMOR_MATERIAL,
+            Identifier.of(ElementalConvergence.MOD_ID, "crown"),
+            new ArmorMaterial(
+                    Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+                        map.put(ArmorItem.Type.HELMET, 2); // noob protection
+                        map.put(ArmorItem.Type.CHESTPLATE, 0);
+                        map.put(ArmorItem.Type.LEGGINGS, 0);
+                        map.put(ArmorItem.Type.BOOTS, 0);
+                    }),
+                    30, //enchantability
+                    SoundEvents.ITEM_ARMOR_EQUIP_GOLD, // Equip sound
+                    () -> Ingredient.ofItems(net.minecraft.item.Items.GOLD_INGOT), // Repair ingredient
+                    List.of(
+                            new ArmorMaterial.Layer(Identifier.of(ElementalConvergence.MOD_ID, "crown"))
+                    ),
+                    0.0F, // Toughness
+                    0.0F  // Knockback resistance
+            )
+    );
+
 
     public static final Item TEST_ITEM = register("test_item", new TestItem(
             new Item.Settings().maxCount(1)));
@@ -101,6 +122,8 @@ public class ModItems {
     public static final Item REINFORCED_HONEYCOMB_BLOCK_ITEM = register("reinforced_honeycomb_block", new BlockItem(ModBlocks.REINFORCED_HONEYCOMB, new Item.Settings()));
 
     public static final Item LOCK_ITEM = register("lock", new Item(new Item.Settings().maxCount(1)));
+
+    public static final Item CROWN = register("crown", new ArmorItem(CROWN_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1)));
 
     //to register every item
     public static <T extends Item> T register(String name, T item) {
