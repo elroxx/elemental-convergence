@@ -696,16 +696,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl = 3;
 			AdvancementEntry waterAdv3 = Advancement.Builder.create()
 					.display(
-							Items.CONDUIT,
+							Items.HEART_OF_THE_SEA,
 							Text.literal(achievementTitle + lvl), //title
-							Text.literal("Loot a heart of the sea"), //description
+							Text.literal("Craft a conduit"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.HEART_OF_THE_SEA))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.CONDUIT))
 					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
