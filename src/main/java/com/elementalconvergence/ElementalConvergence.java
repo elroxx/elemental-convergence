@@ -11,6 +11,7 @@ import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.LevelManager;
@@ -150,6 +151,7 @@ public class ElementalConvergence implements ModInitializer {
 		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
 		ModDimensions.initialize();
+		ModEnchantments.initialize();
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 
 		//Init the MagicRegistry (magic handler is by player now)
