@@ -100,6 +100,8 @@ public class ModItems {
 
     public static final Item REINFORCED_HONEYCOMB_BLOCK_ITEM = register("reinforced_honeycomb_block", new BlockItem(ModBlocks.REINFORCED_HONEYCOMB, new Item.Settings()));
 
+    public static final Item LOCK_ITEM = register("lock", new Item(new Item.Settings().maxCount(1)));
+
     //to register every item
     public static <T extends Item> T register(String name, T item) {
         return Registry.register(Registries.ITEM, ElementalConvergence.id(name), item);
