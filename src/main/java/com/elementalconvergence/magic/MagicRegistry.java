@@ -1,20 +1,21 @@
 package com.elementalconvergence.magic;
 
 import com.elementalconvergence.data.IPlayerMiningMixin;
+import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.convergencehandlers.*;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
 import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class MagicRegistry {
     private static final Map<UUID, IMagicHandler[]> playerMagicHandlers = new HashMap<>(); // Map so that each player has a specific magicHandler
@@ -116,5 +117,19 @@ public class MagicRegistry {
         }
 
         player.clearStatusEffects();
+
+
+        //Clean bee locks
+        PlayerInventory inventory = player.getInventory();
+
+        // check all inv slots
+        for (int i = 0; i < 36; i++) {
+            ItemStack currentStack = inventory.getStack(i);
+
+            // if item is lock we replace
+            if (currentStack.isOf(ModItems.LOCK_ITEM)) {
+                inventory.setStack(i, ItemStack.EMPTY);
+            }
+        }
     }
 }

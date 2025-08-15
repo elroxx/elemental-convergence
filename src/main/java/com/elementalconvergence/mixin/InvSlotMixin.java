@@ -24,26 +24,11 @@ public abstract class InvSlotMixin {
         ItemStack stack = this.getStack();
 
         if (!stack.isEmpty()) {
-            // Check if the item has the Locking Curse enchantment
+            //verify if item has lock curse
             if (EnchantmentHelper.getLevel(playerEntity.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.LOCKING_CURSE), stack) > 0) {
-                // Prevent taking the item
+                //stop taking item
                 cir.setReturnValue(false);
             }
         }
     }
-
-    /**
-     * Alternative approach: Also prevent inserting locked items into slots
-     * This prevents moving locked items around even with keyboard shortcuts
-     */
-    /*@Inject(method = "canInsert", at = @At("HEAD"), cancellable = true)
-    private void preventInsertingLockedItems(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-        if (!stack.isEmpty()) {
-            // Check if the item being inserted has the Locking Curse enchantment
-            if (EnchantmentHelper.getLevel(playerEntity.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.LOCKING_CURSE), stack) > 0) {
-                // Prevent inserting the item
-                cir.setReturnValue(false);
-            }
-        }
-    }*/
 }

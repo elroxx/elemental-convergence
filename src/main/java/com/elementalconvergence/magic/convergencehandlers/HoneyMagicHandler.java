@@ -3,13 +3,18 @@ package com.elementalconvergence.magic.convergencehandlers;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.entity.PegasusEntity;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
@@ -17,8 +22,10 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -26,9 +33,13 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 
@@ -45,6 +56,9 @@ public class HoneyMagicHandler implements IMagicHandler {
     public static final float BEE_REACH=0.8f;
     public static final float BEE_HEALTH=16.0f;
     public static final float BEE_FLIGHT_SPEED=2.4f; //so 0.6 the speed of a creative player
+
+    public static final int INVENTORY_LOCK_DEFAULT_COOLDOWN = 20; //aka 1 seconds
+    private int inventoryLockCooldown=0;
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -92,6 +106,38 @@ public class HoneyMagicHandler implements IMagicHandler {
             player.getAbilities().allowFlying = true;
             ((ServerPlayerEntity) player).sendAbilitiesUpdate();
         }
+
+
+        //DEBUFF (Inventory replacement)
+        if (inventoryLockCooldown==0){
+            PlayerInventory inventory = player.getInventory();
+            List<ItemStack> displacedItems = new ArrayList<>();
+
+            // check all inv slots (so 9 to 36 coz 0-8 is hotbar)
+            for (int i = 9; i < 36; i++) {
+                ItemStack currentStack = inventory.getStack(i);
+
+                // if item is not already a lock, we save it
+                if (!currentStack.isEmpty() && !currentStack.isOf(ModItems.LOCK_ITEM)) {
+                    displacedItems.add(currentStack.copy());
+                }
+
+                //replace with lock
+                ItemStack locks = createEnchantedLock(player.getWorld());
+                inventory.setStack(i, locks);
+            }
+
+            //if inventory was not fully empty
+            if (!displacedItems.isEmpty()) {
+                dropItemsOnGround(player, displacedItems);
+            }
+        }
+
+        //Cooldowns
+        if (inventoryLockCooldown>0){
+            inventoryLockCooldown--;
+        }
+
     }
 
     @Override
@@ -130,6 +176,40 @@ public class HoneyMagicHandler implements IMagicHandler {
 
     public void resetBeeSkinToggle(){
         hasSkinOn=false;
+    }
+
+
+    private static ItemStack createEnchantedLock(World world) {
+        ItemStack lock = new ItemStack(ModItems.LOCK_ITEM);
+
+        // need registry entry
+        RegistryEntry<Enchantment> lockingCurse = world.getRegistryManager()
+                .get(net.minecraft.registry.RegistryKeys.ENCHANTMENT)
+                .getEntry(ModEnchantments.LOCKING_CURSE)
+                .orElse(null);
+
+        RegistryEntry<Enchantment> vanishingCurse = world.getRegistryManager()
+                .get(net.minecraft.registry.RegistryKeys.ENCHANTMENT)
+                .getEntry(Enchantments.VANISHING_CURSE)
+                .orElse(null);
+
+
+        //enchant lock
+        if (lockingCurse != null) {
+            lock.addEnchantment(lockingCurse, 1);
+        }
+        if (vanishingCurse != null) {
+            lock.addEnchantment(vanishingCurse, 1);
+        }
+
+        return lock;
+    }
+
+    private static void dropItemsOnGround(PlayerEntity player, List<ItemStack> items) {
+        //just drop all the items dont need no chest
+        for (ItemStack item : items) {
+            player.dropItem(item, false);
+        }
     }
 
 }
