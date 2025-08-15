@@ -14,6 +14,8 @@ public class ModEnchantments {
     //public static final RegistryKey<Enchantment> THUNDERING = of("thundering");
     //public static MapCodec<LightningEnchantmentEffect> LIGHTNING_EFFECT = register("lightning_effect", LightningEnchantmentEffect.CODEC);
 
+    public static final RegistryKey<Enchantment> LOCKING_CURSE = registerEnchantment("locking_curse");
+    public static final MapCodec<LockingCurseEffect> LOCKING_CURSE_EFFECT = registerEnchantmentEffect("locking_curse_effect", LockingCurseEffect.CODEC);
 
 
 

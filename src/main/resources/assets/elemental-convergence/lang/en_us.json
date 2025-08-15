@@ -46,5 +46,6 @@
   "block.elemental-convergence.altar_of_convergence": "Altar of Convergence",
   "block.elemental-convergence.flower_gateway": "Tree Stump",
   "block.elemental-convergence.praying_altar": "Praying Altar",
-  "block.elemental-convergence.reinforced_honeycomb_block": "Reinforced Honeycomb Block"
+  "block.elemental-convergence.reinforced_honeycomb_block": "Reinforced Honeycomb Block",
+  "enchantment.elemental-convergence.locking_curse": "§cCurse of Locking"
 }
