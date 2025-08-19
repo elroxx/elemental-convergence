@@ -15,6 +15,7 @@ import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.entity.passive.BeeEntity;
 
 public class ModEntities {
 
@@ -57,6 +58,14 @@ public class ModEntities {
                     .build()
     );
 
+    public static final EntityType<MinionBeeEntity> MINION_BEE = Registry.register(
+            Registries.ENTITY_TYPE,
+            ElementalConvergence.id("minion_bee"),
+            EntityType.Builder.create(MinionBeeEntity::new, SpawnGroup.AMBIENT)
+                    .dimensions(0.7f, 0.6f)
+                    .build()
+    );
+
 
 
 
@@ -84,6 +93,10 @@ public class ModEntities {
         EntityRendererRegistry.register(ModEntities.POULET,
                 (EntityRendererFactory.Context context) -> new ChickenEntityRenderer(context));
         FabricDefaultAttributeRegistry.register(POULET, ChickenEntity.createChickenAttributes());
+
+        EntityRendererRegistry.register(ModEntities.MINION_BEE,
+                (EntityRendererFactory.Context context) -> new BeeEntityRenderer(context));
+        FabricDefaultAttributeRegistry.register(MINION_BEE, BeeEntity.createBeeAttributes());
 
         System.out.println("ModEntities initialized");
 

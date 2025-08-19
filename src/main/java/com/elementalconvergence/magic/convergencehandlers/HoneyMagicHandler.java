@@ -4,6 +4,7 @@ import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.enchantment.ModEnchantments;
+import com.elementalconvergence.entity.MinionBeeEntity;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.entity.PegasusEntity;
 import com.elementalconvergence.item.ModItems;
@@ -21,6 +22,7 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -30,9 +32,13 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
@@ -62,7 +68,10 @@ public class HoneyMagicHandler implements IMagicHandler {
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
-
+        if (player.getMainHandStack().isEmpty()){
+            player.sendMessage(Text.of("SUMMON BEE"));
+            spawnMinionBee(player, player.getWorld());
+        }
     }
 
     @Override
@@ -212,4 +221,99 @@ public class HoneyMagicHandler implements IMagicHandler {
         }
     }
 
+    private static void spawnMinionBee(PlayerEntity player, World world) {
+        MinionBeeEntity bee = new MinionBeeEntity(ModEntities.MINION_BEE, world);
+
+        //pos for bee
+        Vec3d playerPos = player.getPos();
+        bee.setPosition(playerPos.x + 1, playerPos.y + 1, playerPos.z);
+
+        //set owner
+        bee.setOwner(player);
+
+        world.spawnEntity(bee);
+
+        //Sounds
+        world.playSound(null, player.getBlockPos(),
+                net.minecraft.sound.SoundEvents.ENTITY_BEE_HURT,
+                net.minecraft.sound.SoundCategory.NEUTRAL, 1.0f, 1.0f);
+
+    }
+
+    private static void targetAllBeesToEntity(PlayerEntity player, World world, Entity target) {
+        // choose only bees with that specific owner
+        List<MinionBeeEntity> nearbyMinionBees = world.getEntitiesByClass(
+                MinionBeeEntity.class,
+                player.getBoundingBox().expand(32.0),
+                bee -> bee.getOwner().getUuid().equals(player.getUuid()) //they need to have this exact uuid
+        );
+
+        //change target for all minion bees
+        for (MinionBeeEntity bee : nearbyMinionBees) {
+            if (target instanceof net.minecraft.entity.LivingEntity livingTarget) {
+                bee.setTarget(livingTarget);
+                bee.setAngerTime(400);
+                bee.setAngryAt(target.getUuid());
+            }
+        }
+
+        //play sound
+        if (!nearbyMinionBees.isEmpty()) {
+            world.playSound(null, player.getBlockPos(),
+                    net.minecraft.sound.SoundEvents.ENTITY_BEE_LOOP_AGGRESSIVE,
+                    net.minecraft.sound.SoundCategory.NEUTRAL, 1.0f, 1.2f);
+        }
+    }
+
+    private static HitResult raycastForEntity(PlayerEntity player, World world) {
+        // raycast to find next bee target
+        Vec3d start = player.getEyePos();
+        Vec3d direction = player.getRotationVec(1.0F);
+        Vec3d end = start.add(direction.multiply(32.0)); // 32 block range
+
+        // check for entities
+        EntityHitResult entityHit = raycastForEntities(player, world, start, end);
+        if (entityHit != null) {
+            return entityHit;
+        }
+
+        // if no entity, check block instead
+        return world.raycast(new RaycastContext(
+                start, end,
+                RaycastContext.ShapeType.OUTLINE,
+                RaycastContext.FluidHandling.NONE,
+                player
+        ));
+    }
+
+    private static EntityHitResult raycastForEntities(PlayerEntity player, World world, Vec3d start, Vec3d end) {
+        Entity closestEntity = null;
+        double closestDistance = Double.MAX_VALUE;
+
+        //all entities in path
+        List<Entity> entities = world.getOtherEntities(player,
+                player.getBoundingBox().stretch(end.subtract(start)).expand(1.0));
+
+        for (Entity entity : entities) {
+            if (entity == player) continue;
+
+            //if ray intersection with entity hitbox
+            var boundingBox = entity.getBoundingBox().expand(0.3);
+            var hit = boundingBox.raycast(start, end);
+
+            if (hit.isPresent()) {
+                double distance = start.distanceTo(hit.get());
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestEntity = entity;
+                }
+            }
+        }
+
+        if (closestEntity != null) {
+            return new EntityHitResult(closestEntity);
+        }
+
+        return null;
+    }
 }
