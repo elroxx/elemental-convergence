@@ -5,10 +5,7 @@ import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.criterions.SelectedMagicCriterion;
 import com.elementalconvergence.criterions.isSelectedMagicConcurrentCriterion;
 import com.elementalconvergence.item.ModItems;
-import com.elementalconvergence.magic.convergencehandlers.GravityMagicHandler;
-import com.elementalconvergence.magic.convergencehandlers.HolyMagicHandler;
-import com.elementalconvergence.magic.convergencehandlers.RatMagicHandler;
-import com.elementalconvergence.magic.convergencehandlers.SteamMagicHandler;
+import com.elementalconvergence.magic.convergencehandlers.*;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
@@ -383,6 +380,33 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//HOLY LVL 2
 			//HOLY LVL 3
 			AdvancementEntry holyLevel3 = generateHolyLevelsAdvancements(holySelectedCN, holySelectedAdvName, holySelectedAdvancement, consumer);
+
+			//HONEY MAGIC SELECTED
+			String honeySelectedCN = "honey_magic_selected";
+			String honeySelectedAdvName = ElementalConvergence.MOD_ID + ":honey_magic_selected";
+			AdvancementEntry honeySelectedAdvancement = Advancement.Builder.create()
+					.display(
+							ModItems.ALTAR_ITEM,
+							Text.literal("Honey Convergence Magic"),
+							Text.literal("Convergence of Air and Life Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(honeySelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							12)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName, honeySelectedCN, honeySelectedAdvName)))
+					.parent(lifeLevel3)
+					.build(consumer, honeySelectedAdvName);
+
+			//HONEY LVL 1
+			//HONEY LVL 2
+			//HONEY LVL 3
+			AdvancementEntry honeyLevel3 = generateHoneyLevelsAdvancements(honeySelectedCN, honeySelectedAdvName, honeySelectedAdvancement, consumer);
+
 		}
 
 		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
@@ -946,16 +970,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl = 3;
 			AdvancementEntry lifeAdv3 = Advancement.Builder.create()
 					.display(
-							Items.PITCHER_POD,
+							Items.TOTEM_OF_UNDYING,
 							Text.literal(achievementTitle + lvl), //title
-							Text.literal("Obtain a pitcher plant"), //description
+							Text.literal("Loot a totem of undying"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.PITCHER_PLANT))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.TOTEM_OF_UNDYING))
 					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
@@ -1380,5 +1404,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 
 			return holyAdv3;
 		}
+
+		public AdvancementEntry generateHoneyLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = HoneyMagicHandler.HONEY_INDEX;
+			String goodMagicPicked = "has_honey_selected_concurrent";
+			String achievementTitle = "Honey Level ";
+			String CN = "honey_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":honey_lvl";
+			String haslvl = "honey_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry honeyAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.CROWN,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a crown"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.CROWN))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = honeyAdv1;
+			lvl = 2;
+			AdvancementEntry honeyAdv2 = Advancement.Builder.create()
+					.display(
+							ModItems.PORTABLE_BEEHIVE,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Craft a portable beehive"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.PORTABLE_BEEHIVE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = honeyAdv2;
+			lvl = 3;
+			AdvancementEntry honeyAdv3 = Advancement.Builder.create()
+					.display(
+							Items.PITCHER_POD,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Harvest a pitcher plant"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.PITCHER_PLANT))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return honeyAdv3;
+		}
+
 	}
 }
