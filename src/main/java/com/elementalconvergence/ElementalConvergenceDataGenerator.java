@@ -386,9 +386,9 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			String honeySelectedAdvName = ElementalConvergence.MOD_ID + ":honey_magic_selected";
 			AdvancementEntry honeySelectedAdvancement = Advancement.Builder.create()
 					.display(
-							ModItems.ALTAR_ITEM,
+							Items.HONEY_BOTTLE,
 							Text.literal("Honey Convergence Magic"),
-							Text.literal("Convergence of Air and Life Magics"),
+							Text.literal("Convergence of Life and Air Magics"),
 							null,
 							AdvancementFrame.TASK,
 							true,
