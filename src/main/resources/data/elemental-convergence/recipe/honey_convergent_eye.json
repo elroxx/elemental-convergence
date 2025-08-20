@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BVB",
+    "AEL",
+    "HHH"
+  ],
+  "key": {
+    "H": {
+      "item": "minecraft:honey_block"
+    },
+    "B": {
+      "item": "minecraft:honeycomb_block"
+    },
+    "V": {
+      "item": "minecraft:beehive"
+    },
+    "A": {
+      "item": "elemental-convergence:air_magic_eye"
+    },
+    "L": {
+      "item": "elemental-convergence:life_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:honey_convergent_eye",
+    "count": 1
+  }
+}
