@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:honey_lvl1",
+  "criteria": {
+    "has_honey_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:honey_lvl2",
+        "criterionName": "honey_criterion_lvl2",
+        "magicIndex": 12
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "honey_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "elemental-convergence:portable_beehive"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "honey_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:honey_lvl2",
+        "criterionName": "honey_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:honey_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Craft a portable beehive",
+    "icon": {
+      "count": 1,
+      "id": "elemental-convergence:portable_beehive"
+    },
+    "title": "Honey Level 2"
+  },
+  "requirements": [
+    [
+      "honey_criterion_lvl2"
+    ],
+    [
+      "honey_has_lvl2"
+    ],
+    [
+      "has_honey_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
