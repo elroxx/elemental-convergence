@@ -5,8 +5,10 @@ package com.elementalconvergence.item;
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.block.PrayingAltarBlock;
+import com.elementalconvergence.effect.ModEffects;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.client.sound.Sound;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
@@ -124,6 +126,8 @@ public class ModItems {
     public static final Item LOCK_ITEM = register("lock", new Item(new Item.Settings().maxCount(1)));
 
     public static final Item CROWN = register("crown", new ArmorItem(CROWN_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1)));
+
+    public static final Item WHITE_POLLEN = register("pollen_white", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60, 1, new Item.Settings().maxCount(6)));
 
     //to register every item
     public static <T extends Item> T register(String name, T item) {
