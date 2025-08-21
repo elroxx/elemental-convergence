@@ -127,15 +127,21 @@ public class ModItems {
 
     public static final Item CROWN = register("crown", new ArmorItem(CROWN_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1)));
 
-    public static final Item POLLEN_WHITE = register("pollen_white", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60, 1, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_ORANGE = register("pollen_orange", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60, 1, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_RED = register("pollen_red", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60, 1, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_BLUE = register("pollen_blue", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60, 1, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_BROWN = register("pollen_brown", new PollenItem(ModEffects.LIGHT_PHASING, 20*60*2, 0, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_YELLOW = register("pollen_yellow", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60, 1, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_PINK = register("pollen_pink", new PollenItem(ModEffects.WINGS, 20*30, 0, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_PURPLE = register("pollen_purple", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60, 1, new Item.Settings().maxCount(8)));
-    public static final Item POLLEN_GREEN = register("pollen_green", new PollenItem(ModEffects.GILLS, 20*60*2, 0, new Item.Settings().maxCount(8)));
+    public static final Item POLLEN_WHITE = register("pollen_white", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60*2, 2, new Item.Settings().maxCount(8)));
+    public static final Item POLLEN_RED = register("pollen_red", new PollenItem(StatusEffects.DARKNESS, 20*60, 0, new Item.Settings().maxCount(8)));
+    public static final Item POLLEN_BLUE = register("pollen_blue", new PollenItem(ModEffects.INSECT_WEIGHT, 20*60*2, 0, new Item.Settings().maxCount(8)));
+    public static final Item POLLEN_ORANGE = register("pollen_orange", new PollenItem(StatusEffects.UNLUCK, 20*60*2, 4, new Item.Settings().maxCount(8).rarity(Rarity.UNCOMMON)));
+    public static final Item POLLEN_PURPLE = register("pollen_purple", new PollenItem(StatusEffects.LUCK, 20*60*2, 4, new Item.Settings().maxCount(8).rarity(Rarity.UNCOMMON)));
+    public static final Item POLLEN_GREEN = register("pollen_green", new PollenItem(ModEffects.GILLS, 20*60*2, 0, new Item.Settings().maxCount(8).rarity(Rarity.RARE)));
+    public static final Item POLLEN_YELLOW = register("pollen_yellow", new PollenItem(ModEffects.PLAGUE, 20*20, 1, new Item.Settings().maxCount(8).rarity(Rarity.RARE)));
+    public static final Item POLLEN_BROWN = register("pollen_brown", new PollenItem(ModEffects.LIGHT_PHASING, 20*60*2, 0, new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
+    public static final Item POLLEN_PINK = register("pollen_pink", new PollenItem(ModEffects.WINGS, 20*60, 0, new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
+    //all pollen effects:
+    //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight
+    //common: white, red, blue
+    //uncommon: orange, purple
+    //rare: green, yellow
+    //epic: pink, brown
 
     //to register every item
     public static <T extends Item> T register(String name, T item) {
