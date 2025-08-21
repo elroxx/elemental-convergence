@@ -123,6 +123,8 @@ public class ModItems {
 
     public static final Item REINFORCED_HONEYCOMB_BLOCK_ITEM = register("reinforced_honeycomb_block", new BlockItem(ModBlocks.REINFORCED_HONEYCOMB, new Item.Settings()));
 
+    public static final Item HONEY_STICK = register("honey_stick", new Item(new Item.Settings().maxCount(1).maxDamage(10)));
+
     public static final Item LOCK_ITEM = register("lock", new Item(new Item.Settings().maxCount(1)));
 
     public static final Item CROWN = register("crown", new ArmorItem(CROWN_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1)));
