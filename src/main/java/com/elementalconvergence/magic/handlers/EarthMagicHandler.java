@@ -111,7 +111,6 @@ public class EarthMagicHandler implements IMagicHandler {
     public void handlePassive(PlayerEntity player) {
 
 
-
         //SCALING MODIFIED (SO NEGATIVE PASSIVE+BURROW)
         if (player instanceof ServerPlayerEntity){
             float scaleModifier=EARTH_PLAYER_SCALE;
@@ -261,7 +260,7 @@ public class EarthMagicHandler implements IMagicHandler {
                 return;
             }
             burrowToggle=!burrowToggle;
-            player.sendMessage(Text.of("Burrow: " + burrowToggle));
+            //player.sendMessage(Text.of("Burrow: " + burrowToggle));
         }
         //Remove invisibility
         if (!burrowToggle){
@@ -281,7 +280,7 @@ public class EarthMagicHandler implements IMagicHandler {
             }
 
             stoneArmorToggle=!stoneArmorToggle;
-            player.sendMessage(Text.of("Stone Armor: " + stoneArmorToggle));
+            //player.sendMessage(Text.of("Stone Armor: " + stoneArmorToggle));
 
             BlockPos pos = player.getBlockPos();
             player.getWorld().playSound(null,  //So that everybody nearby can hear it
