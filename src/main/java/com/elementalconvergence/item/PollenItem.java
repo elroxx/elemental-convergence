@@ -30,7 +30,7 @@ public class PollenItem extends Item {
         this.duration = duration;
         this.amplifier = amplifier;
 
-        // Create food component with basic nutrition values
+        // base food for no honey magic
         this.foodComponent = new FoodComponent.Builder()
                 .nutrition(1)
                 .saturationModifier(0.3f)
@@ -57,7 +57,7 @@ public class PollenItem extends Item {
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
         if (!world.isClient && user instanceof PlayerEntity player) {
             // if player just set the status effect
-            player.addStatusEffect(new StatusEffectInstance(effect, duration, amplifier));
+            player.addStatusEffect(new StatusEffectInstance(effect, duration, amplifier, true, false, true));
 
             //if player is also honey magic, feeds him with food value of BRead, but saturation of steak
             IMagicDataSaver dataSaver = (IMagicDataSaver) user;
@@ -76,7 +76,7 @@ public class PollenItem extends Item {
 
     @Override
     public int getMaxUseTime(ItemStack stack, LivingEntity user) {
-        return 32; // Standard eating time (same as most food items)
+        return 32; //normal eating time
     }
 
 

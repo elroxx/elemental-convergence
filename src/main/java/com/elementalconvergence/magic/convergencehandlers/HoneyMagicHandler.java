@@ -2,6 +2,8 @@ package com.elementalconvergence.magic.convergencehandlers;
 
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.data.PollenDrop;
+import com.elementalconvergence.data.PollenRarity;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.entity.MinionBeeEntity;
@@ -25,8 +27,10 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -44,8 +48,7 @@ import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 
@@ -65,6 +68,9 @@ public class HoneyMagicHandler implements IMagicHandler {
 
     public static final int INVENTORY_LOCK_DEFAULT_COOLDOWN = 20; //aka 1 seconds
     private int inventoryLockCooldown=0;
+
+    private static final int MAX_BEES_PER_PLAYER = 7;
+    private static final Map<UUID, Integer> playerBeeCount = new HashMap<>();
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -221,34 +227,97 @@ public class HoneyMagicHandler implements IMagicHandler {
         }
     }
 
+    public static void incrementBeeCount(UUID playerUuid) {
+        playerBeeCount.put(playerUuid, playerBeeCount.getOrDefault(playerUuid, 0) + 1);
+    }
+
+    public static void decrementBeeCount(UUID playerUuid) {
+        int current = playerBeeCount.getOrDefault(playerUuid, 0);
+        if (current > 0) {
+            playerBeeCount.put(playerUuid, current - 1);
+        }
+    }
+
+    public static int getBeeCount(UUID playerUuid) {
+        return playerBeeCount.getOrDefault(playerUuid, 0);
+    }
+
+    // Alternative method to get accurate count by checking actual entities in world
+    public static int getActualBeeCount(PlayerEntity player, World world) {
+        List<MinionBeeEntity> playerBees = world.getEntitiesByClass(
+                MinionBeeEntity.class,
+                player.getBoundingBox().expand(200.0), // Large search radius
+                bee -> {
+                    PlayerEntity owner = bee.getOwner();
+                    return owner != null && owner.getUuid().equals(player.getUuid());
+                }
+        );
+
+        // Update the counter to match reality
+        playerBeeCount.put(player.getUuid(), playerBees.size());
+        return playerBees.size();
+    }
+
     private static void spawnMinionBee(PlayerEntity player, World world) {
+        UUID playerUuid = player.getUuid();
+
+        // Get accurate count by checking actual entities in world
+        int currentBeeCount = getActualBeeCount(player, world);
+
+        // Check if player has reached the maximum bee limit
+        if (currentBeeCount >= MAX_BEES_PER_PLAYER) {
+            player.sendMessage(Text.literal("§cYou already have the maximum number of minion bees! (" + currentBeeCount + "/" + MAX_BEES_PER_PLAYER + ")"), true);
+            return;
+        }
+
         MinionBeeEntity bee = new MinionBeeEntity(ModEntities.MINION_BEE, world);
 
-        //pos for bee
+        // Position the bee near the player
         Vec3d playerPos = player.getPos();
         bee.setPosition(playerPos.x + 1, playerPos.y + 1, playerPos.z);
 
-        //set owner
+        // Make the bee follow/protect the player
         bee.setOwner(player);
 
         world.spawnEntity(bee);
 
-        //Sounds
+        // Increment the bee count
+        incrementBeeCount(playerUuid);
+
+        // Send feedback message
+        player.sendMessage(Text.literal("§aMinion bee summoned! (" + (currentBeeCount + 1) + "/" + MAX_BEES_PER_PLAYER + ")"), true);
+
+        // Optional: Add particle effects or sound
         world.playSound(null, player.getBlockPos(),
                 net.minecraft.sound.SoundEvents.ENTITY_BEE_HURT,
                 net.minecraft.sound.SoundCategory.NEUTRAL, 1.0f, 1.0f);
-
     }
 
     private static void targetAllBeesToEntity(PlayerEntity player, World world, Entity target) {
-        // choose only bees with that specific owner
+        // Find all bees within a reasonable radius (32 blocks) - both regular and minion bees
+        List<BeeEntity> nearbyBees = world.getEntitiesByClass(
+                BeeEntity.class,
+                player.getBoundingBox().expand(32.0),
+                bee -> true
+        );
+
+        // Also get minion bees specifically
         List<MinionBeeEntity> nearbyMinionBees = world.getEntitiesByClass(
                 MinionBeeEntity.class,
                 player.getBoundingBox().expand(32.0),
-                bee -> bee.getOwner().getUuid().equals(player.getUuid()) //they need to have this exact uuid
+                bee -> bee.getOwner() == player // Only target bees owned by this player
         );
 
-        //change target for all minion bees
+        // Target regular bees
+        for (BeeEntity bee : nearbyBees) {
+            if (target instanceof net.minecraft.entity.LivingEntity livingTarget) {
+                bee.setTarget(livingTarget);
+                bee.setAngerTime(400); // Angry for 20 seconds (400 ticks)
+                bee.setAngryAt(target.getUuid());
+            }
+        }
+
+        // Target minion bees
         for (MinionBeeEntity bee : nearbyMinionBees) {
             if (target instanceof net.minecraft.entity.LivingEntity livingTarget) {
                 bee.setTarget(livingTarget);
@@ -257,8 +326,8 @@ public class HoneyMagicHandler implements IMagicHandler {
             }
         }
 
-        //play sound
-        if (!nearbyMinionBees.isEmpty()) {
+        // Optional: Visual/audio feedback
+        if (!nearbyBees.isEmpty() || !nearbyMinionBees.isEmpty()) {
             world.playSound(null, player.getBlockPos(),
                     net.minecraft.sound.SoundEvents.ENTITY_BEE_LOOP_AGGRESSIVE,
                     net.minecraft.sound.SoundCategory.NEUTRAL, 1.0f, 1.2f);
@@ -266,18 +335,18 @@ public class HoneyMagicHandler implements IMagicHandler {
     }
 
     private static HitResult raycastForEntity(PlayerEntity player, World world) {
-        // raycast to find next bee target
+        // raycast for player
         Vec3d start = player.getEyePos();
         Vec3d direction = player.getRotationVec(1.0F);
         Vec3d end = start.add(direction.multiply(32.0)); // 32 block range
 
-        // check for entities
+        // First check for entity hits
         EntityHitResult entityHit = raycastForEntities(player, world, start, end);
         if (entityHit != null) {
             return entityHit;
         }
 
-        // if no entity, check block instead
+        // If no entity hit, check for block hits
         return world.raycast(new RaycastContext(
                 start, end,
                 RaycastContext.ShapeType.OUTLINE,
@@ -290,14 +359,14 @@ public class HoneyMagicHandler implements IMagicHandler {
         Entity closestEntity = null;
         double closestDistance = Double.MAX_VALUE;
 
-        //all entities in path
+        // Check all entities in the path
         List<Entity> entities = world.getOtherEntities(player,
                 player.getBoundingBox().stretch(end.subtract(start)).expand(1.0));
 
         for (Entity entity : entities) {
             if (entity == player) continue;
 
-            //if ray intersection with entity hitbox
+            // Check if ray intersects with entity's bounding box
             var boundingBox = entity.getBoundingBox().expand(0.3);
             var hit = boundingBox.raycast(start, end);
 
@@ -315,5 +384,98 @@ public class HoneyMagicHandler implements IMagicHandler {
         }
 
         return null;
+    }
+
+
+    public static PollenDrop getRandomPollenWithRarity(World world) {
+        int roll = world.getRandom().nextInt(100);
+
+        if (roll < 50) { // 50% so 0.1667 each
+            Item[] commonPollens = {
+                    ModItems.POLLEN_WHITE,   // Dolphin's Grace
+                    ModItems.POLLEN_RED,     // Darkness
+                    ModItems.POLLEN_BLUE     // Insect Weight
+            };
+            Item selectedPollen = commonPollens[world.getRandom().nextInt(commonPollens.length)];
+            return new PollenDrop(selectedPollen, PollenRarity.COMMON);
+
+        } else if (roll < 75) { // 25% so 0.125 each
+            Item[] uncommonPollens = {
+                    ModItems.POLLEN_ORANGE,  // Unluck
+                    ModItems.POLLEN_PURPLE   // Luck
+            };
+            Item selectedPollen = uncommonPollens[world.getRandom().nextInt(uncommonPollens.length)];
+            return new PollenDrop(selectedPollen, PollenRarity.UNCOMMON);
+
+        } else if (roll < 90) { // 15% chance so 0.075 each
+            Item[] rarePollens = {
+                    ModItems.POLLEN_GREEN,   // Gills
+                    ModItems.POLLEN_YELLOW   // Plague
+            };
+            Item selectedPollen = rarePollens[world.getRandom().nextInt(rarePollens.length)];
+            return new PollenDrop(selectedPollen, PollenRarity.RARE);
+
+        } else { // 10% chance so 0.05 each
+            Item[] epicPollens = {
+                    ModItems.POLLEN_BROWN,   // Light Phasing
+                    ModItems.POLLEN_PINK     // Wings
+            };
+            Item selectedPollen = epicPollens[world.getRandom().nextInt(epicPollens.length)];
+            return new PollenDrop(selectedPollen, PollenRarity.EPIC);
+        }
+    }
+
+    public static void spawnRarityEffects(ServerWorld world, BlockPos pos, PollenRarity rarity) {
+        double x = pos.getX() + 0.5;
+        double y = pos.getY() + 0.5;
+        double z = pos.getZ() + 0.5;
+
+        switch (rarity) {
+            case COMMON -> {
+                world.spawnParticles(ParticleTypes.COMPOSTER, x, y, z, 10, 0.3, 0.3, 0.3, 0.1);
+            }
+            case UNCOMMON -> {
+                world.spawnParticles(ParticleTypes.PORTAL, x, y, z, 15, 0.3, 0.3, 0.3, 0.1);
+                world.spawnParticles(ParticleTypes.COMPOSTER, x, y, z, 8, 0.2, 0.2, 0.2, 0.05);
+            }
+            case RARE -> {
+                world.spawnParticles(ParticleTypes.HAPPY_VILLAGER, x, y, z, 12, 0.4, 0.4, 0.4, 0.1);
+                world.spawnParticles(ParticleTypes.COMPOSTER, x, y, z, 15, 0.3, 0.3, 0.3, 0.1);
+                world.spawnParticles(ParticleTypes.WAX_OFF, x, y, z, 8, 0.2, 0.2, 0.2, 0.05);
+            }
+            case EPIC -> {
+                world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING, x, y, z, 20, 0.5, 0.5, 0.5, 0.2);
+                world.spawnParticles(ParticleTypes.ENCHANT, x, y, z, 25, 0.4, 0.4, 0.4, 0.15);
+                world.spawnParticles(ParticleTypes.COMPOSTER, x, y, z, 20, 0.4, 0.4, 0.4, 0.1);
+                world.spawnParticles(ParticleTypes.END_ROD, x, y, z, 10, 0.3, 0.3, 0.3, 0.1);
+            }
+        }
+    }
+
+    public static void playRaritySound(World world, BlockPos pos, PollenRarity rarity) {
+        switch (rarity) {
+            case COMMON -> {
+                world.playSound(null, pos, SoundEvents.BLOCK_GRASS_BREAK,
+                        SoundCategory.BLOCKS, 1.0f, 1.2f);
+            }
+            case UNCOMMON -> {
+                world.playSound(null, pos, SoundEvents.BLOCK_GRASS_BREAK,
+                        SoundCategory.BLOCKS, 1.0f, 1.4f);
+                world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+                        SoundCategory.BLOCKS, 0.5f, 1.0f);
+            }
+            case RARE -> {
+                world.playSound(null, pos, SoundEvents.BLOCK_GRASS_BREAK,
+                        SoundCategory.BLOCKS, 1.0f, 1.6f);
+                world.playSound(null, pos, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
+                        SoundCategory.BLOCKS, 0.7f, 1.2f);
+            }
+            case EPIC -> {
+                world.playSound(null, pos, SoundEvents.BLOCK_GRASS_BREAK,
+                        SoundCategory.BLOCKS, 1.0f, 1.8f);
+                world.playSound(null, pos, SoundEvents.ENTITY_PLAYER_LEVELUP,
+                        SoundCategory.BLOCKS, 0.8f, 1.5f);
+            }
+        }
     }
 }

@@ -2,22 +2,37 @@ package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.data.PollenDrop;
 import com.elementalconvergence.effect.InsectWeightEffect;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.magic.convergencehandlers.HoneyMagicHandler;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static com.elementalconvergence.magic.convergencehandlers.HoneyMagicHandler.HONEY_INDEX;
 import static com.elementalconvergence.magic.handlers.LightMagicHandler.LIGHT_INDEX;
 
 @Mixin(AbstractBlock.class)
@@ -28,7 +43,7 @@ public class AbstractBlockMixin {
                                      ShapeContext context, CallbackInfoReturnable<VoxelShape> cir) {
         //first check if opaque to remove as many checks as possible
         if (!state.isOpaque()) {
-            // Only proceed if this is an entity context
+            // Only continue if this is an entity context
             if (context instanceof EntityShapeContext entityContext) {
                 Entity entity = entityContext.getEntity();
                 if (entity instanceof PlayerEntity player) {
@@ -61,6 +76,58 @@ public class AbstractBlockMixin {
             }
         }
 
+    }
+
+
+    //also pollen part here
+    @Inject(method = "onUse", at = @At("HEAD"), cancellable = true)
+    private void onPitcherPlantInteraction(BlockState state, World world, BlockPos pos, PlayerEntity player,
+                                           BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
+
+        if (world.isClient) {
+            cir.setReturnValue(ActionResult.SUCCESS);
+            return;
+        }
+
+        if (state.isOf(Blocks.PITCHER_PLANT)) {
+            if (player instanceof ServerPlayerEntity serverPlayer) {
+                if (canPlayerHarvestPollen(serverPlayer)) {
+
+                    //random pollen from rarity
+                    PollenDrop pollenDrop = HoneyMagicHandler.getRandomPollenWithRarity(world);
+                    ItemStack pollenStack = new ItemStack(pollenDrop.item(), 1);
+
+                    //spawn item
+                    ItemEntity itemEntity = new ItemEntity(world,
+                            pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                            pollenStack);
+                    itemEntity.setVelocity(0, 0.2, 0);
+                    world.spawnEntity(itemEntity);
+
+                    //break plant
+                    world.breakBlock(pos, false);
+
+                    // particles
+                    if (world instanceof ServerWorld serverWorld) {
+                        HoneyMagicHandler.spawnRarityEffects(serverWorld, pos, pollenDrop.rarity());
+                    }
+
+                    //rarity sound
+                    HoneyMagicHandler.playRaritySound(world, pos, pollenDrop.rarity());
+
+                    cir.setReturnValue(ActionResult.SUCCESS);
+                } else {
+                    cir.setReturnValue(ActionResult.FAIL);
+                }
+            }
+        }
+    }
+
+    private boolean canPlayerHarvestPollen(ServerPlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int honeyLevel = magicData.getMagicLevel(HONEY_INDEX);
+        return (honeyLevel>=3 && magicData.getSelectedMagic()==HONEY_INDEX);
     }
 
 }
