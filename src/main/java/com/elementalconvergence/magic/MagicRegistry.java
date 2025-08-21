@@ -90,6 +90,7 @@ public class MagicRegistry {
         ScaleData playerEntityReach = ScaleTypes.ENTITY_REACH.getScaleData(player);
         ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
         ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
+        ScaleData playerAttackSpeed = ScaleTypes.ATTACK_SPEED.getScaleData(player);
         ScaleData playerKnockback = ScaleTypes.KNOCKBACK.getScaleData(player);
         ScaleData playerMotion = ScaleTypes.MOTION.getScaleData(player);
         ScaleData playerFlightSpeed = ScaleTypes.FLIGHT.getScaleData(player);
@@ -100,6 +101,7 @@ public class MagicRegistry {
         playerEntityReach.setScale(BASE_SCALE); //Reset player Reach (ENTITY)
         playerHeldItem.setScale(BASE_SCALE); //Reset held item size
         playerAttack.setScale(BASE_SCALE);
+        playerAttackSpeed.setScale(BASE_SCALE);
         playerKnockback.setScale(BASE_SCALE);
         playerMotion.setScale(BASE_SCALE);
         playerFlightSpeed.setScale(BASE_SCALE);

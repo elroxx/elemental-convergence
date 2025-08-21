@@ -31,6 +31,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.component.type.PotionContentsComponent;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.*;
 
@@ -41,6 +43,11 @@ public class BloodMagicHandler implements IMagicHandler {
 
     public static final int DEFAULT_SKYLIGHTHURT_COOLDOWN = 10;
     private int skylightHurtCooldown=0;
+
+    public static final float VAMPIRE_ATTACK=1.5f; //1.5* attack
+    public static final float VAMPIRE_ATTACK_SPEED=1.5f; //1.5* attack speed
+    public static final float VAMPIRE_SPEED=0.15f; //1.5* speed
+    public static final float VAMPIRE_HEALTH=24.0f; //1.2* health
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -74,6 +81,25 @@ public class BloodMagicHandler implements IMagicHandler {
         }
         else{
             skylightHurtCooldown=DEFAULT_SKYLIGHTHURT_COOLDOWN;
+        }
+
+
+        //Buff part
+        //night vision
+        if (!player.hasStatusEffect(StatusEffects.NIGHT_VISION)){
+            player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, -1, 0, false, false, false));
+        }
+
+        double playerHealth = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).getBaseValue();
+        if (!(Math.abs(playerHealth-VAMPIRE_HEALTH)<0.005f)){
+            ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
+            ScaleData playerAttackSpeed = ScaleTypes.ATTACK_SPEED.getScaleData(player);
+
+            playerAttack.setScale(VAMPIRE_ATTACK);
+            playerAttackSpeed.setScale(VAMPIRE_ATTACK_SPEED);
+
+            player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(VAMPIRE_HEALTH);
+            player.getAttributeInstance(EntityAttributes.GENERIC_MOVEMENT_SPEED).setBaseValue(VAMPIRE_SPEED);
         }
     }
 
