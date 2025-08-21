@@ -20,6 +20,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -72,11 +73,51 @@ public class HoneyMagicHandler implements IMagicHandler {
     private static final int MAX_BEES_PER_PLAYER = 7;
     private static final Map<UUID, Integer> playerBeeCount = new HashMap<>();
 
+    public static final int BEE_TARGET_DEFAULT_COOLDOWN = 10;
+
+    private static final int BEE_SPAWN_DEFAULT_COOLDOWN = 20*60;
+    private int beeSpawnCooldown = 0;
+
     @Override
     public void handleItemRightClick(PlayerEntity player) {
-        if (player.getMainHandStack().isEmpty()){
-            player.sendMessage(Text.of("SUMMON BEE"));
-            spawnMinionBee(player, player.getWorld());
+        ItemStack mainHand = player.getMainHandStack();
+
+        //TARGETTING THE BEES! (lvl 1 part 2)
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int honeyLvl = magicData.getMagicLevel(HONEY_INDEX);
+        if (mainHand.isOf(ModItems.HONEY_STICK) && honeyLvl>=1){
+
+            ServerWorld world = (ServerWorld) player.getWorld();
+            HitResult hitResult = raycastForEntity(player, world);
+
+            if (hitResult instanceof EntityHitResult entityHit) {
+
+                targetAllBeesToEntity(player, world, entityHit.getEntity());
+
+                //playsound
+                player.getWorld().playSound(null, player.getBlockPos(),
+                        SoundEvents.BLOCK_HONEY_BLOCK_PLACE,
+                        SoundCategory.PLAYERS, 1f, 1.2f);
+
+                player.getItemCooldownManager().set(ModItems.HONEY_STICK, BEE_TARGET_DEFAULT_COOLDOWN);
+
+                //REMOVE DURABILITY OF THE HONEY STICK
+                if (!player.isCreative()) {
+                    int maxDurability = mainHand.getMaxDamage();
+                    int durabilityToRemove = 1;
+
+                    //break item if not enough durability left
+                    if (mainHand.getDamage() + durabilityToRemove >= maxDurability) {
+                        mainHand.setDamage(maxDurability);
+                        mainHand.decrement(1);
+                        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                                SoundEvents.ENTITY_ITEM_BREAK, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                    } else {
+                        mainHand.setDamage(mainHand.getDamage() + durabilityToRemove);
+                    }
+                }
+            }
         }
     }
 
@@ -148,9 +189,32 @@ public class HoneyMagicHandler implements IMagicHandler {
             }
         }
 
+        //LVL 1 ABILITY BEE SPAWNING
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int honeyLvl = magicData.getMagicLevel(HONEY_INDEX);
+        if (honeyLvl>=1) {
+            ItemStack helmet = player.getInventory().getArmorStack(3); //3 is helmet slot
+            if (!helmet.isOf(ModItems.CROWN)) {
+                //resetting cooldown if no crown
+                beeSpawnCooldown = BEE_SPAWN_DEFAULT_COOLDOWN;
+            } else {
+                if (beeSpawnCooldown == 0) {
+                    spawnMinionBee(player, player.getWorld());
+                    player.getItemCooldownManager().set(ModItems.CROWN, BEE_SPAWN_DEFAULT_COOLDOWN);
+                    beeSpawnCooldown = BEE_SPAWN_DEFAULT_COOLDOWN;
+                }
+            }
+        }
+
+
+
         //Cooldowns
         if (inventoryLockCooldown>0){
             inventoryLockCooldown--;
+        }
+        if (beeSpawnCooldown>0){
+            beeSpawnCooldown--;
         }
 
     }
@@ -231,17 +295,6 @@ public class HoneyMagicHandler implements IMagicHandler {
         playerBeeCount.put(playerUuid, playerBeeCount.getOrDefault(playerUuid, 0) + 1);
     }
 
-    public static void decrementBeeCount(UUID playerUuid) {
-        int current = playerBeeCount.getOrDefault(playerUuid, 0);
-        if (current > 0) {
-            playerBeeCount.put(playerUuid, current - 1);
-        }
-    }
-
-    public static int getBeeCount(UUID playerUuid) {
-        return playerBeeCount.getOrDefault(playerUuid, 0);
-    }
-
     // Alternative method to get accurate count by checking actual entities in world
     public static int getActualBeeCount(PlayerEntity player, World world) {
         List<MinionBeeEntity> playerBees = world.getEntitiesByClass(
@@ -294,40 +347,24 @@ public class HoneyMagicHandler implements IMagicHandler {
     }
 
     private static void targetAllBeesToEntity(PlayerEntity player, World world, Entity target) {
-        // Find all bees within a reasonable radius (32 blocks) - both regular and minion bees
-        List<BeeEntity> nearbyBees = world.getEntitiesByClass(
-                BeeEntity.class,
-                player.getBoundingBox().expand(32.0),
-                bee -> true
-        );
-
-        // Also get minion bees specifically
+        //get all minoin bees owned by player
         List<MinionBeeEntity> nearbyMinionBees = world.getEntitiesByClass(
                 MinionBeeEntity.class,
                 player.getBoundingBox().expand(32.0),
-                bee -> bee.getOwner() == player // Only target bees owned by this player
+                bee -> bee.getOwner()!=null && bee.getOwner().getUuid().toString().equals(player.getUuid().toString()) //Only target bees owned by this player, check only with strings because of a weird bug with comapring sometimes
         );
 
-        // Target regular bees
-        for (BeeEntity bee : nearbyBees) {
-            if (target instanceof net.minecraft.entity.LivingEntity livingTarget) {
-                bee.setTarget(livingTarget);
-                bee.setAngerTime(400); // Angry for 20 seconds (400 ticks)
-                bee.setAngryAt(target.getUuid());
-            }
-        }
-
-        // Target minion bees
+        //target all minion bees
         for (MinionBeeEntity bee : nearbyMinionBees) {
             if (target instanceof net.minecraft.entity.LivingEntity livingTarget) {
                 bee.setTarget(livingTarget);
-                bee.setAngerTime(400);
+                bee.setAngerTime(400); // 20 seconds
                 bee.setAngryAt(target.getUuid());
             }
         }
 
-        // Optional: Visual/audio feedback
-        if (!nearbyBees.isEmpty() || !nearbyMinionBees.isEmpty()) {
+        //playsound if target
+        if (!nearbyMinionBees.isEmpty()) {
             world.playSound(null, player.getBlockPos(),
                     net.minecraft.sound.SoundEvents.ENTITY_BEE_LOOP_AGGRESSIVE,
                     net.minecraft.sound.SoundCategory.NEUTRAL, 1.0f, 1.2f);
@@ -335,18 +372,18 @@ public class HoneyMagicHandler implements IMagicHandler {
     }
 
     private static HitResult raycastForEntity(PlayerEntity player, World world) {
-        // raycast for player
+        //get player
         Vec3d start = player.getEyePos();
         Vec3d direction = player.getRotationVec(1.0F);
-        Vec3d end = start.add(direction.multiply(32.0)); // 32 block range
+        Vec3d end = start.add(direction.multiply(50.0)); //50 range
 
-        // First check for entity hits
+        //All entities hit
         EntityHitResult entityHit = raycastForEntities(player, world, start, end);
         if (entityHit != null) {
             return entityHit;
         }
 
-        // If no entity hit, check for block hits
+        //get block hits worse case but it doesnt rlly matter
         return world.raycast(new RaycastContext(
                 start, end,
                 RaycastContext.ShapeType.OUTLINE,
@@ -359,14 +396,14 @@ public class HoneyMagicHandler implements IMagicHandler {
         Entity closestEntity = null;
         double closestDistance = Double.MAX_VALUE;
 
-        // Check all entities in the path
+        //ALL entities in path
         List<Entity> entities = world.getOtherEntities(player,
                 player.getBoundingBox().stretch(end.subtract(start)).expand(1.0));
 
         for (Entity entity : entities) {
             if (entity == player) continue;
 
-            // Check if ray intersects with entity's bounding box
+            //verify if ray fits
             var boundingBox = entity.getBoundingBox().expand(0.3);
             var hit = boundingBox.raycast(start, end);
 

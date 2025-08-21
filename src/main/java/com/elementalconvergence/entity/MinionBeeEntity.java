@@ -22,14 +22,16 @@ public class MinionBeeEntity extends BeeEntity {
 
     @Override
     protected void initGoals() {
-        //clear the goals
-        //this.targetSelector.getGoals().clear();
+        //clear the  after creating them
+        super.initGoals();
+
+        this.targetSelector.getGoals().clear();
         this.goalSelector.getGoals().clear();
 
         //custom goals
         this.goalSelector.add(0, new SwimGoal(this));
-        this.goalSelector.add(1, new MeleeAttackGoal(this, 1.4, false));
-        this.goalSelector.add(2, new FollowBeeOwnerGoal(this, 1.0, 100.0f, 8.0f));
+        this.goalSelector.add(1, new MeleeAttackGoal(this, 3.4, false));
+        this.goalSelector.add(2, new FollowBeeOwnerGoal(this, 6.0, 100.0f, 8.0f));
         this.goalSelector.add(3, new WanderAroundFarGoal(this, 1.0));
         this.goalSelector.add(4, new LookAtEntityGoal(this, PlayerEntity.class, 8.0f));
         this.goalSelector.add(5, new LookAroundGoal(this));
@@ -96,6 +98,5 @@ public class MinionBeeEntity extends BeeEntity {
             this.ownerUuid = nbt.getUuid("Owner");
         }
     }
-
 }
 

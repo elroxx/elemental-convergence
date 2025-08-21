@@ -30,6 +30,10 @@ public class FollowBeeOwnerGoal extends Goal {
         if (owner == null || owner.isSpectator() || bee.squaredDistanceTo(owner) < (minDistance * minDistance)) {
             return false;
         }
+        else if (this.bee.getTarget() != null) {
+            // Don't start following if we have a target to attack
+            return false;
+        }
         this.owner = owner;
         return true;
     }
