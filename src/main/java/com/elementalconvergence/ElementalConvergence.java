@@ -98,8 +98,8 @@ public class ElementalConvergence implements ModInitializer {
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
 
 	//star was removed
-	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy", "Honey"};
-	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity", "steam", "holy", "honey"};
+	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy", "Honey", "Blood"};
+	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity", "steam", "holy", "honey", "blood"};
 	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
 
 	//FOR THINGS THAT NEED ALL THE MAGICS IN THE LOGIC
@@ -530,6 +530,12 @@ public class ElementalConvergence implements ModInitializer {
 		honey_requirements.add(1); //AIR
 		honey_requirements.add(6); //LIFE
 		arrayForRequirements[4]=honey_requirements;
+
+		//BLOOD REQUIREMENTS
+		ArrayList<Integer> blood_requirements = new ArrayList<>();
+		blood_requirements.add(7); //DEATH
+		blood_requirements.add(4); //SHADOW
+		arrayForRequirements[5]=blood_requirements;
 
 
 		for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
