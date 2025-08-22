@@ -58,7 +58,7 @@ public class FollowBeeOwnerGoal extends Goal {
         bee.getLookControl().lookAt(owner, 10.0f, bee.getMaxLookPitchChange());
         if (--this.updateCountdownTicks <= 0) {
             this.updateCountdownTicks = this.getTickCount(10);
-            if (bee.squaredDistanceTo(owner) >= (maxDistance * maxDistance)) {
+            if (bee.squaredDistanceTo(owner) >= (maxDistance*2)) {
 
                 if (owner.getWorld() instanceof ServerWorld serverWorld) {
                     Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
