@@ -13,6 +13,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.passive.BatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.RotationAxis;
 
 public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
     private static final Identifier BAT_TEXTURE = Identifier.of("textures/entity/bat.png");
@@ -31,7 +32,7 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
                        MatrixStack matrixStack, VertexConsumerProvider vertexConsumers, int light) {
 
         if (player.hasStatusEffect(ModEffects.BAT_FORM)) {
-            // Don’t call super.render() here, skip all player transforms
+            //skip player transforms
             renderBat(player, f, g, matrixStack, vertexConsumers, light);
         } else {
             super.render(player, f, g, matrixStack, vertexConsumers, light);
@@ -47,36 +48,41 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
 
         matrixStack.push();
 
-        // Scale down to bat size
-        matrixStack.scale(0.5f, 0.5f, 0.5f);
+        //scale size
+        matrixStack.scale(1f, 1f, 1f);
 
-        // Lift slightly (bats are smaller than players)
-        matrixStack.translate(0, 0.5, 0);
+        // Face same direction as player's body
+        float bodyYaw = playerEntity.getYaw();
+        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F - bodyYaw));
 
-        // Sync player state -> dummy bat
+        // Flip upside down
+        matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
+        matrixStack.translate(0.0, -2.0, 0.0);
+
+        //Sync state
         dummyBat.setPos(playerEntity.getX(), playerEntity.getY(), playerEntity.getZ());
-        dummyBat.setYaw(playerEntity.getYaw());
+        dummyBat.setYaw(bodyYaw);
         dummyBat.setPitch(playerEntity.getPitch());
-        dummyBat.setHeadYaw(playerEntity.getHeadYaw());
-        dummyBat.setRoosting(false); // absolutely force flying
+        dummyBat.setRoosting(false);
 
-        // Run bat’s own tick so animations progress
+        //advance anim
         dummyBat.tick();
-        dummyBat.age = playerEntity.age; // keep animation time in sync with player
+        dummyBat.age = playerEntity.age;
 
-        // Give velocity (so it doesn’t “fall asleep”)
+        //motion
         if (playerEntity.getVelocity().lengthSquared() > 0.001) {
             dummyBat.setVelocity(playerEntity.getVelocity());
         } else {
-            dummyBat.setVelocity(0, 0.02, 0); // gentle hover motion
+            dummyBat.setVelocity(0, 0.02, 0);
         }
 
-        // Vanilla animation state drives wing flapping
+        //head following cam
         float ageInTicks = (float) playerEntity.age + tickDelta;
-        this.batModel.setAngles(dummyBat, 0.0f, 0.0f, ageInTicks,
-                playerEntity.getHeadYaw(), playerEntity.getPitch());
+        float relHeadYaw = playerEntity.getHeadYaw() - bodyYaw;
+        float headPitch = -playerEntity.getPitch();
 
-        // Render the bat
+        this.batModel.setAngles(dummyBat, 0.0f, 0.0f, ageInTicks, relHeadYaw, headPitch);
+
         var vertexConsumer = vertexConsumerProvider.getBuffer(this.batModel.getLayer(BAT_TEXTURE));
         this.batModel.render(matrixStack, vertexConsumer, light, getOverlay(playerEntity, 0));
 
@@ -95,7 +101,6 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
     @Override
     protected void scale(AbstractClientPlayerEntity abstractClientPlayerEntity, MatrixStack matrixStack, float f) {
         if (abstractClientPlayerEntity.hasStatusEffect(ModEffects.BAT_FORM)) {
-            // Don't apply additional scaling for bat form, we handle it in render method
             return;
         }
         super.scale(abstractClientPlayerEntity, matrixStack, f);
