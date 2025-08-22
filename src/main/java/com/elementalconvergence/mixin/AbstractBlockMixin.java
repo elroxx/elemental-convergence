@@ -85,7 +85,6 @@ public class AbstractBlockMixin {
                                            BlockHitResult hit, CallbackInfoReturnable<ActionResult> cir) {
 
         if (world.isClient) {
-            cir.setReturnValue(ActionResult.SUCCESS);
             return;
         }
 

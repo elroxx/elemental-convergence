@@ -20,6 +20,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> WINGS = register("wings", new WingsEffect());
     public static final RegistryEntry<StatusEffect> PRAYER = register("prayer", new PrayerEffect());
     public static final RegistryEntry<StatusEffect> INSECT_WEIGHT = register("insect_weight", new InsectWeightEffect());
+    public static final RegistryEntry<StatusEffect> BAT_FORM = register("bat_form", new BatFormEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {

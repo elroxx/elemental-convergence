@@ -16,7 +16,8 @@
 		"ItemStackMixin",
 		"BreadMixin",
 		"EntityAccessor",
-		"InvSlotMixin"
+		"InvSlotMixin",
+		"EntityRenderersMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
