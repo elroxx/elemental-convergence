@@ -77,7 +77,7 @@ public class BloodMagicHandler implements IMagicHandler {
         ServerWorld world = (ServerWorld) player.getWorld();
 
         //Maybe add a rain verif check
-        if (world.isDay() && world.isSkyVisible(player.getBlockPos()) && !isBeingRainedOn(player)){
+        if (world.isDay() && world.isSkyVisible(player.getBlockPos()) && !isBeingRainedOn(player) && !player.hasStatusEffect(ModEffects.BAT_FORM)){
             if (skylightHurtCooldown==0) {
                 DamageSource withered = player.getWorld().getDamageSources().wither();
                 player.damage(withered, 4);

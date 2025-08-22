@@ -57,7 +57,7 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
 
         // Flip upside down
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180.0F));
-        matrixStack.translate(0.0, -2.0, 0.0);
+        matrixStack.translate(0.0, -1.8, 0.0);
 
         //Sync state
         dummyBat.setPos(playerEntity.getX(), playerEntity.getY(), playerEntity.getZ());
