@@ -105,7 +105,11 @@ public class AbstractBlockMixin {
                     world.spawnEntity(itemEntity);
 
                     //break plant
-                    world.breakBlock(pos, false);
+                    if (world.getBlockState(pos.add(0, -1, 0)).isOf(Blocks.PITCHER_PLANT)) {
+                        world.breakBlock(pos.add(0, -1, 0), false);
+                    }else {
+                        world.breakBlock(pos, false);
+                    }
 
                     // particles
                     if (world instanceof ServerWorld serverWorld) {
