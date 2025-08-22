@@ -49,7 +49,7 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
         matrixStack.push();
 
         //scale size
-        matrixStack.scale(1f, 1f, 1f);
+        matrixStack.scale(1.5f, 1.5f, 1.5f);
 
         // Face same direction as player's body
         float bodyYaw = playerEntity.getYaw();
