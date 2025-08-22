@@ -69,7 +69,7 @@ public class BloodMagicHandler implements IMagicHandler {
         if (world.isDay() && world.isSkyVisible(player.getBlockPos()) && !isBeingRainedOn(player)){
             if (skylightHurtCooldown==0) {
                 DamageSource withered = player.getWorld().getDamageSources().wither();
-                player.damage(withered, 2);
+                player.damage(withered, 4);
                 skylightHurtCooldown=DEFAULT_SKYLIGHTHURT_COOLDOWN;
 
                 world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_PLAYER_HURT_ON_FIRE,
