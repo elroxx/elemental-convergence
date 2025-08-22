@@ -1,6 +1,7 @@
 package com.elementalconvergence.entity;
 
 import com.elementalconvergence.effect.ModEffects;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory;
@@ -17,6 +18,7 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
     private static final Identifier BAT_TEXTURE = Identifier.of("textures/entity/bat.png");
     private final BatEntityModel batModel;
     private final PlayerEntityModel<AbstractClientPlayerEntity> playerModel;
+    private BatEntity dummyBat;
 
     public BatPlayerEntityRenderer(EntityRendererFactory.Context context, boolean slim) {
         super(context, slim);
@@ -25,86 +27,62 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
     }
 
     @Override
-    public void render(AbstractClientPlayerEntity abstractClientPlayerEntity, float f, float g,
-                       MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i) {
+    public void render(AbstractClientPlayerEntity player, float f, float g,
+                       MatrixStack matrixStack, VertexConsumerProvider vertexConsumers, int light) {
 
-        if (abstractClientPlayerEntity.hasStatusEffect(ModEffects.BAT_FORM)) {
-            // Render as bat
-            renderBat(abstractClientPlayerEntity, f, g, matrixStack, vertexConsumerProvider, i);
+        if (player.hasStatusEffect(ModEffects.BAT_FORM)) {
+            // Don’t call super.render() here, skip all player transforms
+            renderBat(player, f, g, matrixStack, vertexConsumers, light);
         } else {
-            // Render as normal player
-            super.render(abstractClientPlayerEntity, f, g, matrixStack, vertexConsumerProvider, i);
+            super.render(player, f, g, matrixStack, vertexConsumers, light);
         }
     }
 
+
     private void renderBat(AbstractClientPlayerEntity playerEntity, float yaw, float tickDelta,
                            MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light) {
+
+        BatEntity dummyBat = getDummyBat(playerEntity);
+        if (dummyBat == null) return;
 
         matrixStack.push();
 
         // Scale down to bat size
         matrixStack.scale(0.5f, 0.5f, 0.5f);
 
-        // Adjust position - bats are smaller so we need to adjust
+        // Lift slightly (bats are smaller than players)
         matrixStack.translate(0, 0.5, 0);
 
-        // Create a dummy bat entity for the model animations
-        BatEntity dummyBat = new BatEntity(net.minecraft.entity.EntityType.BAT, playerEntity.getWorld());
+        // Sync player state -> dummy bat
         dummyBat.setPos(playerEntity.getX(), playerEntity.getY(), playerEntity.getZ());
         dummyBat.setYaw(playerEntity.getYaw());
         dummyBat.setPitch(playerEntity.getPitch());
         dummyBat.setHeadYaw(playerEntity.getHeadYaw());
-        dummyBat.age = playerEntity.age;
+        dummyBat.setRoosting(false); // absolutely force flying
 
-        // CRITICAL: Force the bat to NOT be roosting (this makes it fly right-side up)
-        dummyBat.setRoosting(false);
+        // Run bat’s own tick so animations progress
+        dummyBat.tick();
+        dummyBat.age = playerEntity.age; // keep animation time in sync with player
 
-        // Force the bat to always have some velocity to trigger flying animation
-        double playerSpeed = playerEntity.getVelocity().lengthSquared();
-        if (playerSpeed > 0.01) {
-            // Player is moving - use their velocity
+        // Give velocity (so it doesn’t “fall asleep”)
+        if (playerEntity.getVelocity().lengthSquared() > 0.001) {
             dummyBat.setVelocity(playerEntity.getVelocity());
         } else {
-            // Player is stationary - give bat a small upward velocity to keep it "flying"
-            dummyBat.setVelocity(0, 0.1, 0);
+            dummyBat.setVelocity(0, 0.02, 0); // gentle hover motion
         }
 
-        // IMPORTANT: Manually trigger the flying animation state
-        dummyBat.roostingAnimationState.stop();
-        dummyBat.flyingAnimationState.startIfNotRunning(dummyBat.age);
+        // Vanilla animation state drives wing flapping
+        float ageInTicks = (float) playerEntity.age + tickDelta;
+        this.batModel.setAngles(dummyBat, 0.0f, 0.0f, ageInTicks,
+                playerEntity.getHeadYaw(), playerEntity.getPitch());
 
-        // Realistic wing flapping animation based on actual bat behavior
-        float ageInTicks = (float)playerEntity.age + tickDelta;
-
-        // Bats don't flap continuously - they glide between flaps
-        // Create a more realistic flapping pattern
-        boolean isFlapping = dummyBat.isFlappingWings(); // Uses the real bat logic: age % 10 == 0
-
-        float limbSwing = 0;
-        float limbSwingAmount = 0;
-
-        if (playerSpeed > 0.01) {
-            // Player is moving - more frequent flapping for active flight
-            limbSwing = ageInTicks * 0.3f; // Much slower than before
-            limbSwingAmount = isFlapping ? 0.8f : 0.2f; // Stronger flaps when actually flapping
-        } else {
-            // Player hovering - gentle, occasional flapping to stay airborne
-            limbSwing = ageInTicks * 0.15f; // Even slower when hovering
-            limbSwingAmount = isFlapping ? 0.5f : 0.1f; // Gentle wing movement
-        }
-
-        float headYaw = playerEntity.getHeadYaw();
-        float headPitch = playerEntity.getPitch();
-
-        // Set angles with the dummy bat entity
-        this.batModel.setAngles(dummyBat, limbSwing, limbSwingAmount, ageInTicks, headYaw, headPitch);
-
-        // Render the bat model
+        // Render the bat
         var vertexConsumer = vertexConsumerProvider.getBuffer(this.batModel.getLayer(BAT_TEXTURE));
         this.batModel.render(matrixStack, vertexConsumer, light, getOverlay(playerEntity, 0));
 
         matrixStack.pop();
     }
+
 
     @Override
     public Identifier getTexture(AbstractClientPlayerEntity abstractClientPlayerEntity) {
@@ -121,5 +99,13 @@ public class BatPlayerEntityRenderer extends PlayerEntityRenderer {
             return;
         }
         super.scale(abstractClientPlayerEntity, matrixStack, f);
+    }
+
+    private BatEntity getDummyBat(PlayerEntity player) {
+        if (this.dummyBat == null && player.getWorld() != null) {
+            this.dummyBat = new BatEntity(net.minecraft.entity.EntityType.BAT, player.getWorld());
+            this.dummyBat.setRoosting(false);
+        }
+        return this.dummyBat;
     }
 }
