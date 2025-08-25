@@ -15,6 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -22,42 +23,101 @@ import net.minecraft.world.World;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.elementalconvergence.magic.convergencehandlers.BloodMagicHandler.BLOOD_INDEX;
 
 public class CoffinBlock extends BedBlock {
 
-    private static final VoxelShape COFFIN_HEAD_SHAPE = VoxelShapes.union(
-            // Floor
-            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 2.0, 16.0),
-            // North wall (closed end)
-            Block.createCuboidShape(0.0, 2.0, 0.0, 16.0, 8.0, 2.0),
-            // East wall
-            Block.createCuboidShape(14.0, 2.0, 0.0, 16.0, 8.0, 16.0),
-            // West wall
-            Block.createCuboidShape(0.0, 2.0, 0.0, 2.0, 8.0, 16.0)
+    // NORTH facing (head at north, foot at south)
+    private static final VoxelShape COFFIN_HEAD_SHAPE_NORTH = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0), // Floor
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 2.0),   // North wall (closed end)
+            Block.createCuboidShape(14.0, 0.0, 0.0, 16.0, 8.0, 16.0), // East wall
+            Block.createCuboidShape(0.0, 0.0, 0.0, 2.0, 8.0, 16.0)    // West wall
     );
 
-    private static final VoxelShape COFFIN_FOOT_SHAPE = VoxelShapes.union(
-            // Floor
-            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 2.0, 16.0),
-            // South wall (closed end)
-            Block.createCuboidShape(0.0, 2.0, 14.0, 16.0, 8.0, 16.0),
-            // East wall
-            Block.createCuboidShape(14.0, 2.0, 0.0, 16.0, 8.0, 16.0),
-            // West wall
-            Block.createCuboidShape(0.0, 2.0, 0.0, 2.0, 8.0, 16.0)
+    private static final VoxelShape COFFIN_FOOT_SHAPE_NORTH = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),  // Floor
+            Block.createCuboidShape(0.0, 0.0, 14.0, 16.0, 8.0, 16.0), // South wall (closed end)
+            Block.createCuboidShape(14.0, 0.0, 0.0, 16.0, 8.0, 16.0), // East wall
+            Block.createCuboidShape(0.0, 0.0, 0.0, 2.0, 8.0, 16.0)    // West wall
+    );
+
+    // SOUTH facing (head at south, foot at north)
+    private static final VoxelShape COFFIN_HEAD_SHAPE_SOUTH = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),  // Floor
+            Block.createCuboidShape(0.0, 0.0, 14.0, 16.0, 8.0, 16.0), // South wall (closed end)
+            Block.createCuboidShape(0.0, 0.0, 0.0, 2.0, 8.0, 16.0),   // West wall
+            Block.createCuboidShape(14.0, 0.0, 0.0, 16.0, 8.0, 16.0)  // East wall
+    );
+
+    private static final VoxelShape COFFIN_FOOT_SHAPE_SOUTH = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),  // Floor
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 2.0),   // North wall (closed end)
+            Block.createCuboidShape(0.0, 0.0, 0.0, 2.0, 8.0, 16.0),   // West wall
+            Block.createCuboidShape(14.0, 0.0, 0.0, 16.0, 8.0, 16.0)  // East wall
+    );
+
+    // WEST facing (head at west, foot at east)
+    private static final VoxelShape COFFIN_HEAD_SHAPE_WEST = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),  // Floor
+            Block.createCuboidShape(0.0, 0.0, 0.0, 2.0, 8.0, 16.0),   // West wall (closed end)
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 2.0),   // North wall
+            Block.createCuboidShape(0.0, 0.0, 14.0, 16.0, 8.0, 16.0)  // South wall
+    );
+
+    private static final VoxelShape COFFIN_FOOT_SHAPE_WEST = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),  // Floor
+            Block.createCuboidShape(14.0, 0.0, 0.0, 16.0, 8.0, 16.0), // East wall (closed end)
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 2.0),   // North wall
+            Block.createCuboidShape(0.0, 0.0, 14.0, 16.0, 8.0, 16.0)  // South wall
+    );
+
+    // EAST facing (head at east, foot at west)
+    private static final VoxelShape COFFIN_HEAD_SHAPE_EAST = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),  // Floor
+            Block.createCuboidShape(14.0, 0.0, 0.0, 16.0, 8.0, 16.0), // East wall (closed end)
+            Block.createCuboidShape(0.0, 0.0, 14.0, 16.0, 8.0, 16.0), // South wall
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 2.0)    // North wall
+    );
+
+    private static final VoxelShape COFFIN_FOOT_SHAPE_EAST = VoxelShapes.union(
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 1.0, 16.0),  // Floor
+            Block.createCuboidShape(0.0, 0.0, 0.0, 2.0, 8.0, 16.0),   // West wall (closed end)
+            Block.createCuboidShape(0.0, 0.0, 14.0, 16.0, 8.0, 16.0), // South wall
+            Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 8.0, 2.0)    // North wall
     );
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return state.get(PART) == BedPart.HEAD ? COFFIN_HEAD_SHAPE : COFFIN_FOOT_SHAPE;
+        Direction facing = state.get(FACING);
+        BedPart part = state.get(PART);
+
+        if (part == BedPart.HEAD) {
+            return switch (facing) {
+                case NORTH -> COFFIN_HEAD_SHAPE_NORTH;
+                case SOUTH -> COFFIN_HEAD_SHAPE_SOUTH;
+                case WEST -> COFFIN_HEAD_SHAPE_WEST;
+                case EAST -> COFFIN_HEAD_SHAPE_EAST;
+                default -> COFFIN_HEAD_SHAPE_NORTH;
+            };
+        } else {
+            return switch (facing) {
+                case NORTH -> COFFIN_FOOT_SHAPE_NORTH;
+                case SOUTH -> COFFIN_FOOT_SHAPE_SOUTH;
+                case WEST -> COFFIN_FOOT_SHAPE_WEST;
+                case EAST -> COFFIN_FOOT_SHAPE_EAST;
+                default -> COFFIN_FOOT_SHAPE_NORTH;
+            };
+        }
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return state.get(PART) == BedPart.HEAD ? COFFIN_HEAD_SHAPE : COFFIN_FOOT_SHAPE;
+        return getOutlineShape(state, world, pos, context);
     }
 
     public CoffinBlock(Settings settings) {
