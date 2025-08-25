@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.EntityDimensions;
@@ -50,6 +51,9 @@ public class ModBlocks {
             .mapColor(MapColor.ORANGE)
             .pistonBehavior(PistonBehavior.BLOCK)
     ));
+
+    public static final Block COFFIN_BLOCK = register("coffin", new CoffinBlock(AbstractBlock.Settings.copy(Blocks.RED_BED)));
+
 
 
     public static <T extends Block> T register(String name, T block) {

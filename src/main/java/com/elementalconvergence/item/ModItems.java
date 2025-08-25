@@ -138,6 +138,8 @@ public class ModItems {
     public static final Item POLLEN_YELLOW = register("pollen_yellow", new PollenItem(ModEffects.PLAGUE, 20*20, 1, new Item.Settings().maxCount(8).rarity(Rarity.RARE)));
     public static final Item POLLEN_BROWN = register("pollen_brown", new PollenItem(ModEffects.LIGHT_PHASING, 20*60*2, 0, new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
     public static final Item POLLEN_PINK = register("pollen_pink", new PollenItem(ModEffects.WINGS, 20*60, 0, new Item.Settings().maxCount(8).rarity(Rarity.EPIC)));
+
+    public static final Item COFFIN_ITEM = register("coffin", new BlockItem(ModBlocks.COFFIN_BLOCK, new Item.Settings()));
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight
     //common: white, red, blue
