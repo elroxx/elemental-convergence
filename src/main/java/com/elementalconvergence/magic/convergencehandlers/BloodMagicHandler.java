@@ -77,7 +77,7 @@ public class BloodMagicHandler implements IMagicHandler {
         ServerWorld world = (ServerWorld) player.getWorld();
 
         //Maybe add a rain verif check
-        if (world.isDay() && world.isSkyVisible(player.getBlockPos()) && !isBeingRainedOn(player) && !player.hasStatusEffect(ModEffects.BAT_FORM)){
+        if (world.isDay() && world.isSkyVisible(player.getBlockPos()) && !isBeingRainedOn(player) && !player.hasStatusEffect(ModEffects.BAT_FORM) && !player.isCreative()){
             if (skylightHurtCooldown==0) {
                 DamageSource withered = player.getWorld().getDamageSources().wither();
                 player.damage(withered, 4);
@@ -152,7 +152,7 @@ public class BloodMagicHandler implements IMagicHandler {
             //also reset flights
 
             //also add flight
-            if (player.getAbilities().allowFlying) {
+            if (player.getAbilities().allowFlying && !player.isCreative()) {
                 player.getAbilities().allowFlying = false;
                 ((ServerPlayerEntity) player).sendAbilitiesUpdate();
                 player.getAbilities().flying = false;
