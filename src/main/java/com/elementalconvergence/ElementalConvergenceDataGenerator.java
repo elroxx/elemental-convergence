@@ -321,7 +321,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							9)))
 					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							rootAdvName, gravitySelectedCN, gravitySelectedAdvName)))
-					.parent(shadowLevel3)
+					.parent(earthLevel3)
 					.build(consumer, gravitySelectedAdvName);
 
 			//GRAVITY LVL 1
@@ -406,6 +406,32 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//HONEY LVL 2
 			//HONEY LVL 3
 			AdvancementEntry honeyLevel3 = generateHoneyLevelsAdvancements(honeySelectedCN, honeySelectedAdvName, honeySelectedAdvancement, consumer);
+
+			//BLOOD MAGIC SELECTED
+			String bloodSelectedCN = "blood_magic_selected";
+			String bloodSelectedAdvName = ElementalConvergence.MOD_ID + ":blood_magic_selected";
+			AdvancementEntry bloodSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.BAT_SPAWN_EGG,
+							Text.literal("Blood Convergence Magic"),
+							Text.literal("Convergence of Shadow and Death Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(bloodSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							13)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName, bloodSelectedCN, bloodSelectedAdvName)))
+					.parent(shadowLevel3)
+					.build(consumer, bloodSelectedAdvName);
+
+			//BLOOD LVL 1
+			//BLOOD LVL 2
+			//BLOOD LVL 3
+			AdvancementEntry bloodLevel3 = generateBloodLevelsAdvancements(bloodSelectedCN, bloodSelectedAdvName, bloodSelectedAdvancement, consumer);
 
 		}
 
@@ -1486,6 +1512,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return honeyAdv3;
+		}
+
+		public AdvancementEntry generateBloodLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = BloodMagicHandler.BLOOD_INDEX;
+			String goodMagicPicked = "has_blood_selected_concurrent";
+			String achievementTitle = "Blood Level ";
+			String CN = "blood_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":blood_lvl";
+			String haslvl = "blood_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry bloodAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.COFFIN_ITEM,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a coffin"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.COFFIN_ITEM))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = bloodAdv1;
+			lvl = 2;
+			AdvancementEntry bloodAdv2 = Advancement.Builder.create()
+					.display(
+							Items.ECHO_SHARD,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Loot an echo shard"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.ECHO_SHARD))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = bloodAdv2;
+			lvl = 3;
+			AdvancementEntry bloodAdv3 = Advancement.Builder.create()
+					.display(
+							Items.HEARTBREAK_POTTERY_SHERD,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Loot a heartbreak pottery sherd"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.HEARTBREAK_POTTERY_SHERD))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return bloodAdv3;
 		}
 
 	}
