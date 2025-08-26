@@ -265,12 +265,8 @@ public class BloodMagicHandler implements IMagicHandler {
         player.velocityModified=true;
         target.velocityModified=true;
 
-        //get init pos to be able to stop them later
-        Vec3d playerInitialPos = player.getPos();
-        Vec3d targetInitialPos = target.getPos();
-
-        //bloodsuck session
-        activeSession = new BloodSuckSession(target, playerInitialPos, targetInitialPos);
+        //bloodsuck session (positions will be set after immunity period)
+        activeSession = new BloodSuckSession(target);
         bloodSuckTicks = 0;
         immunityTicks = 0; // Start immunity period
 
@@ -280,7 +276,7 @@ public class BloodMagicHandler implements IMagicHandler {
 
         //start sound
         player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.5f, 0.8f);
+                SoundEvents.ENTITY_PHANTOM_BITE, SoundCategory.PLAYERS, 1f, 1.25f);
     }
 
     private void handleBloodSuckingTick(PlayerEntity player) {
@@ -290,6 +286,11 @@ public class BloodMagicHandler implements IMagicHandler {
 
         if (immunityTicks < 10) {
             immunityTicks++;
+
+            // get pos at end
+            if (immunityTicks == 10) {
+                activeSession.setPositions(player.getPos(), target.getPos());
+            }
         }
 
         // if session interrupted
@@ -328,7 +329,8 @@ public class BloodMagicHandler implements IMagicHandler {
     private boolean shouldInterruptSession(PlayerEntity player, BloodSuckSession session) {
         LivingEntity target = session.target;
 
-        if (immunityTicks < 10) {
+        // no interrupt if no pos or still in immune frames
+        if (immunityTicks < 10 || !session.hasPositions()) {
             return false;
         }
 
@@ -389,22 +391,30 @@ public class BloodMagicHandler implements IMagicHandler {
                     SoundEvents.ENTITY_MOOSHROOM_MILK, SoundCategory.PLAYERS, 0.8f, 0.25f);
         }
 
-        // Clear session
+        //clean
         activeSession = null;
         bloodSuckTicks = 0;
+        immunityTicks = 0;
     }
 
     //Inner class only for bloodsuck datastructure
     private static class BloodSuckSession {
         final LivingEntity target;
-        final Vec3d playerInitialPos;
-        final Vec3d targetInitialPos;
+        Vec3d playerInitialPos = null;
+        Vec3d targetInitialPos = null;
         float totalHpDrained = 0f;
 
-        BloodSuckSession(LivingEntity target, Vec3d playerPos, Vec3d targetPos) {
+        BloodSuckSession(LivingEntity target) {
             this.target = target;
+        }
+
+        public void setPositions(Vec3d playerPos, Vec3d targetPos) {
             this.playerInitialPos = playerPos;
             this.targetInitialPos = targetPos;
+        }
+
+        public boolean hasPositions() {
+            return playerInitialPos != null && targetInitialPos != null;
         }
     }
 
