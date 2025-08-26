@@ -7,6 +7,8 @@ import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -14,11 +16,17 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.SpawnEggItem;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -46,6 +54,32 @@ public class QuantumMagicHandler implements IMagicHandler {
     @Override
     public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
 
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int quantumLevel = magicData.getMagicLevel(QUANTUM_INDEX);
+        if (quantumLevel >= 3) {
+            if (player.isSneaking() && targetEntity instanceof LivingEntity livingEntity) {
+                ItemStack eggStack = createMobEgg(livingEntity);
+
+                if (eggStack != null) {
+                    if (!player.getInventory().insertStack(eggStack)) {
+                        // if full inv just drop it
+                        player.dropItem(eggStack, false);
+                    }
+
+                    // drops the entity into the void below
+                    livingEntity.refreshPositionAndAngles(livingEntity.getX(), -200.0, livingEntity.getZ(), livingEntity.getYaw(), livingEntity.getPitch());
+
+                    //capture sound
+                    player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SNIFFER_EGG_PLOP,
+                            SoundCategory.PLAYERS, 1.0F, 1.5F);
+
+                    // success message!!!!!!!!! Woohoooo (in color as well)
+                    player.sendMessage(Text.literal("§aCaptured " + livingEntity.getName().getString() + "!"), true);
+
+                }
+            }
+        }
     }
 
     @Override
@@ -87,5 +121,53 @@ public class QuantumMagicHandler implements IMagicHandler {
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
 
+    }
+
+    private ItemStack createMobEgg(LivingEntity entity) {
+        try {
+            // get entity type
+            String entityTypeId = Registries.ENTITY_TYPE.getId(entity.getType()).toString();
+
+            ItemStack eggStack = new ItemStack(Items.DOLPHIN_SPAWN_EGG); //always dolphin coz i like the color
+
+
+            // nbt component
+            NbtCompound entityNbt = new NbtCompound();
+            entity.writeNbt(entityNbt);
+
+            // remove the useless parts
+            cleanEntityNbt(entityNbt);
+
+            //store type in item
+            entityNbt.putString("id", entityTypeId);
+
+            //store everything else in item
+            eggStack.set(DataComponentTypes.ENTITY_DATA, NbtComponent.of(entityNbt));
+
+            //put name as well WITH COLOR WOOHOO
+            eggStack.set(DataComponentTypes.CUSTOM_NAME,
+                    Text.literal("§e" + entity.getName().getString() + " Egg"));
+
+            return eggStack;
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private void cleanEntityNbt(NbtCompound nbt) {
+        //we dont care about those specific info.
+        nbt.remove("UUID");
+        nbt.remove("Pos");
+        nbt.remove("Motion");
+        nbt.remove("Rotation");
+        nbt.remove("FallDistance");
+        nbt.remove("Fire");
+        nbt.remove("Air");
+        nbt.remove("OnGround");
+        nbt.remove("Dimension");
+        nbt.remove("PortalCooldown");
+        nbt.remove("WorldUUIDLeast");
+        nbt.remove("WorldUUIDMost");
     }
 }
