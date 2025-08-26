@@ -115,7 +115,7 @@ public class MagicRegistry {
         GravityChangerAPI.resetGravity(player);
 
         //RESETTING CREATIVE FLIGHT ABILITY
-        if (player.getAbilities().allowFlying) {
+        if (player.getAbilities().allowFlying && !player.isCreative()) {
             player.getAbilities().allowFlying = false;
             ((ServerPlayerEntity) player).sendAbilitiesUpdate();
         }
