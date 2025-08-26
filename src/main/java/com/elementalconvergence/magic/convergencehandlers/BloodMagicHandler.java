@@ -13,6 +13,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
@@ -60,6 +61,11 @@ public class BloodMagicHandler implements IMagicHandler {
     public static final float BAT_FLIGHT=1.25f; //super quick flight
     public static final float BAT_SIZE=0.5f; //half size for height and width
 
+    //Bloodsucking
+    private BloodSuckSession activeSession = null;
+    private int bloodSuckTicks = 0;
+    private int immunityTicks = 0;
+
     @Override
     public void handleItemRightClick(PlayerEntity player) {
 
@@ -67,10 +73,33 @@ public class BloodMagicHandler implements IMagicHandler {
 
     @Override
     public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
+
+        //Check if good lvl (lvl 3 coz somewhat powerful)
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int bloodLevel = magicData.getMagicLevel(BLOOD_INDEX);
+        if (bloodLevel>=3) {
+
+            //Check if sneaking+mainhand empty
+            if (player.isSneaking() && player.getMainHandStack().isEmpty()) {
+                //cant autosuck yourself, nor suck a nonliving entity or if you are already bloodsucking
+                if (targetEntity instanceof LivingEntity target && !target.equals(player) && activeSession == null) {
+                    // get bloodsucking going
+                    startBloodSuck(player, target);
+                }
+            }
+        }
+
     }
 
     @Override
     public void handlePassive(PlayerEntity player) {
+
+        //manage bloodsucking
+        if (activeSession != null) {
+            handleBloodSuckingTick(player);
+        }
 
 
         //DEBUFF - Getting hurt by skylight
@@ -165,6 +194,11 @@ public class BloodMagicHandler implements IMagicHandler {
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
 
+        //cancel bloodsuck if attack
+        if (activeSession != null) {
+            endBloodSuck(player, true);
+        }
+
     }
 
     @Override
@@ -222,6 +256,156 @@ public class BloodMagicHandler implements IMagicHandler {
     private boolean isBeingRainedOn(PlayerEntity player) {
         BlockPos blockPos = player.getBlockPos();
         return player.getWorld().hasRain(blockPos) || player.getWorld().hasRain(BlockPos.ofFloored((double)blockPos.getX(), player.getBoundingBox().maxY, (double)blockPos.getZ()));
+    }
+
+    private void startBloodSuck(PlayerEntity player, LivingEntity target) {
+        //stop momentum
+        player.setVelocity(Vec3d.ZERO);
+        target.setVelocity(Vec3d.ZERO);
+        player.velocityModified=true;
+        target.velocityModified=true;
+
+        //get init pos to be able to stop them later
+        Vec3d playerInitialPos = player.getPos();
+        Vec3d targetInitialPos = target.getPos();
+
+        //bloodsuck session
+        activeSession = new BloodSuckSession(target, playerInitialPos, targetInitialPos);
+        bloodSuckTicks = 0;
+        immunityTicks = 0; // Start immunity period
+
+        //unable to move
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, Integer.MAX_VALUE, 255, false, false));
+        target.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, Integer.MAX_VALUE, -10, false, false));
+
+        //start sound
+        player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 0.5f, 0.8f);
+    }
+
+    private void handleBloodSuckingTick(PlayerEntity player) {
+        if (activeSession == null) return;
+
+        LivingEntity target = activeSession.target;
+
+        if (immunityTicks < 10) {
+            immunityTicks++;
+        }
+
+        // if session interrupted
+        if (shouldInterruptSession(player, activeSession)) {
+            endBloodSuck(player, false); //NOW NO MATTER WHAT THE STRENGTH COMES THROUGH, MAYBE CHANGE IT' IDK YET
+            return;
+        }
+
+        bloodSuckTicks++;
+
+        // draining
+        if (bloodSuckTicks >= 10) {
+            // dmg
+            float damage = 1.0f;
+            target.damage(target.getDamageSources().magic(), damage);
+
+            // health
+            player.heal(damage);
+            activeSession.totalHpDrained += damage;
+
+            // reset tick counter
+            bloodSuckTicks = 0;
+
+            //blood suck sound
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 0.8f, 1.25f);
+
+            // if dead we stop
+            if (target.isDead() || target.getHealth() <= 0) {
+                endBloodSuck(player, false);
+                return;
+            }
+        }
+    }
+
+    private boolean shouldInterruptSession(PlayerEntity player, BloodSuckSession session) {
+        LivingEntity target = session.target;
+
+        if (immunityTicks < 10) {
+            return false;
+        }
+
+        // check if player mvoed
+        if (player.getPos().distanceTo(session.playerInitialPos) > 0.1) {
+            return true;
+        }
+
+        // check if target moved
+        if (target.getPos().distanceTo(session.targetInitialPos) > 0.1) {
+            return true;
+        }
+
+        // check if player dmgd
+        if (player.hurtTime > 0) {
+            return true;
+        }
+
+        // check if target dead
+        if (target.isRemoved() || target.isDead()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void endBloodSuck(PlayerEntity player, boolean interrupted) {
+        if (activeSession == null) return;
+
+        LivingEntity target = activeSession.target;
+
+        // remove movement restrictions from target
+        target.removeStatusEffect(StatusEffects.SLOWNESS);
+        target.removeStatusEffect(StatusEffects.JUMP_BOOST);
+
+        // apply strength
+        if (!interrupted && activeSession.totalHpDrained > 0) {
+            int strengthLevel = Math.min((int) activeSession.totalHpDrained, 255); // need to cap at max lvl amplifier
+            strengthLevel = strengthLevel/2; // (still will half the amount of strength gotten
+            int duration = 20*60*2; // 2 mins
+
+            StatusEffectInstance strengthEffect = new StatusEffectInstance(
+                    StatusEffects.STRENGTH,
+                    duration,
+                    strengthLevel - 1,
+                    false,
+                    true
+            );
+
+            player.addStatusEffect(strengthEffect);
+
+
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_SKELETON_CONVERTED_TO_STRAY, SoundCategory.PLAYERS, 0.8f, 0.75f);
+        } else {
+
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_MOOSHROOM_MILK, SoundCategory.PLAYERS, 0.8f, 0.25f);
+        }
+
+        // Clear session
+        activeSession = null;
+        bloodSuckTicks = 0;
+    }
+
+    //Inner class only for bloodsuck datastructure
+    private static class BloodSuckSession {
+        final LivingEntity target;
+        final Vec3d playerInitialPos;
+        final Vec3d targetInitialPos;
+        float totalHpDrained = 0f;
+
+        BloodSuckSession(LivingEntity target, Vec3d playerPos, Vec3d targetPos) {
+            this.target = target;
+            this.playerInitialPos = playerPos;
+            this.targetInitialPos = targetPos;
+        }
     }
 
 }
