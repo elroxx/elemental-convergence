@@ -25,6 +25,7 @@ import com.elementalconvergence.networking.MiningSpeedPayload;
 import com.elementalconvergence.networking.OpenInventoryPayload;
 import com.elementalconvergence.networking.SpellCastPayload;
 //import com.elementalconvergence.worldgen.ModWorldGeneration;
+import com.elementalconvergence.particle.ModParticles;
 import com.elementalconvergence.world.dimension.ModDimensions;
 import gravity_changer.mixin.EntityCollisionContextMixin;
 import net.fabricmc.api.ModInitializer;
@@ -161,6 +162,7 @@ public class ElementalConvergence implements ModInitializer {
 		ModCriterions.initialize(); //Criterions for advancements
 		ModDimensions.initialize();
 		ModEnchantments.initialize();
+		ModParticles.initialize();
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 
 		//Init the MagicRegistry (magic handler is by player now)
@@ -725,19 +727,19 @@ public class ElementalConvergence implements ModInitializer {
 
 			//check if safe
 			if (isSafeToTeleport(world, targetPos)) {
-				//portal particles
-				world.spawnParticles(ParticleTypes.PORTAL,
-						originalX, originalY + 1, originalZ,
-						32, 0.5, 1.0, 0.5, 0.1);
+				//particles old location
+				world.spawnParticles(ModParticles.ATOM_PARTICLE,
+						newX, newY + 1, newZ,
+						64, 0.5, 1.0, 0.5, 0.1);
 
 				//tp direct
 				Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
 				player.teleport(world, newX, newY, newZ, flags, player.getYaw(), player.getPitch());
 
 				//new location
-				world.spawnParticles(ParticleTypes.PORTAL,
+				world.spawnParticles(ModParticles.ATOM_PARTICLE,
 						newX, newY + 1, newZ,
-						32, 0.5, 1.0, 0.5, 0.1);
+						64, 0.5, 1.0, 0.5, 0.1);
 
 				//tp sound
 				world.playSound(null, targetPos, SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,

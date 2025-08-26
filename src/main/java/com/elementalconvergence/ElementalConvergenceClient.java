@@ -5,9 +5,12 @@ import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.item.renderer.HaloRenderer;
 import com.elementalconvergence.networking.InventoryNetworking;
 import com.elementalconvergence.networking.MiningSpeedPayload;
+import com.elementalconvergence.particle.ModParticles;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
+import net.minecraft.client.particle.PortalParticle;
 
 public class ElementalConvergenceClient implements ClientModInitializer {
 
@@ -24,5 +27,9 @@ public class ElementalConvergenceClient implements ClientModInitializer {
         InventoryNetworking.registerS2CPackets();
 
         ArmorRenderer.register(new HaloRenderer(), ModItems.HALO);
+
+
+        //for particles
+        ParticleFactoryRegistry.getInstance().register(ModParticles.ATOM_PARTICLE, PortalParticle.Factory::new);
     }
 }
