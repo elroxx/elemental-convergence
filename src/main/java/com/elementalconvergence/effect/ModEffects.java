@@ -21,6 +21,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> PRAYER = register("prayer", new PrayerEffect());
     public static final RegistryEntry<StatusEffect> INSECT_WEIGHT = register("insect_weight", new InsectWeightEffect());
     public static final RegistryEntry<StatusEffect> BAT_FORM = register("bat_form", new BatFormEffect());
+    public static final RegistryEntry<StatusEffect> QUANTUM_PHASING = register("quantum_phasing", new QuantumPhasingEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
