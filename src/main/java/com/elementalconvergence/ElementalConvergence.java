@@ -17,6 +17,7 @@ import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler;
 import com.elementalconvergence.magic.handlers.DeathMagicHandler;
 import com.elementalconvergence.mixin.PlayerDataMixin;
 import com.elementalconvergence.networking.InventoryNetworking;
@@ -63,6 +64,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
@@ -73,6 +75,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -89,6 +92,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import virtuoel.pehkui.api.PehkuiConfig;
 
 import java.util.*;
+
+import static com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler.QUANTUM_INDEX;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
@@ -125,6 +130,10 @@ public class ElementalConvergence implements ModInitializer {
 	private static KeyBinding primarySpellKb;
 	private static KeyBinding secondarySpellKb;
 	private static KeyBinding tertiarySpellKb;
+
+	//Section for quantum debuff/teleportation part
+	private static final Map<UUID, Long> lastTeleportTimes = new HashMap<>();
+	private static final long TELEPORT_COOLDOWN = 1000; // 1 sec cooldown on tp
 
 
 
@@ -191,6 +200,16 @@ public class ElementalConvergence implements ModInitializer {
 					if (deathMap.get(playerName).getTimer() == 0) {
 						deathMap.remove(playerName);
 					}
+				}
+			}
+		});
+
+
+		//each tick, but ONLY and like ONLY for the quantum TP debuff
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			for (ServerWorld world : server.getWorlds()) {
+				for (ServerPlayerEntity observer : world.getPlayers()) {
+					checkPlayerLookingAt(observer, world);
 				}
 			}
 		});
@@ -619,4 +638,131 @@ public class ElementalConvergence implements ModInitializer {
 		world.setBlockState(new BlockPos(0, 100, 0), ModBlocks.PRAYING_ALTAR.getDefaultState());
 	}
 
+	private void checkPlayerLookingAt(ServerPlayerEntity observer, ServerWorld world) {
+		// check for player hit
+		for (ServerPlayerEntity target : world.getPlayers()) {
+			if (target.equals(observer)){
+				continue; //dont check raycaster
+			}
+			//check if target is actually quantum
+			IMagicDataSaver dataSaver = (IMagicDataSaver) target;
+			MagicData magicData = dataSaver.getMagicData();
+			if (magicData.getSelectedMagic()!=QUANTUM_INDEX){
+				continue; // Must be quantum to be tpd
+			}
+
+			// if that player is within line of sight, random tp
+			if (isPlayerInLineOfSight(observer, target)) {
+				teleportPlayer(target, world);
+			}
+		}
+	}
+
+	private boolean isPlayerInLineOfSight(ServerPlayerEntity observer, ServerPlayerEntity target) {
+		Vec3d observerEye = observer.getEyePos();
+		Vec3d targetCenter = target.getPos().add(0, target.getHeight() / 2, 0);
+
+		double distance = observerEye.distanceTo(targetCenter);
+		if (distance > 100.0){
+			return false; //max range is 100 blocks
+		}
+
+		// check from raycast result
+		Vec3d toTarget = targetCenter.subtract(observerEye).normalize();
+		Vec3d lookDirection = observer.getRotationVec(1.0F);
+
+		double dotProduct = toTarget.dotProduct(lookDirection);
+		boolean inFOV = dotProduct > 0.95; //about 18deg visual angle
+
+		if (!inFOV) return false;
+
+		// no blocks in the way
+		RaycastContext raycastContext = new RaycastContext(
+				observerEye, targetCenter,
+				RaycastContext.ShapeType.OUTLINE,
+				RaycastContext.FluidHandling.NONE,
+				observer
+		);
+
+		var targetHitResult = observer.getWorld().raycast(raycastContext);
+		return targetHitResult.getType() == HitResult.Type.MISS ||
+				targetHitResult.getPos().distanceTo(targetCenter) < 1.0;
+	}
+
+	private void teleportPlayer(ServerPlayerEntity player, ServerWorld world) {
+		UUID playerId = player.getUuid();
+		long currentTime = System.currentTimeMillis();
+
+		//check tp cooldown
+		if (lastTeleportTimes.containsKey(playerId)) {
+			long lastTeleport = lastTeleportTimes.get(playerId);
+			if (currentTime - lastTeleport < TELEPORT_COOLDOWN) {
+				return; //if still on cooldown
+			}
+		}
+
+		//change last tp
+		lastTeleportTimes.put(playerId, currentTime);
+
+		//chorus fruit random
+		chorusFruitTeleport(player, world);
+	}
+
+	private void chorusFruitTeleport(ServerPlayerEntity player, ServerWorld world) {
+		double originalX = player.getX();
+		double originalY = player.getY();
+		double originalZ = player.getZ();
+
+		//need safe block
+		for (int attempts = 0; attempts < 16; attempts++) {
+			double newX = player.getX() + (random.nextDouble() - 0.5) * 16.0;
+			double newY = Math.max(world.getBottomY(),
+					player.getY() + (random.nextInt(16) - 8));
+			double newZ = player.getZ() + (random.nextDouble() - 0.5) * 16.0;
+
+			//on ground
+			BlockPos targetPos = BlockPos.ofFloored(newX, newY, newZ);
+
+			//check if safe
+			if (isSafeToTeleport(world, targetPos)) {
+				//portal particles
+				world.spawnParticles(ParticleTypes.PORTAL,
+						originalX, originalY + 1, originalZ,
+						32, 0.5, 1.0, 0.5, 0.1);
+
+				//tp direct
+				Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+				player.teleport(world, newX, newY, newZ, flags, player.getYaw(), player.getPitch());
+
+				//new location
+				world.spawnParticles(ParticleTypes.PORTAL,
+						newX, newY + 1, newZ,
+						32, 0.5, 1.0, 0.5, 0.1);
+
+				//tp sound
+				world.playSound(null, targetPos, SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
+						SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+				break;
+			}
+		}
+	}
+
+	private boolean isSafeToTeleport(ServerWorld world, BlockPos pos) {
+		// Check if there's enough space (2 blocks high)
+		if (!world.getBlockState(pos).isAir() ||
+				!world.getBlockState(pos.up()).isAir()) {
+			return false;
+		}
+
+		// Check if there's a solid block below (within 3 blocks)
+		for (int i = 1; i <= 3; i++) {
+			BlockPos below = pos.down(i);
+			if (!world.getBlockState(below).isAir()) {
+				return true; // Found solid ground
+			}
+		}
+
+		return false; // Would fall into void
+	}
 }

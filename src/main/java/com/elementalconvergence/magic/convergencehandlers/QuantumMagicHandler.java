@@ -1,5 +1,6 @@
 package com.elementalconvergence.magic.convergencehandlers;
 
+import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
@@ -13,15 +14,21 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.RaycastContext;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
+
+import java.util.UUID;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 
@@ -30,6 +37,7 @@ public class QuantumMagicHandler implements IMagicHandler {
 
 
 
+    //Quantum debuff is mostly in main class
     @Override
     public void handleItemRightClick(PlayerEntity player) {
 
@@ -80,6 +88,4 @@ public class QuantumMagicHandler implements IMagicHandler {
     public void handleTertiarySpell(PlayerEntity player) {
 
     }
-
-
 }
