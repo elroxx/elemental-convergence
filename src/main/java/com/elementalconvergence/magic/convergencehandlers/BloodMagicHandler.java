@@ -270,9 +270,11 @@ public class BloodMagicHandler implements IMagicHandler {
         bloodSuckTicks = 0;
         immunityTicks = 0; // Start immunity period
 
-        //unable to move
+        //unable to move (players can still jump, but i mean its easy to hit as well)
         target.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, Integer.MAX_VALUE, 255, false, false));
-        target.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, Integer.MAX_VALUE, -10, false, false));
+        //target.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, Integer.MAX_VALUE, -10, false, false));
+        //cant stop the jump anyway
+
 
         //start sound
         player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
@@ -316,7 +318,7 @@ public class BloodMagicHandler implements IMagicHandler {
 
             //blood suck sound
             player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 0.8f, 1.25f);
+                    SoundEvents.ITEM_HONEY_BOTTLE_DRINK, SoundCategory.PLAYERS, 0.7f, 1.0f);
 
             // if dead we stop
             if (target.isDead() || target.getHealth() <= 0) {
