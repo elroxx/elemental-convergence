@@ -17,7 +17,9 @@
 		"BreadMixin",
 		"EntityAccessor",
 		"InvSlotMixin",
-		"EntityRenderersMixin"
+		"EntityRenderersMixin",
+		"CameraMixin",
+		"InGameOverlayRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
