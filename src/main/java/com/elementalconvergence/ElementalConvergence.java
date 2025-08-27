@@ -14,6 +14,7 @@ import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.item.SchrodingerCatItem;
 import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
@@ -46,7 +47,11 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
@@ -58,6 +63,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
@@ -71,10 +77,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -250,6 +253,8 @@ public class ElementalConvergence implements ModInitializer {
 
 		//ALLOWING DEATH (guardian angel)
 		ServerLivingEntityEvents.ALLOW_DEATH.register(this::onEntityAllowDeath);
+
+		UseBlockCallback.EVENT.register(this::onUseBlock);
 
 		//AFTER DEATH
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
@@ -766,5 +771,37 @@ public class ElementalConvergence implements ModInitializer {
 		}
 
 		return false; // Would fall into void
+	}
+
+	private ActionResult onUseBlock(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
+		if (world.isClient || hand != Hand.MAIN_HAND) {
+			return ActionResult.PASS;
+		}
+
+		ItemStack heldItem = player.getStackInHand(hand);
+		if (!(heldItem.getItem() instanceof SchrodingerCatItem)) {
+			return ActionResult.PASS;
+		}
+
+		BlockPos pos = hitResult.getBlockPos();
+		BlockState state = world.getBlockState(pos);
+
+		if (!(state.getBlock() instanceof ChestBlock)) {
+			return ActionResult.PASS;
+		}
+
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+		if (!(blockEntity instanceof ChestBlockEntity chest)) {
+			return ActionResult.PASS;
+		}
+
+		ServerWorld serverWorld = (ServerWorld) world;
+		SchrodingerCatItem item = (SchrodingerCatItem) heldItem.getItem();
+
+		if (player.isSneaking()) {
+			return item.handleShiftRightClick(player, chest, pos, serverWorld);
+		} else {
+			return item.handleRightClick(player, chest, pos, serverWorld);
+		}
 	}
 }
