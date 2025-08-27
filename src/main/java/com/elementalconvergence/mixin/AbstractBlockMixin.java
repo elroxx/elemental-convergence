@@ -64,9 +64,13 @@ public class AbstractBlockMixin {
                 //ONLY CHECK FOR QUANTUM PHASING
                 if (player.hasStatusEffect(ModEffects.QUANTUM_PHASING)) {
                     if (!state.getBlock().equals(Blocks.SCAFFOLDING) && !state.getBlock().equals(Blocks.AIR) && !state.getBlock().equals(Blocks.WATER) && !state.getBlock().equals(Blocks.LAVA)) {
-                        if (context.isAbove(VoxelShapes.fullCube(), pos, true) && !context.isDescending()) {
-                            cir.setReturnValue(NORMAL_OUTLINE_SHAPE);
+
+                        VoxelShape originalCollision = state.getOutlineShape(world, pos);
+
+                        if (context.isAbove(originalCollision, pos, true) && !context.isDescending()) {
+                            //cir.setReturnValue(NORMAL_OUTLINE_SHAPE);
                             //cir.setReturnValue(state.getBlock()); //because slabs
+                            cir.setReturnValue(originalCollision);
                         }
                         else{
                             //get block below
