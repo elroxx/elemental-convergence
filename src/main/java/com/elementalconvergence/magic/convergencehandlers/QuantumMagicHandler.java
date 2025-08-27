@@ -43,6 +43,9 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class QuantumMagicHandler implements IMagicHandler {
     public static final int QUANTUM_INDEX= (BASE_MAGIC_ID.length-1)+7;
 
+    public static final int DEFAULT_PHASE_COOLDOWN = 10;
+    private int phaseCooldown=0;
+
 
 
     //Quantum debuff is mostly in main class
@@ -86,6 +89,10 @@ public class QuantumMagicHandler implements IMagicHandler {
     public void handlePassive(PlayerEntity player) {
 
 
+        //cooldowns
+        if (phaseCooldown>0){
+            phaseCooldown--;
+        }
     }
 
     @Override
@@ -110,6 +117,28 @@ public class QuantumMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
+
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int quantumLevel = magicData.getMagicLevel(QUANTUM_INDEX);
+        //movement ability
+        if (quantumLevel >= 2 && phaseCooldown==0) {
+
+            phaseCooldown=DEFAULT_PHASE_COOLDOWN;
+
+            if (player.hasStatusEffect(ModEffects.QUANTUM_PHASING)){
+                //remove phasing mode
+                player.removeStatusEffect(ModEffects.QUANTUM_PHASING);
+                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENTITY_ILLUSIONER_PREPARE_MIRROR,
+                        SoundCategory.PLAYERS, 1.0F, 0.75F);
+            }
+            else{
+                //put phasing mode on
+                player.addStatusEffect(new StatusEffectInstance(ModEffects.QUANTUM_PHASING, -1, 0, false, false, true));
+                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENTITY_ILLUSIONER_PREPARE_MIRROR,
+                        SoundCategory.PLAYERS, 1.0F, 1.25F);
+            }
+        }
 
     }
 
