@@ -66,12 +66,13 @@ public class AbstractBlockMixin {
                     if (!state.getBlock().equals(Blocks.SCAFFOLDING) && !state.getBlock().equals(Blocks.AIR) && !state.getBlock().equals(Blocks.WATER) && !state.getBlock().equals(Blocks.LAVA)) {
                         if (context.isAbove(VoxelShapes.fullCube(), pos, true) && !context.isDescending()) {
                             cir.setReturnValue(NORMAL_OUTLINE_SHAPE);
+                            //cir.setReturnValue(state.getBlock()); //because slabs
                         }
                         else{
                             //get block below
                             Block blockBelow = world.getBlockState(pos.add(0, -1, 0)).getBlock();
                             //allow to walk through normally (also drops down if sneaking)
-                            cir.setReturnValue(context.isAbove(OUTLINE_SHAPE, pos, true) || blockBelow.equals(Blocks.AIR) ? COLLISION_SHAPE : VoxelShapes.empty());
+                            cir.setReturnValue(context.isAbove(OUTLINE_SHAPE, pos, true) && blockBelow.equals(Blocks.AIR) ? COLLISION_SHAPE : VoxelShapes.empty());
                         }
                     }
                 } else {
