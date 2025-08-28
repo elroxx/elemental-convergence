@@ -17,6 +17,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.PersistentState;
@@ -45,45 +46,60 @@ public class SchrodingerCatItem extends Item {
         PlayerEntity player = context.getPlayer();
         BlockState state = world.getBlockState(pos);
 
-        if (!(state.getBlock() instanceof ChestBlock)) {
-            return ActionResult.PASS;
-        }
+        if (!(state.getBlock() instanceof ChestBlock)) return ActionResult.PASS;
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (!(blockEntity instanceof ChestBlockEntity chestEntity)) {
-            return ActionResult.PASS;
-        }
+        if (!(blockEntity instanceof ChestBlockEntity chestEntity)) return ActionResult.PASS;
 
-        if (world.isClient) {
-            return ActionResult.SUCCESS;
-        }
+        if (world.isClient) return ActionResult.SUCCESS;
 
-        // Must be sneaking for any effect
-        if (!player.isSneaking()) {
-            return ActionResult.PASS;
-        }
+        //need sneak no matter what coz if not it just opens the chest
+        if (!player.isSneaking()) return ActionResult.PASS;
 
-        // Check if it's a lootable container with a loot table
         if (!(chestEntity instanceof LootableContainerBlockEntity lootableChest)) {
             player.sendMessage(Text.literal("This chest has no quantum properties!").formatted(Formatting.RED), false);
             return ActionResult.SUCCESS;
         }
 
-        if (lootableChest.getLootTable() == null) {
-            player.sendMessage(Text.literal("This chest has already collapsed its quantum state!").formatted(Formatting.YELLOW), false);
+        ServerWorld serverWorld = (ServerWorld) world;
+        SchrodingerData data = SchrodingerData.get(serverWorld);
+        String posKey = pos.toShortString();
+
+        // lock first time
+        if (!data.hasChest(posKey)) {
+            if (lootableChest.getLootTable() != null) {
+                lootableChest.generateLoot(player); //get chest inside
+                data.setLootKey(posKey, lootableChest.getLootTable().getValue().toString());
+            }
+
+            data.setChestHash(posKey, generateInventoryHash(lootableChest));
+            player.sendMessage(Text.literal("Quantum state observed! Chest contents locked.").formatted(Formatting.GREEN), false);
             return ActionResult.SUCCESS;
         }
 
-        ServerWorld serverWorld = (ServerWorld) world;
+        //if its locked, try to reroll
+        String originalHash = data.getChestHash(posKey);
+        String currentHash = generateInventoryHash(lootableChest);
 
-        // If chest is already tracked → reroll, otherwise → initialize/lock
-        SchrodingerData data = SchrodingerData.get(serverWorld);
-        String posKey = pos.toShortString();
-        if (data.hasChest(posKey)) {
-            return attemptReroll(serverWorld, pos, lootableChest, player);
-        } else {
-            return checkChestState(serverWorld, pos, lootableChest, player);
+        if (!originalHash.equals(currentHash)) {
+            player.sendMessage(Text.literal("Cannot reroll! Quantum state has been disturbed.").formatted(Formatting.RED), false);
+            return ActionResult.SUCCESS;
         }
+
+        //try to regen the loot
+        String savedLootId = data.getLootKey(posKey);
+        if (savedLootId != null) {
+            lootableChest.clear();
+            ((LootableContainerBlockEntity) lootableChest).setLootTable(
+                    net.minecraft.registry.RegistryKey.of(net.minecraft.registry.RegistryKeys.LOOT_TABLE, Identifier.of(savedLootId)),
+                    world.getRandom().nextLong()
+            );
+            lootableChest.generateLoot(player);
+            data.setChestHash(posKey, generateInventoryHash(lootableChest));
+            player.sendMessage(Text.literal("Quantum reroll successful! New reality manifested.").formatted(Formatting.GOLD), false);
+        }
+
+        return ActionResult.SUCCESS;
     }
 
     private ActionResult checkChestState(ServerWorld world, BlockPos pos, LootableContainerBlockEntity chest, PlayerEntity player) {
