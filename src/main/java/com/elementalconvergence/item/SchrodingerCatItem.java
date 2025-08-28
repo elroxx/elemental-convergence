@@ -1,29 +1,27 @@
 package com.elementalconvergence.item;
 
-import com.elementalconvergence.data.SchrodingerData;
+import com.elementalconvergence.data.SchrodingerCatDataComponent;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.entity.LootableContainerBlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryKey;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 public class SchrodingerCatItem extends Item {
@@ -40,98 +38,76 @@ public class SchrodingerCatItem extends Item {
         World world = context.getWorld();
         BlockPos pos = context.getBlockPos();
         PlayerEntity player = context.getPlayer();
+
+        if (world.isClient || player == null) {
+            return ActionResult.SUCCESS;
+        }
+
         BlockState state = world.getBlockState(pos);
 
-        if (!(state.getBlock() instanceof ChestBlock)) return ActionResult.PASS;
+        // Check if the block is a chest
+        if (!(state.getBlock() instanceof ChestBlock)) {
+            player.sendMessage(Text.literal("Can only be used on chests!").formatted(Formatting.RED), true);
+            return ActionResult.FAIL;
+        }
 
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (!(blockEntity instanceof ChestBlockEntity chestEntity)) return ActionResult.PASS;
-
-        if (world.isClient) return ActionResult.SUCCESS;
-
-        if (!player.isSneaking()) return ActionResult.PASS;
-
-        if (!(chestEntity instanceof LootableContainerBlockEntity lootableChest)) {
-            player.sendMessage(Text.literal("This chest has no quantum properties!").formatted(Formatting.RED), false);
-            return ActionResult.SUCCESS;
+        if (!(blockEntity instanceof ChestBlockEntity chestEntity)) {
+            return ActionResult.FAIL;
         }
 
-        ServerWorld serverWorld = (ServerWorld) world;
-        SchrodingerData data = SchrodingerData.get(serverWorld);
-        String posKey = pos.toShortString();
-
-        Identifier lootId = lootableChest.getLootTable().getRegistry(); // get ID BEFORE generating loot
-
-        // First-time lock
-        if (!data.hasChest(posKey)) {
-            if (lootId != null) {
-                data.setLootKey(posKey, lootId.toString()); // store ID
-                lootableChest.generateLoot(player);         // then generate
-            }
-            data.setChestHash(posKey, generateInventoryHash(lootableChest));
-
-            player.sendMessage(Text.literal("Quantum state observed! Chest contents locked.").formatted(Formatting.GREEN), false);
-            return ActionResult.SUCCESS;
+        // Get the chest inventory (handles double chests automatically)
+        Inventory chestInventory = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
+        if (chestInventory == null) {
+            return ActionResult.FAIL;
         }
 
-        // Already locked → attempt reroll
-        String originalHash = data.getChestHash(posKey);
-        String currentHash = generateInventoryHash(lootableChest);
-
-        if (!originalHash.equals(currentHash)) {
-            player.sendMessage(Text.literal("Cannot reroll! Quantum state has been disturbed.").formatted(Formatting.RED), false);
-            return ActionResult.SUCCESS;
-        }
-
-        String savedLootId = data.getLootKey(posKey);
-        if (savedLootId != null) {
-            lootableChest.clear();
-            lootableChest.setLootTable(
-                    RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(savedLootId)),
-                    world.getRandom().nextLong()
-            );
-            lootableChest.generateLoot(player);
-
-            data.setChestHash(posKey, generateInventoryHash(lootableChest));
-            player.sendMessage(Text.literal("Quantum reroll successful! New reality manifested.").formatted(Formatting.GOLD), false);
-        } else {
-            player.sendMessage(Text.literal("Cannot reroll: Loot table lost!").formatted(Formatting.RED), false);
-        }
+        // Perform the swap
+        swapInventories(player, chestInventory, world, pos);
 
         return ActionResult.SUCCESS;
     }
 
-    private String generateInventoryHash(LootableContainerBlockEntity chest) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+    private void swapInventories(PlayerEntity player, Inventory chestInventory, World world, BlockPos pos) {
+        // Get player's cat inventory
+        DefaultedList<ItemStack> catInventory = SchrodingerCatDataComponent.getCatInventory(player);
 
-            for (int i = 0; i < chest.size(); i++) {
-                ItemStack stack = chest.getStack(i);
-                if (!stack.isEmpty()) {
-                    String itemString = stack.getItem().toString() + ":" + stack.getCount()
-                            + ":" + stack.getComponents().toString();
-                    md.update(itemString.getBytes());
-                    md.update((byte) i);
-                }
-            }
+        // Create temporary storage for chest contents
+        DefaultedList<ItemStack> tempInventory = DefaultedList.ofSize(chestInventory.size(), ItemStack.EMPTY);
 
-            byte[] hash = md.digest();
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < chest.size(); i++) {
-                ItemStack stack = chest.getStack(i);
-                sb.append(i).append(":").append(stack.getItem().toString())
-                        .append(":").append(stack.getCount())
-                        .append(":").append(stack.getComponents().toString());
-            }
-            return String.valueOf(sb.toString().hashCode());
+        // Store chest contents in temp
+        for (int i = 0; i < chestInventory.size(); i++) {
+            tempInventory.set(i, chestInventory.getStack(i).copy());
         }
+
+        // Clear chest and fill with cat inventory
+        chestInventory.clear();
+        int maxSlots = Math.min(catInventory.size(), chestInventory.size());
+        for (int i = 0; i < maxSlots; i++) {
+            if (!catInventory.get(i).isEmpty()) {
+                chestInventory.setStack(i, catInventory.get(i).copy());
+            }
+        }
+
+        // Clear cat inventory and fill with chest contents
+        for (int i = 0; i < catInventory.size(); i++) {
+            catInventory.set(i, ItemStack.EMPTY);
+        }
+        for (int i = 0; i < Math.min(tempInventory.size(), catInventory.size()); i++) {
+            if (!tempInventory.get(i).isEmpty()) {
+                catInventory.set(i, tempInventory.get(i));
+            }
+        }
+
+        // Save the updated cat inventory
+        SchrodingerCatDataComponent.setCatInventory(player, catInventory);
+
+        // Mark chest as dirty to save changes
+        chestInventory.markDirty();
+
+        // Play sound and show message
+        world.playSound(null, pos, SoundEvents.BLOCK_ENDER_CHEST_OPEN, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        player.sendMessage(Text.literal("Schrodinger's Cat swapped inventories!").formatted(Formatting.LIGHT_PURPLE), true);
     }
+
 }
