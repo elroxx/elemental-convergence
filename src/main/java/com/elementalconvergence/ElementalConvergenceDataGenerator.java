@@ -360,7 +360,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			String holySelectedAdvName = ElementalConvergence.MOD_ID + ":holy_magic_selected";
 			AdvancementEntry holySelectedAdvancement = Advancement.Builder.create()
 					.display(
-							ModItems.ALTAR_ITEM,
+							ModItems.PRAYING_ALTAR_ITEM,
 							Text.literal("Holy Convergence Magic"),
 							Text.literal("Convergence of Air and Light Magics"),
 							null,
