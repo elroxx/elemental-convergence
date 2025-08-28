@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TOT",
+    "WEL",
+    "TST"
+  ],
+  "key": {
+    "O": {
+      "item": "minecraft:observer"
+    },
+    "S": {
+      "item": "minecraft:calibrated_sculk_sensor"
+    },
+    "T": {
+      "item": "minecraft:tinted_glass"
+    },
+    "W": {
+      "item": "elemental-convergence:water_magic_eye"
+    },
+    "L": {
+      "item": "elemental-convergence:light_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:quantum_convergent_eye",
+    "count": 1
+  }
+}
