@@ -31,7 +31,7 @@
           "block_state": {
             "type": "minecraft:simple_state_provider",
             "state": {
-              "Name": "minecraft:brittle_obsidian",
+              "Name": "elemental-convergence:brittle_obsidian",
               "Properties": {
                 "age": "0"
               }
