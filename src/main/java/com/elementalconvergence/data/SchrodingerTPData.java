@@ -6,6 +6,11 @@ public class SchrodingerTPData {
     private double savedX = 0;
     private double savedY = 0;
     private double savedZ = 0;
+    private double savedVelocityX = 0;
+    private double savedVelocityY = 0;
+    private double savedVelocityZ = 0;
+
+
     private float savedYaw = 0;
     private float savedPitch = 0;
     private String savedDimension = "";
@@ -48,6 +53,15 @@ public class SchrodingerTPData {
     public double getSavedZ() { return savedZ; }
     public void setSavedZ(double z) { this.savedZ = z; }
 
+    public double getSavedVelocityX() { return savedVelocityX; }
+    public void setSavedVelocityX(double x) { this.savedVelocityX = x; }
+
+    public double getSavedVelocityY() { return savedVelocityY; }
+    public void setSavedVelocityY(double y) { this.savedVelocityY = y; }
+
+    public double getSavedVelocityZ() { return savedVelocityZ; }
+    public void setSavedVelocityZ(double z) { this.savedVelocityZ = z; }
+
     public float getSavedYaw() { return savedYaw; }
     public void setSavedYaw(float yaw) { this.savedYaw = yaw; }
 
@@ -56,4 +70,5 @@ public class SchrodingerTPData {
 
     public String getSavedDimension() { return savedDimension; }
     public void setSavedDimension(String dimension) { this.savedDimension = dimension; }
+
 }
