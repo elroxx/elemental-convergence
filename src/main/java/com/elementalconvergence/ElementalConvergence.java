@@ -5,7 +5,6 @@ import com.elementalconvergence.commands.DeathTeleportCommand;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
-import com.elementalconvergence.container.SchrodingerCatScreenHandler;
 import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.data.BeehivePlayerData;
 import com.elementalconvergence.data.IMagicDataSaver;
@@ -137,10 +136,6 @@ public class ElementalConvergence implements ModInitializer {
 	//Section for quantum debuff/teleportation part
 	private static final Map<UUID, Long> lastTeleportTimes = new HashMap<>();
 	private static final long TELEPORT_COOLDOWN = 1000; // 1 sec cooldown on tp
-
-	//SCREEN FOR QUANTUM REROLL
-	public static final ScreenHandlerType<SchrodingerCatScreenHandler> SCHRODINGER_CAT_SCREEN_HANDLER =
-			new ScreenHandlerType<>(SchrodingerCatScreenHandler::new, null);
 
 
 	// This logger is used to write text to the console and the log file.
@@ -350,9 +345,6 @@ public class ElementalConvergence implements ModInitializer {
 		// INIT FOR MININGSPEED PAYLOAD
 		PayloadTypeRegistry.playS2C().register(MiningSpeedPayload.ID, MiningSpeedPayload.CODEC);
 
-		// register networking for the quantum reroll
-		RerollPacket.registerPayload();
-		RerollPacket.registerServer();
 
 		// Register server-side packet handler
 		ServerPlayNetworking.registerGlobalReceiver(SpellCastPayload.ID, (payload, context) -> {
