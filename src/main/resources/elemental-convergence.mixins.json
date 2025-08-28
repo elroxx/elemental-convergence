@@ -19,7 +19,8 @@
 		"InvSlotMixin",
 		"EntityRenderersMixin",
 		"CameraMixin",
-		"InGameOverlayRendererMixin"
+		"InGameOverlayRendererMixin",
+		"TextRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
