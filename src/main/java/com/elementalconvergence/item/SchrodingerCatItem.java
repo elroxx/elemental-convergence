@@ -12,7 +12,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -20,22 +19,19 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.PersistentStateManager;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryKey;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class SchrodingerCatItem extends Item {
 
     public SchrodingerCatItem(Settings settings) {
         super(settings.component(DataComponentTypes.LORE, new LoreComponent(List.of(
-                Text.literal("Right-click: Check loot chest").formatted(Formatting.GRAY),
-                Text.literal("Shift+Right-click: Reroll chest").formatted(Formatting.GRAY),
-                Text.literal("(if contents are unchanged)").formatted(Formatting.ITALIC, Formatting.GRAY)
+                Text.literal("Sneak+Right-click: Lock or reroll loot chest").formatted(Formatting.GRAY),
+                Text.literal("(only if contents unchanged)").formatted(Formatting.ITALIC, Formatting.GRAY)
         ))));
     }
 
@@ -53,7 +49,6 @@ public class SchrodingerCatItem extends Item {
 
         if (world.isClient) return ActionResult.SUCCESS;
 
-        //need sneak no matter what coz if not it just opens the chest
         if (!player.isSneaking()) return ActionResult.PASS;
 
         if (!(chestEntity instanceof LootableContainerBlockEntity lootableChest)) {
@@ -65,19 +60,21 @@ public class SchrodingerCatItem extends Item {
         SchrodingerData data = SchrodingerData.get(serverWorld);
         String posKey = pos.toShortString();
 
-        // lock first time
-        if (!data.hasChest(posKey)) {
-            if (lootableChest.getLootTable() != null) {
-                lootableChest.generateLoot(player); //get chest inside
-                data.setLootKey(posKey, lootableChest.getLootTable().getValue().toString());
-            }
+        Identifier lootId = lootableChest.getLootTable().getRegistry(); // get ID BEFORE generating loot
 
+        // First-time lock
+        if (!data.hasChest(posKey)) {
+            if (lootId != null) {
+                data.setLootKey(posKey, lootId.toString()); // store ID
+                lootableChest.generateLoot(player);         // then generate
+            }
             data.setChestHash(posKey, generateInventoryHash(lootableChest));
+
             player.sendMessage(Text.literal("Quantum state observed! Chest contents locked.").formatted(Formatting.GREEN), false);
             return ActionResult.SUCCESS;
         }
 
-        //if its locked, try to reroll
+        // Already locked → attempt reroll
         String originalHash = data.getChestHash(posKey);
         String currentHash = generateInventoryHash(lootableChest);
 
@@ -86,84 +83,19 @@ public class SchrodingerCatItem extends Item {
             return ActionResult.SUCCESS;
         }
 
-        //try to regen the loot
         String savedLootId = data.getLootKey(posKey);
         if (savedLootId != null) {
             lootableChest.clear();
-            ((LootableContainerBlockEntity) lootableChest).setLootTable(
-                    net.minecraft.registry.RegistryKey.of(net.minecraft.registry.RegistryKeys.LOOT_TABLE, Identifier.of(savedLootId)),
+            lootableChest.setLootTable(
+                    RegistryKey.of(RegistryKeys.LOOT_TABLE, Identifier.of(savedLootId)),
                     world.getRandom().nextLong()
             );
             lootableChest.generateLoot(player);
+
             data.setChestHash(posKey, generateInventoryHash(lootableChest));
             player.sendMessage(Text.literal("Quantum reroll successful! New reality manifested.").formatted(Formatting.GOLD), false);
-        }
-
-        return ActionResult.SUCCESS;
-    }
-
-    private ActionResult checkChestState(ServerWorld world, BlockPos pos, LootableContainerBlockEntity chest, PlayerEntity player) {
-        SchrodingerData data = SchrodingerData.get(world);
-        String posKey = pos.toShortString();
-
-        if (!data.hasChest(posKey)) {
-            // Force loot generation immediately if a loot table exists
-            if (chest.getLootTable() != null) {
-                chest.generateLoot(player);
-            }
-
-            String hash = generateInventoryHash(chest);
-            data.setChestHash(posKey, hash);
-            data.markDirty();
-
-            player.sendMessage(Text.literal("Quantum state observed! Chest contents locked.").formatted(Formatting.GREEN), false);
         } else {
-            // Compare against saved hash
-            String originalHash = data.getChestHash(posKey);
-            String currentHash = generateInventoryHash(chest);
-
-            if (originalHash.equals(currentHash)) {
-                player.sendMessage(Text.literal("Quantum state intact! Sneak right-click again to reroll.").formatted(Formatting.AQUA), false);
-            } else {
-                player.sendMessage(Text.literal("Quantum state collapsed! Contents have been altered.").formatted(Formatting.RED), false);
-            }
-        }
-
-        return ActionResult.SUCCESS;
-    }
-
-    private ActionResult attemptReroll(ServerWorld world, BlockPos pos, LootableContainerBlockEntity chest, PlayerEntity player) {
-        SchrodingerData data = SchrodingerData.get(world);
-        String posKey = pos.toShortString();
-
-        if (!data.hasChest(posKey)) {
-            player.sendMessage(Text.literal("Chest hasn't been quantum-locked yet! Right-click first.").formatted(Formatting.RED), false);
-            return ActionResult.SUCCESS;
-        }
-
-        String originalHash = data.getChestHash(posKey);
-        String currentHash = generateInventoryHash(chest);
-
-        if (!originalHash.equals(currentHash)) {
-            player.sendMessage(Text.literal("Cannot reroll! Quantum state has been disturbed.").formatted(Formatting.RED), false);
-            return ActionResult.SUCCESS;
-        }
-
-        // Clear the chest and regenerate loot
-        chest.clear();
-
-        // Reset the loot table so it can be rolled again
-        if (chest.getLootTable() != null) {
-            // Set a new random seed and force regeneration
-            chest.setLootTableSeed(world.random.nextLong());
-            chest.getStack(0); // This triggers regeneration
-
-            // Generate new hash and store it
-            String newHash = generateInventoryHash(chest);
-            data.setChestHash(posKey, newHash);
-            data.markDirty();
-
-            player.sendMessage(Text.literal("Quantum reroll successful! New reality manifested.").formatted(Formatting.GOLD), false);
+            player.sendMessage(Text.literal("Cannot reroll: Loot table lost!").formatted(Formatting.RED), false);
         }
 
         return ActionResult.SUCCESS;
@@ -176,14 +108,10 @@ public class SchrodingerCatItem extends Item {
             for (int i = 0; i < chest.size(); i++) {
                 ItemStack stack = chest.getStack(i);
                 if (!stack.isEmpty()) {
-                    // Base info
-                    String itemString = stack.getItem().toString() + ":" + stack.getCount();
-
-                    // Add all components (names, enchants, lore, custom model data, etc.)
-                    itemString += ":" + stack.getComponents().toString();
-
+                    String itemString = stack.getItem().toString() + ":" + stack.getCount()
+                            + ":" + stack.getComponents().toString();
                     md.update(itemString.getBytes());
-                    md.update((byte) i); // include slot index
+                    md.update((byte) i);
                 }
             }
 
@@ -191,15 +119,11 @@ public class SchrodingerCatItem extends Item {
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) {
-                    hexString.append('0');
-                }
+                if (hex.length() == 1) hexString.append('0');
                 hexString.append(hex);
             }
             return hexString.toString();
-
         } catch (NoSuchAlgorithmException e) {
-            // fallback: very simple hash
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < chest.size(); i++) {
                 ItemStack stack = chest.getStack(i);

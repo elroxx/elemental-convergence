@@ -17,6 +17,7 @@ public class SchrodingerData extends PersistentState {
 
     public SchrodingerData() {}
 
+    // Hash accessors
     public boolean hasChest(String posKey) {
         return chestHashes.containsKey(posKey);
     }
@@ -30,6 +31,7 @@ public class SchrodingerData extends PersistentState {
         markDirty();
     }
 
+    // Loot table accessors
     public String getLootKey(String posKey) {
         return lootTableIds.get(posKey);
     }
