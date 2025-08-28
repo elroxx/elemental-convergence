@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "B  ",
+    "OES",
+    "O O"
+  ],
+  "key": {
+    "O": {
+      "item": "minecraft:orange_wool"
+    },
+    "B": {
+      "item": "minecraft:observer"
+    },
+    "E": {
+      "item": "minecraft:ender_chest"
+    },
+    "S": {
+      "item": "minecraft:echo_shard"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:schrodinger_cat",
+    "count": 1
+  }
+}
