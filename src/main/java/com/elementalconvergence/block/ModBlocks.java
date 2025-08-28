@@ -54,6 +54,8 @@ public class ModBlocks {
 
     public static final Block COFFIN_BLOCK = register("coffin", new CoffinBlock(AbstractBlock.Settings.copy(Blocks.RED_BED)));
 
+    public static final Block BRITTLE_OBSIDIAN = register("brittle_obsidian", new BrittleObsidianBlock(Block.Settings.create().requiresTool().strength(50.0F, 1200.0F).dropsNothing().mapColor(MapColor.PURPLE)));
+
 
 
     public static <T extends Block> T register(String name, T block) {
