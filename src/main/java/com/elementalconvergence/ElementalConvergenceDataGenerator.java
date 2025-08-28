@@ -433,6 +433,32 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//BLOOD LVL 3
 			AdvancementEntry bloodLevel3 = generateBloodLevelsAdvancements(bloodSelectedCN, bloodSelectedAdvName, bloodSelectedAdvancement, consumer);
 
+			//QUANTUM MAGIC SELECTED
+			String quantumSelectedCN = "quantum_magic_selected";
+			String quantumSelectedAdvName = ElementalConvergence.MOD_ID + ":quantum_magic_selected";
+			AdvancementEntry quantumSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.OBSERVER,
+							Text.literal("Quantum Convergence Magic"),
+							Text.literal("Convergence of Water and Light Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(quantumSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							14)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName, quantumSelectedCN, quantumSelectedAdvName)))
+					.parent(lightLevel3)
+					.build(consumer, quantumSelectedAdvName);
+
+			//QUANTUM LVL 1
+			//QUANTUM LVL 2
+			//QUANTUM LVL 3
+			AdvancementEntry quantumLevel3 = generateQuantumLevelsAdvancements(quantumSelectedCN, quantumSelectedAdvName, quantumSelectedAdvancement, consumer);
+
 		}
 
 		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
@@ -1595,6 +1621,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return bloodAdv3;
+		}
+
+		public AdvancementEntry generateQuantumLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = QuantumMagicHandler.QUANTUM_INDEX;
+			String goodMagicPicked = "has_quantum_selected_concurrent";
+			String achievementTitle = "Quantum Level ";
+			String CN = "quantum_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":quantum_lvl";
+			String haslvl = "quantum_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry quantumAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.SCHRODINGER_CAT,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Obtain Schrodinger's cat"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.SCHRODINGER_CAT))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = quantumAdv1;
+			lvl = 2;
+			AdvancementEntry quantumAdv2 = Advancement.Builder.create()
+					.display(
+							Items.VEX_ARMOR_TRIM_SMITHING_TEMPLATE,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Loot a vex armor trim"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.VEX_ARMOR_TRIM_SMITHING_TEMPLATE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = quantumAdv2;
+			lvl = 3;
+			AdvancementEntry quantumAdv3 = Advancement.Builder.create()
+					.display(
+							Items.MUSIC_DISC_OTHERSIDE,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Loot the otherside music disc"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.MUSIC_DISC_OTHERSIDE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return quantumAdv3;
 		}
 
 	}
