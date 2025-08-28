@@ -1,113 +1,118 @@
 package com.elementalconvergence.item;
 
-import com.elementalconvergence.data.SchrodingerCatDataComponent;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
+import com.elementalconvergence.data.ISchrodingerTPDataSaver;
+import com.elementalconvergence.data.SchrodingerTPData;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
-import java.util.List;
+import java.util.EnumSet;
+import java.util.Set;
 
 public class SchrodingerCatItem extends Item {
+    private static final String SAVED_X_KEY = "teleport_saved_x";
+    private static final String SAVED_Y_KEY = "teleport_saved_y";
+    private static final String SAVED_Z_KEY = "teleport_saved_z";
+    private static final String SAVED_YAW_KEY = "teleport_saved_yaw";
+    private static final String SAVED_PITCH_KEY = "teleport_saved_pitch";
+    private static final String SAVED_DIMENSION_KEY = "teleport_saved_dimension";
+    private static final String HAS_SAVED_POSITION_KEY = "teleport_has_saved";
 
     public SchrodingerCatItem(Settings settings) {
-        super(settings.component(DataComponentTypes.LORE, new LoreComponent(List.of(
-                Text.literal("Sneak+Right-click: Lock or reroll loot chest").formatted(Formatting.GRAY),
-                Text.literal("(only if contents unchanged)").formatted(Formatting.ITALIC, Formatting.GRAY)
-        ))));
+        super(settings);
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        World world = context.getWorld();
-        BlockPos pos = context.getBlockPos();
-        PlayerEntity player = context.getPlayer();
-
-        if (world.isClient || player == null) {
-            return ActionResult.SUCCESS;
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        if (world.isClient) {
+            return TypedActionResult.pass(user.getStackInHand(hand));
         }
 
-        BlockState state = world.getBlockState(pos);
+        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) user;
+        SchrodingerTPData teleportData = ((ISchrodingerTPDataSaver) serverPlayer).getTeleportData();
 
-        // Check if the block is a chest
-        if (!(state.getBlock() instanceof ChestBlock)) {
-            player.sendMessage(Text.literal("Can only be used on chests!").formatted(Formatting.RED), true);
-            return ActionResult.FAIL;
+        if (!teleportData.hasSavedPosition()) {
+            // use if no pos
+            saveCurrentPosition(serverPlayer, teleportData);
+            serverPlayer.sendMessage(Text.literal("§a Quantum clone created!"), false);
+        } else {
+            // swap
+            swapPositions(serverPlayer, teleportData);
         }
 
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (!(blockEntity instanceof ChestBlockEntity chestEntity)) {
-            return ActionResult.FAIL;
-        }
-
-        // Get the chest inventory (handles double chests automatically)
-        Inventory chestInventory = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
-        if (chestInventory == null) {
-            return ActionResult.FAIL;
-        }
-
-        // Perform the swap
-        swapInventories(player, chestInventory, world, pos);
-
-        return ActionResult.SUCCESS;
+        return TypedActionResult.success(user.getStackInHand(hand));
     }
 
-    private void swapInventories(PlayerEntity player, Inventory chestInventory, World world, BlockPos pos) {
-        // Get player's cat inventory
-        DefaultedList<ItemStack> catInventory = SchrodingerCatDataComponent.getCatInventory(player);
-
-        // Create temporary storage for chest contents
-        DefaultedList<ItemStack> tempInventory = DefaultedList.ofSize(chestInventory.size(), ItemStack.EMPTY);
-
-        // Store chest contents in temp
-        for (int i = 0; i < chestInventory.size(); i++) {
-            tempInventory.set(i, chestInventory.getStack(i).copy());
-        }
-
-        // Clear chest and fill with cat inventory
-        chestInventory.clear();
-        int maxSlots = Math.min(catInventory.size(), chestInventory.size());
-        for (int i = 0; i < maxSlots; i++) {
-            if (!catInventory.get(i).isEmpty()) {
-                chestInventory.setStack(i, catInventory.get(i).copy());
-            }
-        }
-
-        // Clear cat inventory and fill with chest contents
-        for (int i = 0; i < catInventory.size(); i++) {
-            catInventory.set(i, ItemStack.EMPTY);
-        }
-        for (int i = 0; i < Math.min(tempInventory.size(), catInventory.size()); i++) {
-            if (!tempInventory.get(i).isEmpty()) {
-                catInventory.set(i, tempInventory.get(i));
-            }
-        }
-
-        // Save the updated cat inventory
-        SchrodingerCatDataComponent.setCatInventory(player, catInventory);
-
-        // Mark chest as dirty to save changes
-        chestInventory.markDirty();
-
-        // Play sound and show message
-        world.playSound(null, pos, SoundEvents.BLOCK_ENDER_CHEST_OPEN, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        player.sendMessage(Text.literal("Schrodinger's Cat swapped inventories!").formatted(Formatting.LIGHT_PURPLE), true);
+    private void saveCurrentPosition(ServerPlayerEntity player, SchrodingerTPData data) {
+        data.setSavedX(player.getX());
+        data.setSavedY(player.getY());
+        data.setSavedZ(player.getZ());
+        data.setSavedYaw(player.getYaw());
+        data.setSavedPitch(player.getPitch());
+        data.setSavedDimension(player.getServerWorld().getRegistryKey().getValue().toString());
+        data.setHasSavedPosition(true);
     }
 
+    private void swapPositions(ServerPlayerEntity player, SchrodingerTPData data) {
+        // get current pos
+        double currentX = player.getX();
+        double currentY = player.getY();
+        double currentZ = player.getZ();
+        float currentYaw = player.getYaw();
+        float currentPitch = player.getPitch();
+        String currentDimension = player.getServerWorld().getRegistryKey().getValue().toString();
+
+        //get pos
+        double savedX = data.getSavedX();
+        double savedY = data.getSavedY();
+        double savedZ = data.getSavedZ();
+        float savedYaw = data.getSavedYaw();
+        float savedPitch = data.getSavedPitch();
+        String savedDimension = data.getSavedDimension();
+
+        //change pos
+        data.setSavedX(currentX);
+        data.setSavedY(currentY);
+        data.setSavedZ(currentZ);
+        data.setSavedYaw(currentYaw);
+        data.setSavedPitch(currentPitch);
+        data.setSavedDimension(currentDimension);
+
+        // Teleport to old saved position
+        teleportToPosition(player, savedX, savedY, savedZ, savedYaw, savedPitch, savedDimension);
+
+        player.sendMessage(Text.literal("§bTeleported! Positions swapped."), false);
+    }
+
+    private void teleportToPosition(ServerPlayerEntity player, double x, double y, double z,
+                                    float yaw, float pitch, String dimensionString) {
+        try {
+            Identifier dimensionId = Identifier.of(dimensionString);
+            RegistryKey<World> dimensionKey = RegistryKey.of(RegistryKeys.WORLD, dimensionId);
+            ServerWorld targetWorld = player.getServer().getWorld(dimensionKey);
+
+            if (targetWorld == null) {
+                player.sendMessage(Text.literal("§cError: Could not find dimension " + dimensionString), false);
+                return;
+            }
+
+            // tp no matter dimension
+            Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+            player.teleport(targetWorld, x, y, z, flags, yaw, pitch);
+
+        } catch (Exception e) {
+            player.sendMessage(Text.literal("§cError during teleportation: " + e.getMessage()), false);
+        }
+    }
 }

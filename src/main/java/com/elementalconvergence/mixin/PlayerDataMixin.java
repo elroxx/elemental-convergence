@@ -1,9 +1,7 @@
 package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.ElementalConvergence;
-import com.elementalconvergence.data.IMagicDataSaver;
-import com.elementalconvergence.data.IPlayerMiningMixin;
-import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.data.*;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.magic.handlers.EarthMagicHandler;
 import net.minecraft.block.BlockState;
@@ -27,7 +25,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
-public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin {
+public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver {
     private float miningSpeedMultiplier = 1.0f;
 
     //START OF STUFF FOR MAGIC
@@ -39,17 +37,36 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin {
         return magicData;
     }
 
+    //START OF STUFF FOR TELEPORT
+    @Unique
+    private final SchrodingerTPData teleportData = new SchrodingerTPData();
+
+    @Override
+    public SchrodingerTPData getTeleportData() {
+        return teleportData;
+    }
+
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo info) {
         NbtCompound magicNbt = new NbtCompound();
         magicData.writeNbt(magicNbt);
         nbt.put("magic_data", magicNbt);
+
+        //quantum tp stuff as well
+        NbtCompound teleportNbt = new NbtCompound();
+        teleportData.writeNbt(teleportNbt);
+        nbt.put("teleport_data", teleportNbt);
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo info) {
         if (nbt.contains("magic_data")) {
             magicData.readNbt(nbt.getCompound("magic_data"));
+        }
+
+        //quantum tp read
+        if (nbt.contains("teleport_data")) {
+            teleportData.readNbt(nbt.getCompound("teleport_data"));
         }
     }
 
