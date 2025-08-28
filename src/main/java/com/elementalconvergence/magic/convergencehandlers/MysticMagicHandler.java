@@ -4,6 +4,7 @@ import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.magic.IMagicHandler;
+import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
@@ -39,6 +40,9 @@ public class MysticMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
+        if (!player.hasStatusEffect(ModEffects.MYSTICAL_CRAZE)){
+            player.addStatusEffect(new StatusEffectInstance(ModEffects.MYSTICAL_CRAZE, -1, 0, false, false, false));
+        }
 
     }
 
