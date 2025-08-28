@@ -1,5 +1,5 @@
 {
-  "parent": "elemental-convergence:fire_lvl3",
+  "parent": "elemental-convergence:water_lvl3",
   "criteria": {
     "has_no_magic": {
       "conditions": {

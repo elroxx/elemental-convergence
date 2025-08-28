@@ -347,7 +347,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							10)))
 					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							rootAdvName, steamSelectedCN, steamSelectedAdvName)))
-					.parent(fireLevel3)
+					.parent(waterLevel3)
 					.build(consumer, steamSelectedAdvName);
 
 			//STEAM LVL 1
