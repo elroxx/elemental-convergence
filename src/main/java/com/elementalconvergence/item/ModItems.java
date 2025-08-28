@@ -75,14 +75,6 @@ public class ModItems {
     );
 
 
-    public static final Item TEST_ITEM = register("test_item", new TestItem(
-            new Item.Settings().maxCount(1)));
-
-    //Blank information scroll
-    public static final Item BLANK_SCROLL = register("blank_scroll", new Item(new Item.Settings()));
-
-    //all scrolls
-    //public static final Item[] INFO_SCROLLS = registerScrolls("_info_scroll");
 
     //all magic eyes
     public static final Item[] MAGIC_EYES = registerMagicEyes("_magic_eye");
@@ -154,13 +146,6 @@ public class ModItems {
         return Registry.register(Registries.ITEM, ElementalConvergence.id(name), item);
     }
 
-    public static Item[] registerScrolls(String baseString){
-        Item[] scrolls = new Item[BASE_MAGIC_ID.length];
-        for (int i=0; i<BASE_MAGIC_ID.length; i++){
-            scrolls[i]= register(BASE_MAGIC_ID[i]+baseString, new InfoScrollItem(new Item.Settings().maxCount(1), i));
-        }
-        return scrolls;
-    }
 
     public static Item[] registerMagicEyes(String baseString){
         Item[] eyes = new Item[BASE_MAGIC_ID.length];
