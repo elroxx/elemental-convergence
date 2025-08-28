@@ -5,6 +5,7 @@ import com.elementalconvergence.commands.DeathTeleportCommand;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
+import com.elementalconvergence.container.SchrodingerCatScreenHandler;
 import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.data.BeehivePlayerData;
 import com.elementalconvergence.data.IMagicDataSaver;
@@ -21,10 +22,7 @@ import com.elementalconvergence.magic.SpellManager;
 import com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler;
 import com.elementalconvergence.magic.handlers.DeathMagicHandler;
 import com.elementalconvergence.mixin.PlayerDataMixin;
-import com.elementalconvergence.networking.InventoryNetworking;
-import com.elementalconvergence.networking.MiningSpeedPayload;
-import com.elementalconvergence.networking.OpenInventoryPayload;
-import com.elementalconvergence.networking.SpellCastPayload;
+import com.elementalconvergence.networking.*;
 //import com.elementalconvergence.worldgen.ModWorldGeneration;
 import com.elementalconvergence.particle.ModParticles;
 import com.elementalconvergence.world.dimension.ModDimensions;
@@ -67,6 +65,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -139,6 +138,9 @@ public class ElementalConvergence implements ModInitializer {
 	private static final Map<UUID, Long> lastTeleportTimes = new HashMap<>();
 	private static final long TELEPORT_COOLDOWN = 1000; // 1 sec cooldown on tp
 
+	//SCREEN FOR QUANTUM REROLL
+	public static final ScreenHandlerType<SchrodingerCatScreenHandler> SCHRODINGER_CAT_SCREEN_HANDLER =
+			new ScreenHandlerType<>(SchrodingerCatScreenHandler::new, null);
 
 
 	// This logger is used to write text to the console and the log file.
@@ -254,7 +256,6 @@ public class ElementalConvergence implements ModInitializer {
 		//ALLOWING DEATH (guardian angel)
 		ServerLivingEntityEvents.ALLOW_DEATH.register(this::onEntityAllowDeath);
 
-		UseBlockCallback.EVENT.register(this::onUseBlock);
 
 		//AFTER DEATH
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
@@ -348,6 +349,10 @@ public class ElementalConvergence implements ModInitializer {
 
 		// INIT FOR MININGSPEED PAYLOAD
 		PayloadTypeRegistry.playS2C().register(MiningSpeedPayload.ID, MiningSpeedPayload.CODEC);
+
+		// register networking for the quantum reroll
+		RerollPacket.registerPayload();
+		RerollPacket.registerServer();
 
 		// Register server-side packet handler
 		ServerPlayNetworking.registerGlobalReceiver(SpellCastPayload.ID, (payload, context) -> {
@@ -773,35 +778,4 @@ public class ElementalConvergence implements ModInitializer {
 		return false; // Would fall into void
 	}
 
-	private ActionResult onUseBlock(PlayerEntity player, World world, Hand hand, BlockHitResult hitResult) {
-		if (world.isClient || hand != Hand.MAIN_HAND) {
-			return ActionResult.PASS;
-		}
-
-		ItemStack heldItem = player.getStackInHand(hand);
-		if (!(heldItem.getItem() instanceof SchrodingerCatItem)) {
-			return ActionResult.PASS;
-		}
-
-		BlockPos pos = hitResult.getBlockPos();
-		BlockState state = world.getBlockState(pos);
-
-		if (!(state.getBlock() instanceof ChestBlock)) {
-			return ActionResult.PASS;
-		}
-
-		BlockEntity blockEntity = world.getBlockEntity(pos);
-		if (!(blockEntity instanceof ChestBlockEntity chest)) {
-			return ActionResult.PASS;
-		}
-
-		ServerWorld serverWorld = (ServerWorld) world;
-		SchrodingerCatItem item = (SchrodingerCatItem) heldItem.getItem();
-
-		if (player.isSneaking()) {
-			return item.handleShiftRightClick(player, chest, pos, serverWorld);
-		} else {
-			return item.handleRightClick(player, chest, pos, serverWorld);
-		}
-	}
 }
