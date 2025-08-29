@@ -22,7 +22,8 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> INSECT_WEIGHT = register("insect_weight", new InsectWeightEffect());
     public static final RegistryEntry<StatusEffect> BAT_FORM = register("bat_form", new BatFormEffect());
     public static final RegistryEntry<StatusEffect> QUANTUM_PHASING = register("quantum_phasing", new QuantumPhasingEffect());
-    public static final RegistryEntry<StatusEffect> MYSTICAL_CRAZE = register("mystical_craze", new MysticalCrazeEffect());
+    public static final RegistryEntry<StatusEffect> MYSTICAL_CRAZE = register("mystical_craze", new MysticalEffect());
+    public static final RegistryEntry<StatusEffect> MYSTICAL_TOUCH = register("mystical_touch", new MysticalEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
