@@ -40,8 +40,13 @@ public class MysticMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
+
+        //craze = debuff, touch = buff
         if (!player.hasStatusEffect(ModEffects.MYSTICAL_CRAZE)){
             player.addStatusEffect(new StatusEffectInstance(ModEffects.MYSTICAL_CRAZE, -1, 0, false, false, false));
+        }
+        if (!player.hasStatusEffect(ModEffects.MYSTICAL_TOUCH)){
+            player.addStatusEffect(new StatusEffectInstance(ModEffects.MYSTICAL_TOUCH, -1, 0, false, false, false));
         }
 
     }
