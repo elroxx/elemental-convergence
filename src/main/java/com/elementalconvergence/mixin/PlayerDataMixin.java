@@ -3,6 +3,7 @@ package com.elementalconvergence.mixin;
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.*;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.effect.MysticalEffect;
 import com.elementalconvergence.magic.handlers.EarthMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -20,6 +21,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -136,6 +138,19 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
                 cir.setReturnValue(true);
             }
         }
+    }
+
+    //for double xp in mystic
+    @ModifyVariable(method = "addExperience", at = @At("HEAD"), ordinal = 0, argsOnly = true)
+    private int doubleExperienceWithEffect(int experience) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+
+        // check if mystic
+        if (player.hasStatusEffect(ModEffects.MYSTICAL_TOUCH)) {
+            return experience * 2; // double xp if they were
+        }
+
+        return experience;
     }
 
 }
