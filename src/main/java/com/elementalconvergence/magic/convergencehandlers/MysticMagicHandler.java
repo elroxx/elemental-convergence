@@ -60,7 +60,7 @@ public class MysticMagicHandler implements IMagicHandler {
                     Set<RegistryEntry<Enchantment>> enchantSet= offHand.getEnchantments().getEnchantments();
 
                     for (RegistryEntry<Enchantment> enchant : enchantSet){
-                        int currentLvl = EnchantmentHelper.getLevel(enchant, mainHand);
+                                                int currentLvl = EnchantmentHelper.getLevel(enchant, offHand);
                         if (currentLvl<255) { //double check max lvl enchants to avoid oveflow
                             offHand.addEnchantment(enchant, currentLvl + 1);
                         }
