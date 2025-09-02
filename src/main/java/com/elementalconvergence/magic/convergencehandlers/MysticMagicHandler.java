@@ -56,7 +56,7 @@ public class MysticMagicHandler implements IMagicHandler {
                     player.sendMessage(Text.literal("§cThere are no enchanted items in the offhand!"), true);
                 }
                 else{
-                    //Add 1 lvl to every enchant (unless max lvl)
+                    //Add 1 lvl to every enchant
                     Set<RegistryEntry<Enchantment>> enchantSet= offHand.getEnchantments().getEnchantments();
 
                     for (RegistryEntry<Enchantment> enchant : enchantSet){
@@ -98,6 +98,9 @@ public class MysticMagicHandler implements IMagicHandler {
     public void handlePassive(PlayerEntity player) {
         if (!player.hasStatusEffect(ModEffects.MYSTICAL_CRAZE)){
             player.addStatusEffect(new StatusEffectInstance(ModEffects.MYSTICAL_CRAZE, -1, 0, false, false, false));
+        }
+        if (!player.hasStatusEffect(ModEffects.MYSTICAL_TOUCH)){
+            player.addStatusEffect(new StatusEffectInstance(ModEffects.MYSTICAL_TOUCH, -1, 0, false, false, false));
         }
 
         //cooldowns
