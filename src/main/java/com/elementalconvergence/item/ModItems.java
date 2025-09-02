@@ -134,6 +134,9 @@ public class ModItems {
     public static final Item COFFIN_ITEM = register("coffin", new BlockItem(ModBlocks.COFFIN_BLOCK, new Item.Settings().maxCount(1)));
 
     public static final Item SCHRODINGER_CAT = register("schrodinger_cat", new SchrodingerCatItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+
+    public static final Item MYSTICAL_ENERGY = register("mystical_energy", new Item(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
+
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight
     //common: white, red, blue
