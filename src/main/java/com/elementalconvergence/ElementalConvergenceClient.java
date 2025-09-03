@@ -1,5 +1,7 @@
 package com.elementalconvergence;
 
+import com.elementalconvergence.container.MysticalTomeScreen;
+import com.elementalconvergence.container.MysticalTomeScreenHandler;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.item.renderer.HaloRenderer;
@@ -32,5 +34,8 @@ public class ElementalConvergenceClient implements ClientModInitializer {
 
         //for particles
         ParticleFactoryRegistry.getInstance().register(ModParticles.ATOM_PARTICLE, PortalParticle.Factory::new);
+
+        //for the tome inventory:
+        HandledScreens.register(ElementalConvergence.MYSTICAL_TOME_SCREEN_HANDLER, MysticalTomeScreen::new);
     }
 }

@@ -147,7 +147,7 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
 
         // check if mystic
         if (player.hasStatusEffect(ModEffects.MYSTICAL_TOUCH)) {
-            return experience * 2; // double xp if they were
+            return experience * 4; // double xp if they were (i decided times 4 coz the font is AWFUL)yuiytuuyuuioop
         }
 
         return experience;
