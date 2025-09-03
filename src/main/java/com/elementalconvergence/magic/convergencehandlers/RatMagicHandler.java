@@ -73,6 +73,7 @@ public class RatMagicHandler implements IMagicHandler {
 
         if ((mainHand.isOf(ModItems.ROTTEN_CORPSE) || offHand.isOf(ModItems.ROTTEN_CORPSE)) &&contaminateCooldown==0 && ratLevel>=1){
             contaminateCooldown=CONTAMINATE_DEFAULT_COOLDOWN;
+            player.getItemCooldownManager().set(ModItems.ROTTEN_CORPSE, CONTAMINATE_DEFAULT_COOLDOWN);
             if (mainHand.isOf(ModItems.ROTTEN_CORPSE)){
                 mainHand.decrement(1);
             }else{

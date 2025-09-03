@@ -72,6 +72,7 @@ public class GravityMagicHandler implements IMagicHandler {
         if (gravityLevel>=1 && (mainHand.isOf(Items.HOPPER) || offHand.isOf(Items.HOPPER))){
             //set cooldown
             vacuumCooldown=VACUUM_DEFAULT_COOLDOWN;
+            player.getItemCooldownManager().set(Items.HOPPER, VACUUM_DEFAULT_COOLDOWN);
 
             //consume item
             if (mainHand.isOf(Items.HOPPER)){
@@ -109,6 +110,7 @@ public class GravityMagicHandler implements IMagicHandler {
         if (gravityLevel>=3 && mainHand.isOf(ModItems.GRAVITY_SHARD) && gravityInstabilityCooldown==0){
             //cooldown
             gravityInstabilityCooldown=GRAVITY_INSTABILITY_COOLDOWN;
+            player.getItemCooldownManager().set(ModItems.GRAVITY_SHARD, GRAVITY_INSTABILITY_COOLDOWN);
 
             //consume an item
             if (!player.getAbilities().creativeMode) {
