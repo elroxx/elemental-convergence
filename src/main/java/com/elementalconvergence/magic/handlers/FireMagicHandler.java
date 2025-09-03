@@ -271,12 +271,12 @@ public class FireMagicHandler implements IMagicHandler {
                 player.removeStatusEffect(ModEffects.FURNACE);
 
                 player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,1.0f, 1.0f);
+                        SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,0.6f, 1.0f);
             }
             else{
                 player.addStatusEffect(new StatusEffectInstance(ModEffects.FURNACE, -1, 0, true, false ,true));
                 player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.ENTITY_BLAZE_BURN, SoundCategory.PLAYERS,1.0f, 1.0f);
+                        SoundEvents.ENTITY_BLAZE_BURN, SoundCategory.PLAYERS,0.6f, 1.0f);
             }
 
 
