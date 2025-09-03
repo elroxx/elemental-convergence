@@ -24,6 +24,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> QUANTUM_PHASING = register("quantum_phasing", new QuantumPhasingEffect());
     public static final RegistryEntry<StatusEffect> MYSTICAL_CRAZE = register("mystical_craze", new MysticalEffect());
     public static final RegistryEntry<StatusEffect> MYSTICAL_TOUCH = register("mystical_touch", new MysticalEffect());
+    public static final RegistryEntry<StatusEffect> FURNACE = register("furnace", new FurnaceEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
