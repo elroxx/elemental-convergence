@@ -5,6 +5,7 @@ import com.elementalconvergence.commands.DeathTeleportCommand;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
+import com.elementalconvergence.container.MysticalTomeScreenHandler;
 import com.elementalconvergence.criterions.ModCriterions;
 import com.elementalconvergence.data.BeehivePlayerData;
 import com.elementalconvergence.data.IMagicDataSaver;
@@ -64,6 +65,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
@@ -136,6 +140,8 @@ public class ElementalConvergence implements ModInitializer {
 	//Section for quantum debuff/teleportation part
 	private static final Map<UUID, Long> lastTeleportTimes = new HashMap<>();
 	private static final long TELEPORT_COOLDOWN = 1000; // 1 sec cooldown on tp
+
+	public static final ScreenHandlerType<MysticalTomeScreenHandler> MYSTICAL_TOME_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, id("mystical_tome"), new ScreenHandlerType<>(MysticalTomeScreenHandler::new, FeatureSet.empty()));
 
 
 	// This logger is used to write text to the console and the log file.

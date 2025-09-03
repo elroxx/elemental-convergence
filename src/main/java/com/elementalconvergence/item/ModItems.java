@@ -6,14 +6,18 @@ import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.block.ModBlocks;
 import com.elementalconvergence.block.PrayingAltarBlock;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.enchantment.ModEnchantments;
 import net.fabricmc.fabric.api.item.v1.FabricItem;
 import net.minecraft.client.sound.Sound;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
@@ -21,6 +25,7 @@ import net.minecraft.item.*;
 import net.minecraft.util.Rarity;
 import net.minecraft.util.Util;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -136,6 +141,7 @@ public class ModItems {
     public static final Item SCHRODINGER_CAT = register("schrodinger_cat", new SchrodingerCatItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
 
     public static final Item MYSTICAL_ENERGY = register("mystical_energy", new Item(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
+    public static final Item MYSTICAL_CHAPTER_1 = register("mystical_chapter_1", new MysticalTomeItem(getEnchantList(1), getEnchantLevelList(1), new Item.Settings().maxCount(1)));
 
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight
@@ -164,6 +170,26 @@ public class ModItems {
             eyes[i]= register(CONVERGENCE_MAGIC_ID[i]+baseString, new ConvergentEyeItem(new Item.Settings().maxCount(1).rarity(Rarity.EPIC), i+BASE_MAGIC_ID.length));
         }
         return eyes;
+    }
+
+    public static List<RegistryKey<Enchantment>> getEnchantList(int tome){
+        //if (tome==1){
+            List<RegistryKey<Enchantment>> enchantList = new ArrayList<RegistryKey<Enchantment>>();
+            enchantList.add(ModEnchantments.LAVA_WALKER);
+            enchantList.add(Enchantments.FLAME);
+            enchantList.add(Enchantments.FIRE_ASPECT);
+            return enchantList;
+        //}
+    }
+
+    public static List<Integer> getEnchantLevelList(int tome){
+        //if (tome==1){
+        List<Integer> lvlList = new ArrayList<Integer>();
+        lvlList.add(1);
+        lvlList.add(1);
+        lvlList.add(1);
+        return lvlList;
+        //}
     }
 
     //So that the class exists
