@@ -19,6 +19,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -26,9 +28,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.elementalconvergence.ElementalConvergence.getLookingAtBlockPos;
 
@@ -44,6 +44,10 @@ public class ShadowMagicHandler implements IMagicHandler {
     private int shadowTPCooldown = 0;
     private static final int SHADOWTP_MAXRANGE=50;
     private static final float CHANCE_OF_STEAL=0.01f;
+
+    private static boolean backstabToggle=false;
+    public static final int DEFAULT_BACKSTAB_TOGGLE_COOLDOWN=5;
+    private int backStabToggleCooldown=0;
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -111,11 +115,46 @@ public class ShadowMagicHandler implements IMagicHandler {
         if (shadowTPCooldown>0){
             shadowTPCooldown--;
         }
+        if (backStabToggleCooldown>0){
+            backStabToggleCooldown--;
+        }
     }
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
+
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
+        if (shadowLevel >= 1 && backstabToggle && victim instanceof LivingEntity) {
+            // pos behind victim
+            LivingEntity livingVictim = (LivingEntity) victim;
+
+            //victim yaw
+            float victimYaw = livingVictim.getYaw();
+
+            // get behind
+            double angle = Math.toRadians(victimYaw + 180);
+
+            // get offset
+            double offsetDistance = 2.0;
+            double offsetX = Math.sin(-angle) * offsetDistance;
+            double offsetZ = Math.cos(angle) * offsetDistance;
+
+            // get target pos
+            double targetX = victim.getX() + offsetX;
+            double targetY = player.getY();
+            double targetZ = victim.getZ() + offsetZ;
+
+
+
+            // tp
+            Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+            player.teleport((ServerWorld) player.getWorld(), targetX, targetY, targetZ, flags, victimYaw, player.getPitch());
+
+        }
+
+        /*IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
         if (shadowLevel>=1) {
@@ -154,7 +193,7 @@ public class ShadowMagicHandler implements IMagicHandler {
                 }
 
             }
-        }
+        }*/
     }
 
     @Override
@@ -173,7 +212,7 @@ public class ShadowMagicHandler implements IMagicHandler {
     }
 
     @Override
-    public void handlePrimarySpell(PlayerEntity player) {
+    public void handleSecondarySpell(PlayerEntity player) {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
@@ -200,8 +239,28 @@ public class ShadowMagicHandler implements IMagicHandler {
     }
 
     @Override
-    public void handleSecondarySpell(PlayerEntity player) {
+    public void handlePrimarySpell(PlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int shadowLevel = magicData.getMagicLevel(SHADOW_INDEX);
 
+        if (shadowLevel>=1 && backStabToggleCooldown==0) {
+            backstabToggle= !backstabToggle;
+
+            String backstabMsg = "§aBackstab ";
+            backstabMsg +=  backstabToggle ? "activated!" : "deactived!";
+            player.sendMessage(Text.of(backstabMsg), true);
+
+            player.getWorld().playSound(null,
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
+                    SoundEvents.ENTITY_SQUID_SQUIRT,
+                    SoundCategory.PLAYERS,
+                    1.0F,
+                    1.0F
+            );
+        }
     }
 
     @Override
