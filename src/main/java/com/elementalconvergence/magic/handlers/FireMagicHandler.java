@@ -88,7 +88,11 @@ public class FireMagicHandler implements IMagicHandler {
 
                     player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
                             SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 1.0F, 1.0F);
+
                     fireballCooldown=DEFAULT_FIREBALL_COOLDOWN;
+
+                    player.getItemCooldownManager().set(Items.COAL, DEFAULT_FIREBALL_COOLDOWN);
+                    player.getItemCooldownManager().set(Items.CHARCOAL, DEFAULT_FIREBALL_COOLDOWN);
                 }
             }
         }
