@@ -245,7 +245,20 @@ public class EarthMagicHandler implements IMagicHandler {
         int earthLevel = magicData.getMagicLevel(0);
         if (earthLevel>=1) {
             veinMinerToggle=!veinMinerToggle;
-            player.sendMessage(Text.of("Vein miner: " + veinMinerToggle));
+            String veinMsg = "§aVein miner ";
+            veinMsg +=  veinMinerToggle ? "activated!" : "deactived!";
+            player.sendMessage(Text.of(veinMsg), true);
+
+            player.getWorld().playSound(null,
+                    player.getX(),
+                    player.getY(),
+                    player.getZ(),
+                    SoundEvents.ITEM_ARMOR_EQUIP_IRON,
+                    SoundCategory.BLOCKS,
+                    1.0F,
+                    1.0F
+            );
+
         }
     }
 
