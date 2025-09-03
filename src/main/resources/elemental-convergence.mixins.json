@@ -20,7 +20,8 @@
 		"EntityRenderersMixin",
 		"CameraMixin",
 		"InGameOverlayRendererMixin",
-		"TextRendererMixin"
+		"TextRendererMixin",
+		"BlockMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
