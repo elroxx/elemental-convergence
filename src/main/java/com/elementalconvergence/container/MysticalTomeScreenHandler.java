@@ -44,22 +44,22 @@ public class MysticalTomeScreenHandler extends ScreenHandler {
         this.enchantmentLevels = enchantmentLevels;
         this.player = playerInventory.player;
 
-        // Initialize the inventory with enchanted books
+        // init inve with books
         initializeBooks();
 
-        // Add tome inventory slots (3 slots in a row)
+        // add the slots
         for (int i = 0; i < 3; i++) {
             this.addSlot(new EnchantedBookSlot(inventory, i, 62 + i * 18, 35));
         }
 
-        // Add player inventory slots
+        // player inv
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {
                 this.addSlot(new Slot(playerInventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
-        // Add player hotbar slots
+        //hotbar
         for (int i = 0; i < 9; ++i) {
             this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
         }
@@ -88,16 +88,16 @@ public class MysticalTomeScreenHandler extends ScreenHandler {
             stack = stackInSlot.copy();
 
             if (slotIndex < 3) {
-                // Moving from tome inventory to player inventory
+                // when moving from inv to book
                 if (!this.insertItem(stackInSlot, 3, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-                // Trigger the refill logic
+                // trigger refill
                 if (slot instanceof EnchantedBookSlot bookSlot) {
                     bookSlot.onTakeItem(player, stackInSlot);
                 }
             } else {
-                // Moving from player inventory to tome inventory - not allowed
+                // not allowed when moving from inv to tome
                 return ItemStack.EMPTY;
             }
 
@@ -125,33 +125,28 @@ public class MysticalTomeScreenHandler extends ScreenHandler {
         public void onTakeItem(PlayerEntity player, ItemStack stack) {
             super.onTakeItem(player, stack);
 
-            // Check if player has enough XP
+            // check if enough xp
             if (player.experienceLevel >= 3) {
-                // Deduct 3 levels
+                // rmv lvl
                 player.addExperienceLevels(-3);
 
-                // Refill the slot with the same enchanted book
+                // refill
                 if (this.getIndex() < enchantments.size()) {
                     ItemStack newBook = new ItemStack(Items.ENCHANTED_BOOK);
                     newBook.addEnchantment(player.getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(enchantments.get(this.getIndex())), enchantmentLevels.get(this.getIndex()));
                     this.inventory.setStack(this.getIndex(), newBook);
                 }
 
-                // Play sound
+                // playsound
                 player.getWorld().playSound(null, player.getBlockPos(),
                         SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE, SoundCategory.PLAYERS,
                         1.0F, 1.0F);
             } else {
-                // Not enough XP - return the item to the slot
+                // not enough xp
                 if (this.getIndex() < enchantments.size()) {
                     ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
                     book.addEnchantment(player.getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(enchantments.get(this.getIndex())), enchantmentLevels.get(this.getIndex()));
                     this.inventory.setStack(this.getIndex(), book);
-                }
-
-                // Optionally send a message to the player
-                if (player instanceof ServerPlayerEntity serverPlayer) {
-                    serverPlayer.sendMessage(Text.translatable("message.yourmod.insufficient_xp"), true);
                 }
             }
         }
@@ -168,7 +163,7 @@ public class MysticalTomeScreenHandler extends ScreenHandler {
 
         @Override
         public Text getDisplayName() {
-            return Text.translatable("container.yourmod.mystical_tome");
+            return Text.translatable("");
         }
 
         @Override

@@ -142,6 +142,7 @@ public class ModItems {
 
     public static final Item MYSTICAL_ENERGY = register("mystical_energy", new Item(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
     public static final Item MYSTICAL_CHAPTER_1 = register("mystical_chapter_1", new MysticalTomeItem(getEnchantList(1), getEnchantLevelList(1), new Item.Settings().maxCount(1)));
+    public static final Item MYSTICAL_CHAPTER_2 = register("mystical_chapter_2", new MysticalTomeItem(getEnchantList(1), getEnchantLevelList(1), new Item.Settings().maxCount(1)));
 
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight

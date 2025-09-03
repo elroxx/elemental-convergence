@@ -39,7 +39,7 @@ public class MysticalTomeItem extends Item {
         return TypedActionResult.success(user.getStackInHand(hand));
     }
 
-    public List<RegistryEntry<Enchantment>> getEnchantments() {
+    public List<RegistryKey<Enchantment>> getEnchantments() {
         return this.enchantments;
     }
 

@@ -8,7 +8,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class MysticalTomeScreen extends HandledScreen<MysticalTomeScreenHandler> {
-    private static final Identifier TEXTURE = Identifier.of("yourmod", "textures/gui/mystical_tome.png");
+    private static final Identifier TEXTURE = Identifier.of("elemental-convergence","textures/gui/mystical_tome.png");
 
     public MysticalTomeScreen(MysticalTomeScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -19,7 +19,7 @@ public class MysticalTomeScreen extends HandledScreen<MysticalTomeScreenHandler>
     @Override
     protected void init() {
         super.init();
-        // Center the title
+        // center title
         this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
     }
 
@@ -42,10 +42,9 @@ public class MysticalTomeScreen extends HandledScreen<MysticalTomeScreenHandler>
     protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
         super.drawForeground(context, mouseX, mouseY);
 
-        // Draw additional text or decorations if needed
-        Text xpCostText = Text.translatable("gui.yourmod.mystical_tome.xp_cost");
+        /*Text xpCostText = Text.translatable("gui.yourmod.mystical_tome.xp_cost");
         int textWidth = this.textRenderer.getWidth(xpCostText);
         context.drawText(this.textRenderer, xpCostText,
-                (this.backgroundWidth - textWidth) / 2, 60, 0x404040, false);
+                (this.backgroundWidth - textWidth) / 2, 60, 0x404040, false);*/
     }
 }
