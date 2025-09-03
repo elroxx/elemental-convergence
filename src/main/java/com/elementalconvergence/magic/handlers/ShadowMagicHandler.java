@@ -40,7 +40,7 @@ public class ShadowMagicHandler implements IMagicHandler {
     private static final int DEFAULT_LIGHT_UPDATE_COOLDOWN=10;
     private int lightUpdateCooldown=0;
     private static final int INVIS_DURATION=219; //almost 11 seconds so that it stays 10 a long time
-    private static final int DEFAULT_SHADOWTP_COOLDOWN=40; //2 seconds
+    private static final int DEFAULT_SHADOWTP_COOLDOWN=30; //1.5 seconds
     private int shadowTPCooldown = 0;
     private static final int SHADOWTP_MAXRANGE=50;
     private static final float CHANCE_OF_STEAL=0.01f;
