@@ -22,18 +22,35 @@ public class ArrowItemMixin {
     private void elemental$onCreateArrow(World world, ItemStack arrowStack, LivingEntity shooter, @Nullable ItemStack shotFrom,
                                          CallbackInfoReturnable<PersistentProjectileEntity> cir) {
         PersistentProjectileEntity arrow = cir.getReturnValue();
-        if (arrow == null || shooter == null) return;
+        if (arrow == null || shooter == null || shotFrom == null) return;
 
-        // check both hands W
-        int level = Math.max(
-                EnchantmentHelper.getLevel(shooter.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.BOUNCY_ARROW), shooter.getMainHandStack()),
-                EnchantmentHelper.getLevel(shooter.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.BOUNCY_ARROW), shooter.getOffHandStack())
-        );
+        // Check the bow/crossbow for the bouncy arrow enchantment
+        int level = 0;
+        try {
+            level = EnchantmentHelper.getLevel(
+                    shooter.getWorld().getRegistryManager()
+                            .getWrapperOrThrow(RegistryKeys.ENCHANTMENT)
+                            .getOrThrow(ModEnchantments.BOUNCY_ARROW),
+                    shotFrom
+            );
+        } catch (Exception e) {
+            // Fallback: check both hands if shotFrom fails
+            level = Math.max(
+                    EnchantmentHelper.getLevel(shooter.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.BOUNCY_ARROW), shooter.getMainHandStack()),
+                    EnchantmentHelper.getLevel(shooter.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.BOUNCY_ARROW), shooter.getOffHandStack())
+            );
+        }
+
         if (level <= 0) return;
 
-        NbtCompound nbt = new NbtCompound();
+        // Apply bouncy enchantment data to the arrow
+        NbtCompound nbt = arrow.writeNbt(new NbtCompound());
         nbt.putBoolean("IsBouncy", true);
         nbt.putInt("BouncesRemaining", level);
+        nbt.putInt("BouncyEnchantLevel", level);
         arrow.readNbt(nbt);
+
+        // Debug output (remove in production)
+        System.out.println("Arrow created with bouncy enchantment level: " + level);
     }
 }

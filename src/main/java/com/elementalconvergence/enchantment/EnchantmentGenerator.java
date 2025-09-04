@@ -72,6 +72,6 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
 
     @Override
     public String getName() {
-        return "LockingCurseGenerator";
+        return "ElementalConvergenceEnchantGenerator";
     }
 }

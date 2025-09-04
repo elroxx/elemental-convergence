@@ -20,7 +20,7 @@ public record BouncyArrowEnchantmentEffect(EnchantmentLevelBasedValue bounces) i
 
     @Override
     public void apply(ServerWorld world, int level, EnchantmentEffectContext context, Entity target, Vec3d pos) {
-        // This effect is applied to the arrow projectile
+        // This effect is applied to the arrow projectile when it's spawned
         if (target instanceof PersistentProjectileEntity arrow) {
             // Set custom NBT data to track bounces remaining
             NbtCompound nbt = arrow.writeNbt(new NbtCompound());
@@ -29,8 +29,14 @@ public record BouncyArrowEnchantmentEffect(EnchantmentLevelBasedValue bounces) i
             nbt.putInt("BouncesRemaining", maxBounces);
             nbt.putBoolean("IsBouncy", true);
 
+            // Store the original enchantment level for reference
+            nbt.putInt("BouncyEnchantLevel", level);
+
             // Update the arrow's NBT data
             arrow.readNbt(nbt);
+
+            // Debug output (remove in production)
+            System.out.println("Applied bouncy enchantment to arrow with " + maxBounces + " bounces at level " + level);
         }
     }
 
