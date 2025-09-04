@@ -50,6 +50,20 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                                 new LockingCurseEffect(EnchantmentLevelBasedValue.constant(1.0f))
                         )
         );
+
+
+        register(entries, ModEnchantments.BOUNCY_ARROW, Enchantment.builder(
+                        Enchantment.definition(
+                                registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.BOW_ENCHANTABLE),
+                                1, // weight
+                                3, // max level
+                                Enchantment.leveledCost(50, 10),
+                                Enchantment.leveledCost(50, 15),
+                                4, // anvil cost
+                                AttributeModifierSlot.HAND
+                        )
+                )
+        );
     }
 
     private void register(Entries entries, RegistryKey<Enchantment> key, Enchantment.Builder builder, ResourceCondition... resourceConditions) {

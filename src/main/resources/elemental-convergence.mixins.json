@@ -21,7 +21,9 @@
 		"CameraMixin",
 		"InGameOverlayRendererMixin",
 		"TextRendererMixin",
-		"BlockMixin"
+		"BlockMixin",
+		"PersistentProjectileEntityMixin",
+		"ArrowItemMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -56,13 +56,16 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -256,7 +259,6 @@ public class ElementalConvergence implements ModInitializer {
 
 		//ALLOWING DEATH (guardian angel)
 		ServerLivingEntityEvents.ALLOW_DEATH.register(this::onEntityAllowDeath);
-
 
 		//AFTER DEATH
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, damageSource) -> {
