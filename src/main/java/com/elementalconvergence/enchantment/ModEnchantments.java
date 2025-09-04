@@ -17,7 +17,6 @@ public class ModEnchantments {
     public static final RegistryKey<Enchantment> LOCKING_CURSE = registerEnchantment("locking_curse");
     public static final MapCodec<LockingCurseEffect> LOCKING_CURSE_EFFECT = registerEnchantmentEffect("locking_curse_effect", LockingCurseEffect.CODEC);
     public static final RegistryKey<Enchantment> BOUNCY_ARROW = registerEnchantment("bouncy_arrow");
-    public static final MapCodec<BouncyArrowEnchantmentEffect> BOUNCY_ARROW_EFFECT = registerEnchantmentEffect("bouncy_arrow_effect", BouncyArrowEnchantmentEffect.CODEC);
 
     public static final RegistryKey<Enchantment> LAVA_WALKER = registerEnchantment("lava_walker");
 

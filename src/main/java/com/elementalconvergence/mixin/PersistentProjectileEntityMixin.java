@@ -1,22 +1,19 @@
 package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.enchantment.ModEnchantments;
-import net.minecraft.block.BlockState;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,152 +21,117 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PersistentProjectileEntity.class)
 public abstract class PersistentProjectileEntityMixin {
 
-    @Shadow @Nullable private BlockState inBlockState;
     @Shadow protected boolean inGround;
-    @Shadow public int shake;
+    @Shadow public abstract void writeCustomDataToNbt(NbtCompound nbt);
+    @Shadow public abstract void readCustomDataFromNbt(NbtCompound nbt);
 
-    @Shadow public abstract void setVelocity(double x, double y, double z, float power, float uncertainty);
+    @Unique
+    private static final String BOUNCE_COUNT_KEY = "elementalconvergence:bounce_count";
+    @Unique
+    private static final String MAX_BOUNCES_KEY = "elementalconvergence:max_bounces";
+    @Unique
+    private static final String HAS_BOUNCY_KEY = "elementalconvergence:has_bouncy";
 
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void onTick(CallbackInfo ci) {
+    // Store bounce data in NBT when writing custom data
+    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
+    private void writeBounceData(NbtCompound nbt, CallbackInfo ci) {
+        // NBT data is automatically handled by the shadow methods
+    }
+
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    private void readBounceData(NbtCompound nbt, CallbackInfo ci) {
+        // NBT data is automatically handled by the shadow methods
+    }
+
+    // Handle bouncing when hitting blocks
+    @Inject(method = "onBlockHit", at = @At("HEAD"), cancellable = true)
+    private void handleBounce(BlockHitResult blockHitResult, CallbackInfo ci) {
         PersistentProjectileEntity arrow = (PersistentProjectileEntity) (Object) this;
 
-        // Check if arrow has bounce cooldown
-        NbtCompound nbt = arrow.writeNbt(new NbtCompound());
-        if (nbt.contains("BounceCooldown")) {
-            int cooldown = nbt.getInt("BounceCooldown");
-            if (cooldown > 0) {
-                // Prevent the arrow from being marked as inGround during cooldown
-                this.inGround = false;
-                this.inBlockState = null;
+        // Don't bounce if already in ground
+        if (this.inGround) {
+            return;
+        }
 
-                // Decrease cooldown
-                nbt.putInt("BounceCooldown", cooldown - 1);
-                arrow.readNbt(nbt);
+        // Get current NBT data
+        NbtCompound nbt = new NbtCompound();
+        arrow.writeCustomDataToNbt(nbt);
 
-                // Ensure arrow keeps moving
-                Vec3d velocity = arrow.getVelocity();
-                if (velocity.lengthSquared() < 0.01) { // If velocity is too small
-                    // Give it a small push to keep it moving
-                    arrow.setVelocity(velocity.add(0, 0.1, 0));
+        // Check if this arrow has bouncing capability or try to initialize it
+        if (!nbt.getBoolean(HAS_BOUNCY_KEY) && !nbt.contains(MAX_BOUNCES_KEY)) {
+            // Try to initialize bouncy data by checking if we can find enchantment data
+            if (arrow.getWorld() instanceof ServerWorld serverWorld) {
+                // Look for weapon data in NBT
+                if (nbt.contains("weapon", 10)) {
+                    NbtCompound weaponNbt = nbt.getCompound("weapon");
+                    ItemStack weapon = ItemStack.fromNbt(serverWorld.getRegistryManager(), weaponNbt).orElse(ItemStack.EMPTY);
+
+                    if (!weapon.isEmpty()) {
+                        int bouncingLevel = EnchantmentHelper.getLevel(
+                                serverWorld.getRegistryManager()
+                                        .getWrapperOrThrow(net.minecraft.registry.RegistryKeys.ENCHANTMENT)
+                                        .getOrThrow(ModEnchantments.BOUNCY_ARROW),
+                                weapon
+                        );
+
+                        if (bouncingLevel > 0) {
+                            nbt.putBoolean(HAS_BOUNCY_KEY, true);
+                            nbt.putInt(BOUNCE_COUNT_KEY, 0);
+                            nbt.putInt(MAX_BOUNCES_KEY, bouncingLevel);
+                            arrow.readCustomDataFromNbt(nbt);
+                        }
+                    }
                 }
             }
         }
-    }
 
-    @Inject(method = "onBlockHit", at = @At("HEAD"), cancellable = true)
-    private void onBlockHit(BlockHitResult blockHitResult, CallbackInfo ci) {
-        PersistentProjectileEntity arrow = (PersistentProjectileEntity) (Object) this;
+        // Now check if we can bounce
+        if (nbt.getBoolean(HAS_BOUNCY_KEY) || nbt.contains(MAX_BOUNCES_KEY)) {
+            int currentBounces = nbt.getInt(BOUNCE_COUNT_KEY);
+            int maxBounces = nbt.getInt(MAX_BOUNCES_KEY);
 
-        // Check if this arrow has bouncy enchantment using NBT data
-        NbtCompound nbt = arrow.writeNbt(new NbtCompound());
+            // If we haven't reached max bounces yet
+            if (currentBounces < maxBounces) {
+                // Cancel normal block hit behavior (prevents sticking to block)
+                ci.cancel();
 
-        if (nbt.contains("IsBouncy") && nbt.getBoolean("IsBouncy")) {
-            int bouncesRemaining = nbt.getInt("BouncesRemaining");
-
-            if (bouncesRemaining > 0) {
-                // Calculate bounce physics
+                // Calculate bounce direction
                 Vec3d velocity = arrow.getVelocity();
-                Vec3d hitPos = blockHitResult.getPos();
-                Direction hitSide = blockHitResult.getSide();
+                Vector3f normalF = blockHitResult.getSide().getUnitVector();
+                Vec3d normal = new Vec3d(normalF.x, normalF.y, normalF.z);
 
-                // Calculate new velocity based on hit surface
-                Vec3d newVelocity = calculateBounceVelocity(velocity, hitSide);
+                // Reflect velocity using the formula: v' = v - 2(v·n)n
+                double dotProduct = velocity.dotProduct(normal);
+                Vec3d reflectedVelocity = velocity.subtract(normal.multiply(2 * dotProduct));
 
-                // Apply velocity multiplier of 1.05 as requested
-                newVelocity = newVelocity.multiply(1.05);
+                // Apply dampening (arrow loses some energy each bounce)
+                double damping = 0.8 - (currentBounces * 0.1); // Gets weaker with each bounce
+                reflectedVelocity = reflectedVelocity.multiply(Math.max(damping, 0.3));
 
-                // Reduce bounces remaining and update NBT
-                nbt.putInt("BouncesRemaining", bouncesRemaining - 1);
-                arrow.readNbt(nbt);
-
-                // Critical: Ensure the arrow is not stuck in ground or block
-                this.inGround = false;
-                this.inBlockState = null;
-                this.shake = 0;
-
-                // Move the arrow slightly away from the hit surface to prevent immediate re-collision
-                Vec3d surfaceNormal = Vec3d.of(hitSide.getVector());
-                Vec3d currentPos = arrow.getPos();
-                Vec3d newPosition = currentPos.add(surfaceNormal.multiply(0.2)); // Increased offset
-                arrow.setPos(newPosition.x, newPosition.y, newPosition.z);
-
-                // Apply new velocity using the proper shadow method
-                this.setVelocity(newVelocity.x, newVelocity.y, newVelocity.z, 1.0f, 0.0f);
+                // Set new velocity and mark as modified
+                arrow.setVelocity(reflectedVelocity);
                 arrow.velocityModified = true;
 
-                // Reset collision states that might interfere
-                arrow.setOnGround(false);
+                // Update bounce count
+                nbt.putInt(BOUNCE_COUNT_KEY, currentBounces + 1);
+                arrow.readCustomDataFromNbt(nbt);
 
-                // Reset age to prevent despawning behavior
-                arrow.age = Math.max(0, arrow.age - 100);
+                // Ensure arrow is not considered to be in ground
+                this.inGround = false;
 
-                // Play bounce sound with slight variation
-                arrow.getWorld().playSound(null, arrow.getBlockPos(),
-                        SoundEvents.ENTITY_SLIME_SQUISH, SoundCategory.NEUTRAL, 0.7f,
-                        1.0f + (float)(Math.random() * 0.8 - 0.4)); // More pitch variation
+                // Play bounce sound effect
+                if (arrow.getWorld() instanceof ServerWorld serverWorld) {
+                    serverWorld.playSound(null, arrow.getBlockPos(),
+                            SoundEvents.BLOCK_SLIME_BLOCK_STEP,
+                            SoundCategory.NEUTRAL,
+                            0.6f,
+                            1.0f + (currentBounces * 0.2f) + arrow.getRandom().nextFloat() * 0.2f);
+                }
 
-                // Cancel the original block hit behavior completely
-                ci.cancel();
                 return;
             }
         }
-    }
 
-    private Vec3d calculateBounceVelocity(Vec3d velocity, Direction hitSide) {
-        double x = velocity.x;
-        double y = velocity.y;
-        double z = velocity.z;
-
-        // Store original speed for reference
-        double originalSpeed = velocity.length();
-
-        // Reflect velocity based on the surface normal
-        switch (hitSide) {
-            case UP -> {
-                y = Math.abs(y); // Always bounce upward when hitting from above
-                // Ensure minimum upward velocity to prevent getting stuck on ground
-                if (y < 0.4) {
-                    y = 0.5 + (Math.random() * 0.3);
-                }
-            }
-            case DOWN -> {
-                y = -Math.abs(y); // Always bounce downward when hitting ceiling
-                // Ensure minimum downward velocity
-                if (Math.abs(y) < 0.3) {
-                    y = -0.4;
-                }
-            }
-            case NORTH -> {
-                z = Math.abs(z); // Bounce towards positive Z
-                if (Math.abs(z) < 0.2) z = 0.3;
-            }
-            case SOUTH -> {
-                z = -Math.abs(z); // Bounce towards negative Z
-                if (Math.abs(z) < 0.2) z = -0.3;
-            }
-            case EAST -> {
-                x = -Math.abs(x); // Bounce towards negative X
-                if (Math.abs(x) < 0.2) x = -0.3;
-            }
-            case WEST -> {
-                x = Math.abs(x); // Bounce towards positive X
-                if (Math.abs(x) < 0.2) x = 0.3;
-            }
-        }
-
-        Vec3d newVelocity = new Vec3d(x, y, z);
-
-        // Ensure the new velocity isn't too weak or too strong
-        double newSpeed = newVelocity.length();
-        if (newSpeed < 0.3) {
-            // If velocity is too small, give it a reasonable boost
-            newVelocity = newVelocity.normalize().multiply(0.5);
-        } else if (newSpeed > originalSpeed * 2.5) {
-            // Prevent excessive speeds that could cause issues
-            newVelocity = newVelocity.normalize().multiply(originalSpeed * 2.0);
-        }
-
-        return newVelocity;
+        // If no bounce capability or max bounces reached, allow normal behavior
     }
 }
