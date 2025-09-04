@@ -104,7 +104,9 @@ public class MysticMagicHandler implements IMagicHandler {
         }
 
         //cooldowns
-
+        if (lvlUpCooldown>0){
+            lvlUpCooldown--;
+        }
 
     }
 
