@@ -42,7 +42,7 @@ public class FireMagicHandler implements IMagicHandler {
     private int fireResCooldown=50;
     private int waterHurtCooldown=10;
     private int fireIndex=2; //just to keep track
-    private static final int DEFAULT_DIMSWAP_COOLDOWN=40; //2 seconds
+    private static final int DEFAULT_DIMSWAP_COOLDOWN=20; //1 second
     private int dimensionSwapCooldown=0;
     private static final int DEFAULT_FIREBALL_COOLDOWN=5; //0.25 seconds
     private int fireballCooldown=0;
@@ -276,7 +276,7 @@ public class FireMagicHandler implements IMagicHandler {
             else{
                 player.addStatusEffect(new StatusEffectInstance(ModEffects.FURNACE, -1, 0, true, false ,true));
                 player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
-                        SoundEvents.ENTITY_BLAZE_BURN, SoundCategory.PLAYERS,0.6f, 1.0f);
+                        SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS,0.6f, 1.0f);
             }
 
 
