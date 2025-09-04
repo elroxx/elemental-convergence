@@ -22,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class PersistentProjectileEntityMixin {
 
     @Shadow protected boolean inGround;
-    @Shadow public abstract void writeCustomDataToNbt(NbtCompound nbt);
-    @Shadow public abstract void readCustomDataFromNbt(NbtCompound nbt);
 
     @Unique
     private static final String BOUNCE_COUNT_KEY = "elementalconvergence:bounce_count";
@@ -32,36 +30,42 @@ public abstract class PersistentProjectileEntityMixin {
     @Unique
     private static final String HAS_BOUNCY_KEY = "elementalconvergence:has_bouncy";
 
-    // Store bounce data in NBT when writing custom data
+    @Unique
+    private int bounceCount = -1; // -1 means not initialized
+    @Unique
+    private int maxBounces = 0;
+    @Unique
+    private boolean bouncyInitialized = false;
+
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     private void writeBounceData(NbtCompound nbt, CallbackInfo ci) {
-        // NBT data is automatically handled by the shadow methods
+        if (bounceCount >= 0) {
+            nbt.putInt(BOUNCE_COUNT_KEY, bounceCount);
+            nbt.putInt(MAX_BOUNCES_KEY, maxBounces);
+            nbt.putBoolean(HAS_BOUNCY_KEY, true);
+        }
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
     private void readBounceData(NbtCompound nbt, CallbackInfo ci) {
-        // NBT data is automatically handled by the shadow methods
+        if (nbt.contains(BOUNCE_COUNT_KEY)) {
+            bounceCount = nbt.getInt(BOUNCE_COUNT_KEY);
+            maxBounces = nbt.getInt(MAX_BOUNCES_KEY);
+            bouncyInitialized = true;
+        }
     }
 
-    // Handle bouncing when hitting blocks
-    @Inject(method = "onBlockHit", at = @At("HEAD"), cancellable = true)
-    private void handleBounce(BlockHitResult blockHitResult, CallbackInfo ci) {
-        PersistentProjectileEntity arrow = (PersistentProjectileEntity) (Object) this;
+    // init bounce on first tick
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void initializeBounceData(CallbackInfo ci) {
+        if (!bouncyInitialized && bounceCount == -1) {
+            PersistentProjectileEntity arrow = (PersistentProjectileEntity) (Object) this;
 
-        // Don't bounce if already in ground
-        if (this.inGround) {
-            return;
-        }
-
-        // Get current NBT data
-        NbtCompound nbt = new NbtCompound();
-        arrow.writeCustomDataToNbt(nbt);
-
-        // Check if this arrow has bouncing capability or try to initialize it
-        if (!nbt.getBoolean(HAS_BOUNCY_KEY) && !nbt.contains(MAX_BOUNCES_KEY)) {
-            // Try to initialize bouncy data by checking if we can find enchantment data
             if (arrow.getWorld() instanceof ServerWorld serverWorld) {
-                // Look for weapon data in NBT
+
+                NbtCompound nbt = new NbtCompound();
+                arrow.writeCustomDataToNbt(nbt);
+
                 if (nbt.contains("weapon", 10)) {
                     NbtCompound weaponNbt = nbt.getCompound("weapon");
                     ItemStack weapon = ItemStack.fromNbt(serverWorld.getRegistryManager(), weaponNbt).orElse(ItemStack.EMPTY);
@@ -75,63 +79,74 @@ public abstract class PersistentProjectileEntityMixin {
                         );
 
                         if (bouncingLevel > 0) {
-                            nbt.putBoolean(HAS_BOUNCY_KEY, true);
-                            nbt.putInt(BOUNCE_COUNT_KEY, 0);
-                            nbt.putInt(MAX_BOUNCES_KEY, bouncingLevel);
-                            arrow.readCustomDataFromNbt(nbt);
+                            bounceCount = 0;
+                            maxBounces = bouncingLevel;
+                            bouncyInitialized = true;
+                            System.out.println("Bouncy Arrow Initialized: Max bounces = " + maxBounces);
+                        } else {
+
+                            bounceCount = -2; // no bounces
+                            bouncyInitialized = true;
                         }
                     }
+                } else {
+                    // no obunces if no wep data
+                    bounceCount = -2;
+                    bouncyInitialized = true;
                 }
             }
         }
+    }
 
-        // Now check if we can bounce
-        if (nbt.getBoolean(HAS_BOUNCY_KEY) || nbt.contains(MAX_BOUNCES_KEY)) {
-            int currentBounces = nbt.getInt(BOUNCE_COUNT_KEY);
-            int maxBounces = nbt.getInt(MAX_BOUNCES_KEY);
+    // handle bouncing
+    @Inject(method = "onBlockHit", at = @At("HEAD"), cancellable = true)
+    private void handleBounce(BlockHitResult blockHitResult, CallbackInfo ci) {
+        PersistentProjectileEntity arrow = (PersistentProjectileEntity) (Object) this;
 
-            // If we haven't reached max bounces yet
-            if (currentBounces < maxBounces) {
-                // Cancel normal block hit behavior (prevents sticking to block)
-                ci.cancel();
-
-                // Calculate bounce direction
-                Vec3d velocity = arrow.getVelocity();
-                Vector3f normalF = blockHitResult.getSide().getUnitVector();
-                Vec3d normal = new Vec3d(normalF.x, normalF.y, normalF.z);
-
-                // Reflect velocity using the formula: v' = v - 2(v·n)n
-                double dotProduct = velocity.dotProduct(normal);
-                Vec3d reflectedVelocity = velocity.subtract(normal.multiply(2 * dotProduct));
-
-                // Apply dampening (arrow loses some energy each bounce)
-                double damping = 0.8 - (currentBounces * 0.1); // Gets weaker with each bounce
-                reflectedVelocity = reflectedVelocity.multiply(Math.max(damping, 0.3));
-
-                // Set new velocity and mark as modified
-                arrow.setVelocity(reflectedVelocity);
-                arrow.velocityModified = true;
-
-                // Update bounce count
-                nbt.putInt(BOUNCE_COUNT_KEY, currentBounces + 1);
-                arrow.readCustomDataFromNbt(nbt);
-
-                // Ensure arrow is not considered to be in ground
-                this.inGround = false;
-
-                // Play bounce sound effect
-                if (arrow.getWorld() instanceof ServerWorld serverWorld) {
-                    serverWorld.playSound(null, arrow.getBlockPos(),
-                            SoundEvents.BLOCK_SLIME_BLOCK_STEP,
-                            SoundCategory.NEUTRAL,
-                            0.6f,
-                            1.0f + (currentBounces * 0.2f) + arrow.getRandom().nextFloat() * 0.2f);
-                }
-
-                return;
-            }
+        // dont boucne if in ground
+        if (this.inGround) {
+            return;
         }
 
-        // If no bounce capability or max bounces reached, allow normal behavior
+        // bounce
+        if (bounceCount >= 0 && bounceCount < maxBounces) {
+            System.out.println("Bouncing! Current: " + bounceCount + " / Max: " + maxBounces);
+
+            ci.cancel();
+
+            Vec3d velocity = arrow.getVelocity();
+            Vector3f normalF = blockHitResult.getSide().getUnitVector();
+            Vec3d normal = new Vec3d(normalF.x, normalF.y, normalF.z);
+
+            double dotProduct = velocity.dotProduct(normal);
+            Vec3d reflectedVelocity = velocity.subtract(normal.multiply(2 * dotProduct));
+
+            // dampening
+            double damping = 0.8 - (bounceCount * 0.1);
+            reflectedVelocity = reflectedVelocity.multiply(Math.max(damping, 0.3));
+
+            //set new velocity
+            arrow.setVelocity(reflectedVelocity);
+            arrow.velocityModified = true;
+
+            //add bounce count
+            bounceCount++;
+            System.out.println("Bounce count now: " + bounceCount);
+
+            this.inGround = false;
+
+            // bounce effect
+            if (arrow.getWorld() instanceof ServerWorld serverWorld) {
+                serverWorld.playSound(null, arrow.getBlockPos(),
+                        SoundEvents.BLOCK_SLIME_BLOCK_STEP,
+                        SoundCategory.NEUTRAL,
+                        0.6f,
+                        1.0f + (bounceCount * 0.2f) + arrow.getRandom().nextFloat() * 0.2f);
+            }
+
+            return;
+        } else if (bounceCount >= maxBounces) {
+            System.out.println("Max bounces reached! Arrow will stick. (" + bounceCount + " >= " + maxBounces + ")");
+        }
     }
 }
