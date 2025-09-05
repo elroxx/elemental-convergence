@@ -61,7 +61,7 @@ Index: 2
 
 Impact: **Medium**
 
-Playstyle: Fighter, PvP
+Playstyle: Fighter, Miner
 
 ### Passives
 ***Burning body* (Buff)**: Is immune to fire.
