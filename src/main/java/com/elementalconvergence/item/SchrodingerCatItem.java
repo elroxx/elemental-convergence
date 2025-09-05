@@ -63,7 +63,7 @@ public class SchrodingerCatItem extends Item {
             if (!teleportData.hasSavedPosition()) {
                 // use if no pos
                 saveCurrentPosition(serverPlayer, teleportData);
-                serverPlayer.sendMessage(Text.literal("§a Quantum clone created!"), false);
+                serverPlayer.sendMessage(Text.literal("§a Quantum clone created!"), true);
             } else {
                 // swap
                 swapPositions(serverPlayer, teleportData);
@@ -131,7 +131,7 @@ public class SchrodingerCatItem extends Item {
         teleportToPositionAndChangeVelocity(player, savedX, savedY, savedZ, savedVelocityX, savedVelocityY, savedVelocityZ, savedYaw, savedPitch, savedDimension);
 
 
-        player.sendMessage(Text.literal("§bTeleported! Positions swapped."), false);
+        player.sendMessage(Text.literal("§bTeleported! Positions swapped."), true);
     }
 
     private void teleportToPositionAndChangeVelocity(ServerPlayerEntity player, double x, double y, double z, double veloX, double veloY, double veloZ, float yaw, float pitch, String dimensionString) {
@@ -141,7 +141,7 @@ public class SchrodingerCatItem extends Item {
             ServerWorld targetWorld = player.getServer().getWorld(dimensionKey);
 
             if (targetWorld == null) {
-                player.sendMessage(Text.literal("§cError: Could not find dimension " + dimensionString), false);
+                player.sendMessage(Text.literal("§cError: Could not find dimension " + dimensionString), true);
                 return;
             }
 
@@ -155,7 +155,7 @@ public class SchrodingerCatItem extends Item {
             player.velocityModified=true; //IMPORTANT COZ IF NOT THIS DOESNT CHANGE THE PLAYERS VELOCITY AT ALL
 
         } catch (Exception e) {
-            player.sendMessage(Text.literal("§cError during teleportation: " + e.getMessage()), false);
+            player.sendMessage(Text.literal("§cError during teleportation: " + e.getMessage()), true);
         }
     }
 }
