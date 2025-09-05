@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GTG",
+    "HES",
+    "ATA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:bookshelf"
+    },
+    "G": {
+      "item": "minecraft:chiseled_bookshelf"
+    },
+    "T": {
+      "item": "minecraft:enchanting_table"
+    },
+    "S": {
+      "item": "elemental-convergence:fire_magic_eye"
+    },
+    "H": {
+      "item": "elemental-convergence:earth_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:mystical_convergent_eye",
+    "count": 1
+  }
+}
