@@ -86,7 +86,7 @@ public class EarthMagicHandler implements IMagicHandler {
     //For vein miner
     private static final int BREAK_DELAY_TICKS = 2;
     private static final int MAX_BLOCKS = 64;
-    private static final Set<BlockPos> PROCESSING_BLOCKS = new HashSet<>();
+    private static final List<BlockPos> PROCESSING_BLOCKS = new ArrayList<BlockPos>();
 
     //Particles for burrow
     private static final int PARTICLE_COUNT = 1;
@@ -379,25 +379,27 @@ public class EarthMagicHandler implements IMagicHandler {
         }
 
         try {
-            Set<BlockPos> blocksToMine = findConnectedOres(player.getWorld(), startPos, oreType);
+            List<BlockPos> blocksToMine = findConnectedOres(player.getWorld(), startPos, oreType);
             mineBlocks(player.getWorld(), blocksToMine, player);
         } finally {
             PROCESSING_BLOCKS.remove(startPos);
         }
     }
 
-    private Set<BlockPos> findConnectedOres(World world, BlockPos startPos, int oreType) {
-        Set<BlockPos> connectedBlocks = new HashSet<>();
+    private List<BlockPos> findConnectedOres(World world, BlockPos startPos, int oreType) {
+        Set<BlockPos> visitedBlocks = new HashSet<>();  // For duplicate checking
+        List<BlockPos> orderedBlocks = new ArrayList<>();  // BFS
         Queue<BlockPos> toCheck = new LinkedList<>();
         toCheck.add(startPos);
 
-        while (!toCheck.isEmpty() && connectedBlocks.size() < MAX_BLOCKS) {
+        while (!toCheck.isEmpty() && orderedBlocks.size() < MAX_BLOCKS) {
             BlockPos currentPos = toCheck.poll();
-            if (!connectedBlocks.add(currentPos)) {
-                continue;
+            if (!visitedBlocks.add(currentPos)) {
+                continue; // alr checkde this block
             }
+            orderedBlocks.add(currentPos); // list ordered
 
-            // Check all adjacent blocks
+            // All adjacent
             for (int x = -1; x <= 1; x++) {
                 for (int y = -1; y <= 1; y++) {
                     for (int z = -1; z <= 1; z++) {
@@ -406,7 +408,7 @@ public class EarthMagicHandler implements IMagicHandler {
                         BlockPos newPos = currentPos.add(x, y, z);
                         BlockState newState = world.getBlockState(newPos);
 
-                        // Check if the new block matches the ore type
+                        // adjacents
                         boolean isMatchingOre = switch (oreType) {
                             case 0 -> newState.isIn(BlockTags.COAL_ORES);
                             case 1 -> newState.isIn(BlockTags.COPPER_ORES);
@@ -421,7 +423,7 @@ public class EarthMagicHandler implements IMagicHandler {
                             default -> false;
                         };
 
-                        if (isMatchingOre && !connectedBlocks.contains(newPos)) {
+                        if (isMatchingOre && !visitedBlocks.contains(newPos)) {
                             toCheck.add(newPos);
                         }
                     }
@@ -429,10 +431,10 @@ public class EarthMagicHandler implements IMagicHandler {
             }
         }
 
-        return connectedBlocks;
+        return orderedBlocks;
     }
 
-    private void mineBlocks(World world, Set<BlockPos> blocks, PlayerEntity player) {
+    private void mineBlocks(World world, List<BlockPos> blocks, PlayerEntity player) {
         Queue<BlockPos> blockQueue = new LinkedList<>(blocks);
         final int[] tickCounter = {0};
         ServerTickEvents.END_SERVER_TICK.register(server -> {
