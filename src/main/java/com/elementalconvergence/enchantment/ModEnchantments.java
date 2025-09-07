@@ -19,6 +19,8 @@ public class ModEnchantments {
     public static final RegistryKey<Enchantment> BOUNCY_ARROW = registerEnchantment("bouncy_arrow");
 
     public static final RegistryKey<Enchantment> LAVA_WALKER = registerEnchantment("lava_walker");
+    public static final RegistryKey<Enchantment> VOLCANIC_CHARGE = registerEnchantment("volcanic_charge");
+    public static final RegistryKey<Enchantment> FANGS = registerEnchantment("fangs");
 
 
 

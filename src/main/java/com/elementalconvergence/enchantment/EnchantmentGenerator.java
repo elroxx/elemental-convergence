@@ -33,7 +33,7 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                                         // max lvl 1
                                         1,
                                         // (shouldnt be obtainable)
-                                        Enchantment.leveledCost(25, 0),
+                                        Enchantment.leveledCost(50, 0),
                                         Enchantment.leveledCost(50, 0),
                                         // anvil cost
                                         10,
@@ -64,6 +64,33 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                         )
                 )
         );
+
+        register(entries, ModEnchantments.FANGS, Enchantment.builder(
+                        Enchantment.definition(
+                                registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.SWORD_ENCHANTABLE),
+                                1, // weight
+                                3, // max level
+                                Enchantment.leveledCost(50, 10),
+                                Enchantment.leveledCost(50, 15),
+                                4, // anvil cost
+                                AttributeModifierSlot.HAND
+                        )
+                )
+        );
+
+        register(entries, ModEnchantments.VOLCANIC_CHARGE, Enchantment.builder(
+                        Enchantment.definition(
+                                registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.CHEST_ARMOR_ENCHANTABLE),
+                                1, // weight
+                                3, // max level
+                                Enchantment.leveledCost(50, 10),
+                                Enchantment.leveledCost(50, 15),
+                                4, // anvil cost
+                                AttributeModifierSlot.HAND
+                        )
+                )
+        );
+
     }
 
     private void register(Entries entries, RegistryKey<Enchantment> key, Enchantment.Builder builder, ResourceCondition... resourceConditions) {
