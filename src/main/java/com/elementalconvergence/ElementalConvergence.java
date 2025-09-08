@@ -57,7 +57,9 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -71,6 +73,8 @@ import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
@@ -250,8 +254,17 @@ public class ElementalConvergence implements ModInitializer {
 			if (!world.isClient()){
 				SpellManager.handleEntityRightClick(player, entity);
 
-				//NOW CHECK FOR CARRIER HELMET BEHAVIOUR
-				return MysticMagicHandler.handleCarrierUseEntity(player, world, hand, entity, hitResult); //we also return something so dont add any lines after that in this nested part.
+
+				//CHECKING FOR CARRIER ENCHANTMENT
+				if (entity instanceof ServerPlayerEntity target){
+
+					ItemStack helmet = player.getEquippedStack(EquipmentSlot.HEAD);
+					RegistryEntry<Enchantment> carrierEntry = player.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.CARRIER);
+					int carrierLevel = EnchantmentHelper.getLevel(carrierEntry, helmet);
+					if (player.isSneaking() && !player.equals(target) && carrierLevel>=1){
+						target.startRiding(player, true);
+					}
+				}
 			}
 			return ActionResult.PASS;
 		});
