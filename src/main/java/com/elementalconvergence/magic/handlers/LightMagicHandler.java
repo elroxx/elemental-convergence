@@ -259,7 +259,7 @@ public class LightMagicHandler implements IMagicHandler {
 
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
-
+        player.kill();
     }
 
     private boolean hasNearbyGlowingEntity(PlayerEntity player) {
