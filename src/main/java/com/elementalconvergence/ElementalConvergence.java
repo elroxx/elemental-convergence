@@ -19,6 +19,7 @@ import com.elementalconvergence.item.SchrodingerCatItem;
 import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.magic.convergencehandlers.MysticMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler;
 import com.elementalconvergence.magic.handlers.DeathMagicHandler;
 import com.elementalconvergence.mixin.PlayerDataMixin;
@@ -248,6 +249,9 @@ public class ElementalConvergence implements ModInitializer {
 		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
 			if (!world.isClient()){
 				SpellManager.handleEntityRightClick(player, entity);
+
+				//NOW CHECK FOR CARRIER HELMET BEHAVIOUR
+				return MysticMagicHandler.handleCarrierUseEntity(player, world, hand, entity, hitResult); //we also return something so dont add any lines after that in this nested part.
 			}
 			return ActionResult.PASS;
 		});

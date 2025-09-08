@@ -104,6 +104,20 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                 )
         );
 
+        register(entries, ModEnchantments.CARRIER, Enchantment.builder(
+                        Enchantment.definition(
+                                registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.HEAD_ARMOR_ENCHANTABLE),
+                                3,
+                                1, // max level (for anvil)
+                                Enchantment.leveledCost(50, 10),
+                                Enchantment.leveledCost(50, 15),
+                                3, // anvil cost
+                                AttributeModifierSlot.HEAD
+                        )
+                )
+        );
+
+
     }
 
     private void register(Entries entries, RegistryKey<Enchantment> key, Enchantment.Builder builder, ResourceCondition... resourceConditions) {
