@@ -56,7 +56,7 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                         Enchantment.definition(
                                 registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.BOW_ENCHANTABLE),
                                 1, // weight
-                                3, // max level
+                                2, // max level (anvil)
                                 Enchantment.leveledCost(50, 10),
                                 Enchantment.leveledCost(50, 15),
                                 4, // anvil cost
@@ -69,7 +69,7 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                         Enchantment.definition(
                                 registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.SWORD_ENCHANTABLE),
                                 1, // weight
-                                3, // max level
+                                2, // max level (anvil)
                                 Enchantment.leveledCost(50, 10),
                                 Enchantment.leveledCost(50, 15),
                                 4, // anvil cost
@@ -82,11 +82,24 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                         Enchantment.definition(
                                 registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.CHEST_ARMOR_ENCHANTABLE),
                                 1, // weight
-                                1, // max level
+                                1, // max level (anvil)
                                 Enchantment.leveledCost(50, 10),
                                 Enchantment.leveledCost(50, 15),
                                 4, // anvil cost
                                 AttributeModifierSlot.HAND
+                        )
+                )
+        );
+
+        register(entries, ModEnchantments.HIGH_STEPS, Enchantment.builder(
+                        Enchantment.definition(
+                                registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.LEG_ARMOR_ENCHANTABLE),
+                                5,
+                                2, //max anvil lvl
+                                Enchantment.leveledCost(50, 10),
+                                    Enchantment.leveledCost(50, 15),
+                                2,
+                                AttributeModifierSlot.LEGS
                         )
                 )
         );
