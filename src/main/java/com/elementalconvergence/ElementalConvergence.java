@@ -146,6 +146,8 @@ public class ElementalConvergence implements ModInitializer {
 
 	public static final ScreenHandlerType<MysticalTomeScreenHandler> MYSTICAL_TOME_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, id("mystical_tome"), new ScreenHandlerType<>(MysticalTomeScreenHandler::new, FeatureSet.empty()));
 
+	//ALL RECIPES LIST
+	List<Identifier> recipesList = getRecipesList();
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -225,6 +227,7 @@ public class ElementalConvergence implements ModInitializer {
 			}
 		});
 
+
 		//BLOCK BREAK
 		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) -> {
 				if (!world.isClient()){
@@ -270,6 +273,11 @@ public class ElementalConvergence implements ModInitializer {
 			}
 
 			if (entity instanceof ServerPlayerEntity player){
+
+				//GIVE ALL RECIPES AGAIN
+				giveAllElementalConvergenceRecipes(player);
+
+				//DEATH PART
 				BlockPos deathPos = player.getBlockPos();
 				String playerName= player.getName().getString();
 				//String playerName = player.getDisplayName().toString();
@@ -782,6 +790,54 @@ public class ElementalConvergence implements ModInitializer {
 		}
 
 		return false; // Would fall into void
+	}
+
+	public static void giveAllElementalConvergenceRecipes(ServerPlayerEntity player){
+		player.unlockRecipes(getRecipesList());
+		LOGGER.info("All recipes were given to");
+	}
+
+	public static List<Identifier> getRecipesList(){
+		List<Identifier> allRecipesList = new ArrayList<Identifier>();
+
+		allRecipesList.add(id("altar_of_convergence"));
+		allRecipesList.add(id("air_magic_eye"));
+		allRecipesList.add(id("bland_magic_eye"));
+		allRecipesList.add(id("blood_convergent_eye"));
+		allRecipesList.add(id("coffin"));
+		allRecipesList.add(id("convergent_eye_blast"));
+		allRecipesList.add(id("convergent_eye_furnace"));
+		allRecipesList.add(id("crown"));
+		allRecipesList.add(id("death_magic_eye"));
+		allRecipesList.add(id("earth_magic_eye"));
+		allRecipesList.add(id("epsilon_dust"));
+		allRecipesList.add(id("fire_magic_eye"));
+		allRecipesList.add(id("flower_gateway"));
+		allRecipesList.add(id("gravity_convergent_eye"));
+		allRecipesList.add(id("gravity_shard"));
+		allRecipesList.add(id("halo"));
+		allRecipesList.add(id("holy_convergent_eye"));
+		allRecipesList.add(id("honey_convergent_eye"));
+		allRecipesList.add(id("honey_stick"));
+		allRecipesList.add(id("life_magic_eye"));
+		allRecipesList.add(id("light_magic_eye"));
+		allRecipesList.add(id("limiting_eye"));
+		allRecipesList.add(id("mystical_chapter_1"));
+		allRecipesList.add(id("mystical_chapter_2"));
+		allRecipesList.add(id("mystical_convergent_eye"));
+		allRecipesList.add(id("mystical_energy"));
+		allRecipesList.add(id("portable_beehive"));
+		allRecipesList.add(id("quantum_convergent_eye"));
+		allRecipesList.add(id("rat_convergent_eye"));
+		allRecipesList.add(id("rotten_corpse"));
+		allRecipesList.add(id("schrodinger_cat"));
+		allRecipesList.add(id("shadow_magic_eye"));
+		allRecipesList.add(id("steam_convergent_eye"));
+		allRecipesList.add(id("train_whistle"));
+		allRecipesList.add(id("water_magic_eye"));
+
+
+		return allRecipesList;
 	}
 
 }
