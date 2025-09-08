@@ -8,6 +8,7 @@ import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -15,6 +16,7 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.mob.EvokerFangsEntity;
@@ -22,9 +24,12 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.BlockStateParticleEffect;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -44,6 +49,9 @@ public class MysticMagicHandler implements IMagicHandler {
 
     public static final int DEFAULT_FANGS_COOLDOWN = 2*20;
     private int fangsCooldown=0;
+
+    public static final int DEFAULT_VOLCANIC_COOLDOWN = 2*20;
+    private int volcanicCooldown=0;
 
 
     @Override
@@ -69,7 +77,7 @@ public class MysticMagicHandler implements IMagicHandler {
                     Set<RegistryEntry<Enchantment>> enchantSet= offHand.getEnchantments().getEnchantments();
 
                     for (RegistryEntry<Enchantment> enchant : enchantSet){
-                                                int currentLvl = EnchantmentHelper.getLevel(enchant, offHand);
+                        int currentLvl = EnchantmentHelper.getLevel(enchant, offHand);
                         if (currentLvl<255) { //double check max lvl enchants to avoid oveflow
                             offHand.addEnchantment(enchant, currentLvl + 1);
                         }
@@ -101,6 +109,7 @@ public class MysticMagicHandler implements IMagicHandler {
         if (mysticLevel>=1 && fangsCooldown==0){
             spawnEvokerFangLine(player, player.getWorld(), mainHand);
             player.getItemCooldownManager().set(mainHand.getItem(), DEFAULT_FANGS_COOLDOWN);
+            fangsCooldown=DEFAULT_FANGS_COOLDOWN;
         }
 
     }
@@ -125,6 +134,9 @@ public class MysticMagicHandler implements IMagicHandler {
         }
         if (fangsCooldown>0){
             fangsCooldown--;
+        }
+        if (volcanicCooldown>0){
+            volcanicCooldown--;
         }
 
     }
@@ -152,6 +164,26 @@ public class MysticMagicHandler implements IMagicHandler {
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
 
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int mysticLevel = magicData.getMagicLevel(MYSTIC_INDEX);
+        if (mysticLevel>=2 && volcanicCooldown==0) {
+            ItemStack chestplate = player.getEquippedStack(EquipmentSlot.CHEST);
+            if (chestplate.isEmpty()) {
+                return; //avoid null
+            }
+
+            RegistryEntry<Enchantment> volcanicEntry = player.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.VOLCANIC_CHARGE);
+            int volcanicLevel = EnchantmentHelper.getLevel(volcanicEntry, chestplate);
+            if (volcanicLevel > 0) {
+
+                performFireDash(player, player.getWorld(), volcanicLevel);
+
+                player.getItemCooldownManager().set(chestplate.getItem(), DEFAULT_VOLCANIC_COOLDOWN);
+                volcanicCooldown=DEFAULT_VOLCANIC_COOLDOWN;
+            }
+
+        }
     }
 
     @Override
@@ -235,4 +267,107 @@ public class MysticMagicHandler implements IMagicHandler {
 
         return null; // No suitable position found
     }
+
+    private void performFireDash(PlayerEntity player, World world, int volcanicLevel) {
+        // lookat
+        Vec3d lookDirection = player.getRotationVector();
+        Vec3d horizontalDirection = new Vec3d(lookDirection.x, 0, lookDirection.z).normalize();
+
+        //get dash veloc
+        double dashMultiplier = 0.5 * volcanicLevel;
+        Vec3d dashVelocity = horizontalDirection.multiply(dashMultiplier);
+
+        // veloc.
+        player.setVelocity(dashVelocity.x, 0, dashVelocity.z);
+        player.velocityModified = true;
+
+        if (world instanceof ServerWorld serverWorld) {
+            createParticleTrail(serverWorld, player, horizontalDirection);
+            playDashSounds(serverWorld, player);
+        }
+    }
+
+    private void createParticleTrail(ServerWorld world, PlayerEntity player, Vec3d direction) {
+        Vec3d playerPos = player.getPos();
+
+        for (int i = 0; i < 20; i++) {
+            double offset = i * 0.2;
+            double x = playerPos.x - direction.x * offset;
+            double y = playerPos.y + 0.1;
+            double z = playerPos.z - direction.z * offset;
+
+            //fire particles
+            world.spawnParticles(
+                    ParticleTypes.FLAME,
+                    x, y, z,
+                    3,
+                    0.3, 0.1, 0.3,
+                    0.05
+            );
+
+            //lava particles
+            world.spawnParticles(
+                    ParticleTypes.LAVA,
+                    x, y, z,
+                    1,
+                    0.2, 0.1, 0.2,
+                    0.02
+            );
+        }
+
+        //dirt particles
+        for (int i = 0; i < 15; i++) {
+            double x = playerPos.x + (world.random.nextDouble() - 0.5) * 2;
+            double y = playerPos.y + 0.1;
+            double z = playerPos.z + (world.random.nextDouble() - 0.5) * 2;
+
+            //poof
+            world.spawnParticles(
+                    ParticleTypes.POOF,
+                    x, y, z,
+                    1,
+                    0.1, 0.1, 0.1,
+                    0.1
+            );
+
+            //dirt particles
+            world.spawnParticles(
+                    new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.DIRT.getDefaultState()),
+                    x, y, z,
+                    2,
+                    0.2, 0.1, 0.2,
+                    0.05
+            );
+        }
+    }
+
+    private void playDashSounds(ServerWorld world, PlayerEntity player) {
+        world.playSound(
+                null,
+                player.getBlockPos(),
+                SoundEvents.ITEM_FIRECHARGE_USE,
+                SoundCategory.PLAYERS,
+                1.0f,
+                0.8f
+        );
+
+        world.playSound(
+                null,
+                player.getBlockPos(),
+                SoundEvents.BLOCK_ANVIL_LAND,
+                SoundCategory.PLAYERS,
+                0.2f, // volume
+                0.5f
+        );
+
+        world.playSound(
+                null,
+                player.getBlockPos(),
+                SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP,
+                SoundCategory.PLAYERS,
+                0.8f, // volume
+                1.2f // higher pitch
+        );
+    }
 }
+

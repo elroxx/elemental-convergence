@@ -82,7 +82,7 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                         Enchantment.definition(
                                 registries.getWrapperOrThrow(RegistryKeys.ITEM).getOrThrow(ItemTags.CHEST_ARMOR_ENCHANTABLE),
                                 1, // weight
-                                3, // max level
+                                1, // max level
                                 Enchantment.leveledCost(50, 10),
                                 Enchantment.leveledCost(50, 15),
                                 4, // anvil cost
