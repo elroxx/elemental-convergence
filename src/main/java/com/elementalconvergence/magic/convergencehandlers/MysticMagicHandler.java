@@ -164,6 +164,11 @@ public class MysticMagicHandler implements IMagicHandler {
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
 
+    }
+
+    @Override
+    public void handleSecondarySpell(PlayerEntity player) {
+
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int mysticLevel = magicData.getMagicLevel(MYSTIC_INDEX);
@@ -184,11 +189,6 @@ public class MysticMagicHandler implements IMagicHandler {
             }
 
         }
-    }
-
-    @Override
-    public void handleSecondarySpell(PlayerEntity player) {
-
     }
 
     @Override
