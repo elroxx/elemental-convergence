@@ -3,6 +3,7 @@ package com.elementalconvergence.magic.convergencehandlers;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.entity.PegasusEntity;
 import com.elementalconvergence.item.ModItems;
@@ -10,6 +11,8 @@ import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -24,6 +27,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -79,6 +84,15 @@ public class BloodMagicHandler implements IMagicHandler {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int bloodLevel = magicData.getMagicLevel(BLOOD_INDEX);
+
+        ItemStack helmet = player.getEquippedStack(EquipmentSlot.HEAD);
+        RegistryEntry<Enchantment> carrierEntry = player.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.CARRIER);
+        int carrierLevel = EnchantmentHelper.getLevel(carrierEntry, helmet);
+
+        if (!helmet.isEmpty() && carrierLevel>1){
+            return; //stop if carrierLevel is 1 just because i have no clue what will actually happen like that.
+        }
+
         if (bloodLevel>=3) {
 
             //Check if sneaking+mainhand empty
