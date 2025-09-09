@@ -1,0 +1,53 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "bottom": "minecraft:block/spruce_planks",
+    "barrel_side": "minecraft:block/barrel_side",
+    "barrel_bottom": "minecraft:block/barrel_bottom",
+    "red_wool": "minecraft:block/red_wool",
+    "particle": "minecraft:block/barrel_side"
+  },
+  "elements": [
+    {
+      "name": "Floor",
+      "from": [0, 0, 0],
+      "to": [16, 1, 16],
+      "faces": {
+        "up": {"uv": [0, 0, 16, 16], "texture": "#red_wool"},
+        "down": {"uv": [0, 0, 16, 16], "texture": "#bottom"}
+      }
+    },
+    {
+      "name": "South Wall (foot)",
+      "from": [0, 0, 14],
+      "to": [16, 8, 16],
+      "faces": {
+        "north": {"uv": [0, 8, 16, 14], "texture": "#red_wool"},
+        "south": {"uv": [0, 8, 16, 14], "texture": "#barrel_side"},
+        "up": {"uv": [0, 14, 16, 16], "texture": "#barrel_bottom"},
+        "east": {"uv": [0, 8, 2, 14], "texture": "#barrel_side"},
+        "west": {"uv": [14, 8, 16, 14], "texture": "#barrel_side"}
+      }
+    },
+    {
+      "name": "East Wall",
+      "from": [14, 0, 0],
+      "to": [16, 8, 14],
+      "faces": {
+        "east": {"uv": [2, 8, 16, 14], "texture": "#barrel_side"},
+        "west": {"uv": [2, 8, 16, 14], "texture": "#red_wool"},
+        "up": {"uv": [14, 2, 16, 16], "texture": "#barrel_bottom"}
+      }
+    },
+    {
+      "name": "West Wall",
+      "from": [0, 0, 0],
+      "to": [2, 8, 14],
+      "faces": {
+        "east": {"uv": [2, 8, 16, 14], "texture": "#red_wool"},
+        "west": {"uv": [2, 8, 16, 14], "texture": "#barrel_side"},
+        "up": {"uv": [0, 2, 2, 16], "texture": "#barrel_bottom"}
+      }
+    }
+  ]
+}

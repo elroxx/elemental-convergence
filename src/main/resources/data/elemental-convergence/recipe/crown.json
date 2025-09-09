@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " E ",
+    "DHD"
+  ],
+  "key": {
+    "E": {
+      "item": "minecraft:emerald"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "H": {
+      "item": "minecraft:golden_helmet"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:crown",
+    "count": 1
+  }
+}

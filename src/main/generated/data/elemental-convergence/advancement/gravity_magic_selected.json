@@ -1,5 +1,5 @@
 {
-  "parent": "elemental-convergence:shadow_lvl3",
+  "parent": "elemental-convergence:earth_lvl3",
   "criteria": {
     "gravity_magic_selected": {
       "conditions": {

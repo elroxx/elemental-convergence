@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:blood_lvl2",
+  "criteria": {
+    "blood_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:heartbreak_pottery_sherd"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "blood_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:blood_lvl3",
+        "criterionName": "blood_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:blood_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_blood_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:blood_lvl3",
+        "criterionName": "blood_criterion_lvl3",
+        "magicIndex": 13
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Loot a heartbreak pottery sherd",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:heartbreak_pottery_sherd"
+    },
+    "title": "Blood Level 3"
+  },
+  "requirements": [
+    [
+      "blood_criterion_lvl3"
+    ],
+    [
+      "blood_has_lvl3"
+    ],
+    [
+      "has_blood_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

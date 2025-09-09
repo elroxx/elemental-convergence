@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "BRB",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:barrel"
+    },
+    "R": {
+      "item": "minecraft:red_bed"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:coffin",
+    "count": 1
+  }
+}

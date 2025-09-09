@@ -36,7 +36,7 @@ public class DeathMagicHandler implements IMagicHandler {
     public static final int DEATH_INDEX=7;
 
     public static final int HORSE_DEFAULT_COOLDOWN=40;
-    public static final int ZOMBIE_DEFAULT_COOLDOWN=60; //so each 3 seconds
+    public static final int ZOMBIE_DEFAULT_COOLDOWN=20; //so every 1 seconds
 
     private int horseCooldown=0;
     private int zombieCooldown=0;
@@ -82,6 +82,7 @@ public class DeathMagicHandler implements IMagicHandler {
 
 
                 horseCooldown=HORSE_DEFAULT_COOLDOWN;
+                player.getItemCooldownManager().set(Items.GOLDEN_HOE, HORSE_DEFAULT_COOLDOWN);
             }
         }
 
@@ -125,6 +126,11 @@ public class DeathMagicHandler implements IMagicHandler {
                             SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.PLAYERS, 1.0F, 1.0F);
 
                     zombieCooldown=ZOMBIE_DEFAULT_COOLDOWN;
+                    player.getItemCooldownManager().set(Items.STONE_HOE, ZOMBIE_DEFAULT_COOLDOWN);
+                    player.getItemCooldownManager().set(Items.WOODEN_HOE, ZOMBIE_DEFAULT_COOLDOWN);
+                    player.getItemCooldownManager().set(Items.IRON_HOE, ZOMBIE_DEFAULT_COOLDOWN);
+                    player.getItemCooldownManager().set(Items.DIAMOND_HOE, ZOMBIE_DEFAULT_COOLDOWN);
+                    player.getItemCooldownManager().set(Items.NETHERITE_HOE, ZOMBIE_DEFAULT_COOLDOWN);
 
                 }
             }

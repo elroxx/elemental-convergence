@@ -5,23 +5,28 @@ import com.elementalconvergence.commands.DeathTeleportCommand;
 import com.elementalconvergence.commands.GetSelectedMagicCommand;
 import com.elementalconvergence.commands.MagicCommand;
 import com.elementalconvergence.commands.SetMagicLevelCommand;
+import com.elementalconvergence.container.MysticalTomeScreenHandler;
 import com.elementalconvergence.criterions.ModCriterions;
+import com.elementalconvergence.data.BeehivePlayerData;
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.item.SchrodingerCatItem;
 import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.magic.convergencehandlers.MysticMagicHandler;
+import com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler;
 import com.elementalconvergence.magic.handlers.DeathMagicHandler;
 import com.elementalconvergence.mixin.PlayerDataMixin;
-import com.elementalconvergence.networking.InventoryNetworking;
-import com.elementalconvergence.networking.MiningSpeedPayload;
-import com.elementalconvergence.networking.OpenInventoryPayload;
-import com.elementalconvergence.networking.SpellCastPayload;
+import com.elementalconvergence.networking.*;
 //import com.elementalconvergence.worldgen.ModWorldGeneration;
+import com.elementalconvergence.particle.ModParticles;
+import com.elementalconvergence.world.dimension.ModDimensions;
 import gravity_changer.mixin.EntityCollisionContextMixin;
 import net.fabricmc.api.ModInitializer;
 
@@ -31,6 +36,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
@@ -40,35 +46,51 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.advancement.Advancement;
 import net.minecraft.advancement.AdvancementEntry;
 import net.minecraft.advancement.AdvancementProgress;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.ChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.resource.featuretoggle.FeatureSet;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ServerAdvancementLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -86,6 +108,8 @@ import virtuoel.pehkui.api.PehkuiConfig;
 
 import java.util.*;
 
+import static com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler.QUANTUM_INDEX;
+
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
 	public static final int TICKSEC = 20;
@@ -94,8 +118,8 @@ public class ElementalConvergence implements ModInitializer {
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
 
 	//star was removed
-	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy"};
-	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity", "steam", "holy"};
+	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy", "Honey", "Blood", "Quantum", "Mystic"};
+	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity", "steam", "holy", "honey", "blood", "quantum", "mystic"};
 	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
 
 	//FOR THINGS THAT NEED ALL THE MAGICS IN THE LOGIC
@@ -122,7 +146,14 @@ public class ElementalConvergence implements ModInitializer {
 	private static KeyBinding secondarySpellKb;
 	private static KeyBinding tertiarySpellKb;
 
+	//Section for quantum debuff/teleportation part
+	private static final Map<UUID, Long> lastTeleportTimes = new HashMap<>();
+	private static final long TELEPORT_COOLDOWN = 1000; // 1 sec cooldown on tp
 
+	public static final ScreenHandlerType<MysticalTomeScreenHandler> MYSTICAL_TOME_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, id("mystical_tome"), new ScreenHandlerType<>(MysticalTomeScreenHandler::new, FeatureSet.empty()));
+
+	//ALL RECIPES LIST
+	List<Identifier> recipesList = getRecipesList();
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -146,7 +177,9 @@ public class ElementalConvergence implements ModInitializer {
 		ModEntities.initialize(); //Entities
 		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
-		//ModWorldGeneration.initialize();
+		ModDimensions.initialize();
+		ModEnchantments.initialize();
+		ModParticles.initialize();
 		InventoryNetworking.init(); //ONLY FOR STEALING IN INVENTORY
 
 		//Init the MagicRegistry (magic handler is by player now)
@@ -190,6 +223,20 @@ public class ElementalConvergence implements ModInitializer {
 			}
 		});
 
+
+		//each tick, but ONLY and like ONLY for the quantum TP debuff
+		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			for (ServerWorld world : server.getWorlds()) {
+				for (ServerPlayerEntity observer : world.getPlayers()) {
+					checkPlayerLookingAt(observer, world);
+				}
+			}
+		});
+
+		//pretty much only for carrier
+		ServerTickEvents.END_WORLD_TICK.register(TaskScheduler::tick);
+
+
 		//BLOCK BREAK
 		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) -> {
 				if (!world.isClient()){
@@ -210,6 +257,21 @@ public class ElementalConvergence implements ModInitializer {
 		UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
 			if (!world.isClient()){
 				SpellManager.handleEntityRightClick(player, entity);
+
+
+				//CHECKING FOR CARRIER ENCHANTMENT
+				if (entity instanceof ServerPlayerEntity target){
+
+					ItemStack helmet = player.getEquippedStack(EquipmentSlot.HEAD);
+					RegistryEntry<Enchantment> carrierEntry = player.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.CARRIER);
+					int carrierLevel = EnchantmentHelper.getLevel(carrierEntry, helmet);
+					if (player.isSneaking() && !player.equals(target) && carrierLevel>=1){
+						target.startRiding(player, true);
+						if (player instanceof ServerPlayerEntity serverPlayer) {
+							serverPlayer.networkHandler.sendPacket(new EntityPassengersSetS2CPacket(player));
+						}
+					}
+				}
 			}
 			return ActionResult.PASS;
 		});
@@ -235,6 +297,11 @@ public class ElementalConvergence implements ModInitializer {
 			}
 
 			if (entity instanceof ServerPlayerEntity player){
+
+				//GIVE ALL RECIPES AGAIN
+				giveAllElementalConvergenceRecipes(player);
+
+				//DEATH PART
 				BlockPos deathPos = player.getBlockPos();
 				String playerName= player.getName().getString();
 				//String playerName = player.getDisplayName().toString();
@@ -290,11 +357,16 @@ public class ElementalConvergence implements ModInitializer {
 
 		});
 
+		//generating the praying altar
 		ServerWorldEvents.LOAD.register((server, world) -> {
 			if (!world.isClient()) {
 				placePrayingAltar(world);
 			}
 		});
+
+		//Set beehive player data server on server started
+		ServerLifecycleEvents.SERVER_STARTED.register(BeehivePlayerData::setServer);
+
 
 
 
@@ -312,6 +384,7 @@ public class ElementalConvergence implements ModInitializer {
 
 		// INIT FOR MININGSPEED PAYLOAD
 		PayloadTypeRegistry.playS2C().register(MiningSpeedPayload.ID, MiningSpeedPayload.CODEC);
+
 
 		// Register server-side packet handler
 		ServerPlayNetworking.registerGlobalReceiver(SpellCastPayload.ID, (payload, context) -> {
@@ -515,6 +588,30 @@ public class ElementalConvergence implements ModInitializer {
 		holy_requirements.add(5); //LIGHT
 		arrayForRequirements[3]=holy_requirements;
 
+		//HONEY REQUIREMENTS
+		ArrayList<Integer> honey_requirements = new ArrayList<>();
+		honey_requirements.add(1); //AIR
+		honey_requirements.add(6); //LIFE
+		arrayForRequirements[4]=honey_requirements;
+
+		//BLOOD REQUIREMENTS
+		ArrayList<Integer> blood_requirements = new ArrayList<>();
+		blood_requirements.add(7); //DEATH
+		blood_requirements.add(4); //SHADOW
+		arrayForRequirements[5]=blood_requirements;
+
+		//QUANTUM REQUIREMENTS
+		ArrayList<Integer> quantum_requirements = new ArrayList<>();
+		quantum_requirements.add(3); //WATER
+		quantum_requirements.add(5); //LIGHT
+		arrayForRequirements[6]=quantum_requirements;
+
+		//MYSTIC REQUIREMENTS
+		ArrayList<Integer> mystic_requirements = new ArrayList<>();
+		mystic_requirements.add(0); //EARTH
+		mystic_requirements.add(4); //FIRE
+		arrayForRequirements[7]=mystic_requirements;
+
 
 		for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
 			convergenceRequirementsMap.put(CONVERGENCE_MAGIC_ID[i], arrayForRequirements[i]);
@@ -589,6 +686,184 @@ public class ElementalConvergence implements ModInitializer {
 
 		//place praying altar (ONLY SPAWNS AFTER RELOADING THE WORLD ONCE)
 		world.setBlockState(new BlockPos(0, 100, 0), ModBlocks.PRAYING_ALTAR.getDefaultState());
+	}
+
+	private void checkPlayerLookingAt(ServerPlayerEntity observer, ServerWorld world) {
+		// check for player hit
+		for (ServerPlayerEntity target : world.getPlayers()) {
+			if (target.equals(observer)){
+				continue; //dont check raycaster
+			}
+			//check if target is actually quantum
+			IMagicDataSaver dataSaver = (IMagicDataSaver) target;
+			MagicData magicData = dataSaver.getMagicData();
+			if (magicData.getSelectedMagic()!=QUANTUM_INDEX){
+				continue; // Must be quantum to be tpd
+			}
+
+			// if that player is within line of sight, random tp
+			if (isPlayerInLineOfSight(observer, target)) {
+				teleportPlayer(target, world);
+			}
+		}
+	}
+
+	private boolean isPlayerInLineOfSight(ServerPlayerEntity observer, ServerPlayerEntity target) {
+		Vec3d observerEye = observer.getEyePos();
+		Vec3d targetCenter = target.getPos().add(0, target.getHeight() / 2, 0);
+
+		double distance = observerEye.distanceTo(targetCenter);
+		if (distance > 100.0){
+			return false; //max range is 100 blocks
+		}
+
+		// check from raycast result
+		Vec3d toTarget = targetCenter.subtract(observerEye).normalize();
+		Vec3d lookDirection = observer.getRotationVec(1.0F);
+
+		double dotProduct = toTarget.dotProduct(lookDirection);
+		boolean inFOV = dotProduct > 0.95; //about 18deg visual angle
+
+		if (!inFOV) return false;
+
+		// no blocks in the way
+		RaycastContext raycastContext = new RaycastContext(
+				observerEye, targetCenter,
+				RaycastContext.ShapeType.OUTLINE,
+				RaycastContext.FluidHandling.NONE,
+				observer
+		);
+
+		var targetHitResult = observer.getWorld().raycast(raycastContext);
+		return targetHitResult.getType() == HitResult.Type.MISS ||
+				targetHitResult.getPos().distanceTo(targetCenter) < 1.0;
+	}
+
+	private void teleportPlayer(ServerPlayerEntity player, ServerWorld world) {
+		UUID playerId = player.getUuid();
+		long currentTime = System.currentTimeMillis();
+
+		//check tp cooldown
+		if (lastTeleportTimes.containsKey(playerId)) {
+			long lastTeleport = lastTeleportTimes.get(playerId);
+			if (currentTime - lastTeleport < TELEPORT_COOLDOWN) {
+				return; //if still on cooldown
+			}
+		}
+
+		//change last tp
+		lastTeleportTimes.put(playerId, currentTime);
+
+		//chorus fruit random
+		chorusFruitTeleport(player, world);
+	}
+
+	private void chorusFruitTeleport(ServerPlayerEntity player, ServerWorld world) {
+		double originalX = player.getX();
+		double originalY = player.getY();
+		double originalZ = player.getZ();
+
+		//need safe block
+		for (int attempts = 0; attempts < 16; attempts++) {
+			double newX = player.getX() + (random.nextDouble() - 0.5) * 16.0;
+			double newY = Math.max(world.getBottomY(),
+					player.getY() + (random.nextInt(16) - 8));
+			double newZ = player.getZ() + (random.nextDouble() - 0.5) * 16.0;
+
+			//on ground
+			BlockPos targetPos = BlockPos.ofFloored(newX, newY, newZ);
+
+			//check if safe
+			if (isSafeToTeleport(world, targetPos)) {
+				//particles old location
+				world.spawnParticles(ModParticles.ATOM_PARTICLE,
+						newX, newY + 1, newZ,
+						64, 0.5, 1.0, 0.5, 0.1);
+
+				//tp direct
+				Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+				player.teleport(world, newX, newY, newZ, flags, player.getYaw(), player.getPitch());
+
+				//new location
+				world.spawnParticles(ModParticles.ATOM_PARTICLE,
+						newX, newY + 1, newZ,
+						64, 0.5, 1.0, 0.5, 0.1);
+
+				//tp sound
+				world.playSound(null, targetPos, SoundEvents.ITEM_CHORUS_FRUIT_TELEPORT,
+						SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+				break;
+			}
+		}
+	}
+
+	private boolean isSafeToTeleport(ServerWorld world, BlockPos pos) {
+		// Check if there's enough space (2 blocks high)
+		if (!world.getBlockState(pos).isAir() ||
+				!world.getBlockState(pos.up()).isAir()) {
+			return false;
+		}
+
+		// Check if there's a solid block below (within 3 blocks)
+		for (int i = 1; i <= 3; i++) {
+			BlockPos below = pos.down(i);
+			if (!world.getBlockState(below).isAir()) {
+				return true; // Found solid ground
+			}
+		}
+
+		return false; // Would fall into void
+	}
+
+	public static void giveAllElementalConvergenceRecipes(ServerPlayerEntity player){
+		player.unlockRecipes(getRecipesList());
+		LOGGER.info("All recipes were given to");
+	}
+
+	public static List<Identifier> getRecipesList(){
+		List<Identifier> allRecipesList = new ArrayList<Identifier>();
+
+		allRecipesList.add(id("altar_of_convergence"));
+		allRecipesList.add(id("air_magic_eye"));
+		allRecipesList.add(id("bland_magic_eye"));
+		allRecipesList.add(id("blood_convergent_eye"));
+		allRecipesList.add(id("bounding_sequence"));
+		allRecipesList.add(id("coffin"));
+		allRecipesList.add(id("convergent_eye_blast"));
+		allRecipesList.add(id("convergent_eye_furnace"));
+		allRecipesList.add(id("crown"));
+		allRecipesList.add(id("death_magic_eye"));
+		allRecipesList.add(id("earth_magic_eye"));
+		allRecipesList.add(id("epsilon_dust"));
+		allRecipesList.add(id("fire_magic_eye"));
+		allRecipesList.add(id("flower_gateway"));
+		allRecipesList.add(id("gravity_convergent_eye"));
+		allRecipesList.add(id("gravity_shard"));
+		allRecipesList.add(id("halo"));
+		allRecipesList.add(id("holy_convergent_eye"));
+		allRecipesList.add(id("honey_convergent_eye"));
+		allRecipesList.add(id("honey_stick"));
+		allRecipesList.add(id("life_magic_eye"));
+		allRecipesList.add(id("light_magic_eye"));
+		allRecipesList.add(id("limiting_eye"));
+		allRecipesList.add(id("mystic_convergent_eye"));
+		allRecipesList.add(id("mystical_chapter_1"));
+		allRecipesList.add(id("mystical_chapter_2"));
+		allRecipesList.add(id("mystical_energy"));
+		allRecipesList.add(id("portable_beehive"));
+		allRecipesList.add(id("quantum_convergent_eye"));
+		allRecipesList.add(id("rat_convergent_eye"));
+		allRecipesList.add(id("rotten_corpse"));
+		allRecipesList.add(id("schrodinger_cat"));
+		allRecipesList.add(id("shadow_magic_eye"));
+		allRecipesList.add(id("shadowball"));
+		allRecipesList.add(id("steam_convergent_eye"));
+		allRecipesList.add(id("train_whistle"));
+		allRecipesList.add(id("water_magic_eye"));
+
+
+		return allRecipesList;
 	}
 
 }

@@ -22,25 +22,24 @@ import java.util.List;
 public class GameRendererMixin {
 
     @Unique
-    private long worldJoinTime = -1; // Stores when the player joined the world
+    private long worldJoinTime = -1; //stored when joining
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
 
         if (client.player == null || client.world == null) {
-            worldJoinTime = -1; // Reset when not in a world
+            worldJoinTime = -1; //reset when not in a world
             return;
         }
 
-        // If the player just joined, store the current time
+        // store current time
         if (worldJoinTime == -1) {
             worldJoinTime = System.currentTimeMillis();
         }
 
-        // Check if 5 seconds have passed since joining
-        if (System.currentTimeMillis() - worldJoinTime < 5000) {
-            return; // Allow rendering world normally for the first 5 seconds
+        if (System.currentTimeMillis() - worldJoinTime < 10000) {
+            return; //allow rendering for first 10 seconds to try and get out of softlock
         }
 
         if (client.player.hasStatusEffect(ModEffects.FULL_BLINDNESS) && !client.player.hasStatusEffect(StatusEffects.GLOWING)) {
@@ -51,7 +50,7 @@ public class GameRendererMixin {
             drawContext.fill(0, 0, client.getWindow().getScaledWidth(), client.getWindow().getScaledHeight(), 0xFF000000);
             drawContext.getMatrices().pop();
 
-            ci.cancel(); // CANCEL RENDERING. IT CANCELS BEFORE IT CAN PUT MY BLACKSCREEN THO
+            ci.cancel(); // CANCEL RENDERING. IT CANCELS BEFORE IT CAN PUT MY BLACKSCREEN THO. MIGHT NEED TO CHANGE TO NORMAL SUFFOCATION OVERLAY THO
         }
     }
 

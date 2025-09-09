@@ -13,7 +13,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:pitcher_plant"
+            "items": "minecraft:totem_of_undying"
           }
         ]
       },
@@ -29,10 +29,10 @@
     }
   },
   "display": {
-    "description": "Obtain a pitcher plant",
+    "description": "Loot a totem of undying",
     "icon": {
       "count": 1,
-      "id": "minecraft:pitcher_pod"
+      "id": "minecraft:totem_of_undying"
     },
     "title": "Life Level 3"
   },

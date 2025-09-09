@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DCD",
+    "CEC",
+    "DCD"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:end_crystal"
+    },
+    "D": {
+      "item": "elemental-convergence:epsilon_dust"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:mystical_energy",
+    "count": 1
+  }
+}

@@ -33,4 +33,15 @@ public class EntityMixin {
         }
     }
 
+    @Inject(method = "isInsideWall", at = @At("HEAD"), cancellable = true)
+    private void preventQuantumPhasingSuffocation(CallbackInfoReturnable<Boolean> cir) {
+        Entity entity = (Entity) (Object) this;
+
+        if (entity instanceof LivingEntity livingEntity &&
+                livingEntity.hasStatusEffect(ModEffects.QUANTUM_PHASING)) {
+            //if quantum phasing, they arent inside wall.
+            cir.setReturnValue(false);
+        }
+    }
+
 }

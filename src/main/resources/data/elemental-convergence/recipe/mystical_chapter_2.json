@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XWX",
+    "XBX",
+    "XEX"
+  ],
+  "key": {
+    "E": {
+      "item": "minecraft:enchanting_table"
+    },
+    "X": {
+      "item": "minecraft:experience_bottle"
+    },
+    "B": {
+      "item": "minecraft:book"
+    },
+    "W": {
+      "item": "minecraft:wayfinder_armor_trim_smithing_template"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:mystical_chapter_2",
+    "count": 1
+  }
+}

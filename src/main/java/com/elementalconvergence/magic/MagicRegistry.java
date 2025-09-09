@@ -1,19 +1,21 @@
 package com.elementalconvergence.magic;
 
 import com.elementalconvergence.data.IPlayerMiningMixin;
+import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.convergencehandlers.*;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
 import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class MagicRegistry {
     private static final Map<UUID, IMagicHandler[]> playerMagicHandlers = new HashMap<>(); // Map so that each player has a specific magicHandler
@@ -36,6 +38,10 @@ public class MagicRegistry {
         magic_handlers[GravityMagicHandler.GRAVITY_INDEX] = new GravityMagicHandler();
         magic_handlers[SteamMagicHandler.STEAM_INDEX] = new SteamMagicHandler();
         magic_handlers[HolyMagicHandler.HOLY_INDEX] = new HolyMagicHandler();
+        magic_handlers[HoneyMagicHandler.HONEY_INDEX] = new HoneyMagicHandler();
+        magic_handlers[BloodMagicHandler.BLOOD_INDEX] = new BloodMagicHandler();
+        magic_handlers[QuantumMagicHandler.QUANTUM_INDEX] = new QuantumMagicHandler();
+        magic_handlers[MysticMagicHandler.MYSTIC_INDEX] = new MysticMagicHandler();
         //magic_handlers[StarMagicHandler.STAR_INDEX] = new StarMagicHandler(); //star removed
 
         System.out.println("MAGICREGISTRY CREATED");
@@ -86,7 +92,10 @@ public class MagicRegistry {
         ScaleData playerEntityReach = ScaleTypes.ENTITY_REACH.getScaleData(player);
         ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
         ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
+        ScaleData playerAttackSpeed = ScaleTypes.ATTACK_SPEED.getScaleData(player);
         ScaleData playerKnockback = ScaleTypes.KNOCKBACK.getScaleData(player);
+        ScaleData playerMotion = ScaleTypes.MOTION.getScaleData(player);
+        ScaleData playerFlightSpeed = ScaleTypes.FLIGHT.getScaleData(player);
 
         playerHeight.setScale(BASE_SCALE); //Reset player scale
         playerWidth.setScale(BASE_SCALE);
@@ -94,14 +103,38 @@ public class MagicRegistry {
         playerEntityReach.setScale(BASE_SCALE); //Reset player Reach (ENTITY)
         playerHeldItem.setScale(BASE_SCALE); //Reset held item size
         playerAttack.setScale(BASE_SCALE);
+        playerAttackSpeed.setScale(BASE_SCALE);
         playerKnockback.setScale(BASE_SCALE);
+        playerMotion.setScale(BASE_SCALE);
+        playerFlightSpeed.setScale(BASE_SCALE);
 
         ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
         ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
+        ((HoneyMagicHandler)getHandler(player, HoneyMagicHandler.HONEY_INDEX)).resetBeeSkinToggle(); //RESET THE HASSKINON FOR Bee skin
 
         //Resetting the gravity of the player
         GravityChangerAPI.resetGravity(player);
 
+        //RESETTING CREATIVE FLIGHT ABILITY
+        if (player.getAbilities().allowFlying && !player.isCreative()) {
+            player.getAbilities().allowFlying = false;
+            ((ServerPlayerEntity) player).sendAbilitiesUpdate();
+        }
+
         player.clearStatusEffects();
+
+
+        //Clean bee locks
+        PlayerInventory inventory = player.getInventory();
+
+        // check all inv slots
+        for (int i = 0; i < 36; i++) {
+            ItemStack currentStack = inventory.getStack(i);
+
+            // if item is lock we replace
+            if (currentStack.isOf(ModItems.LOCK_ITEM)) {
+                inventory.setStack(i, ItemStack.EMPTY);
+            }
+        }
     }
 }

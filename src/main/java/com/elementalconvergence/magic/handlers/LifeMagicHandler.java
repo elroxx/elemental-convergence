@@ -79,6 +79,7 @@ public class LifeMagicHandler implements IMagicHandler {
             if (groupTPCooldown==0){
                 groupTPCooldown=GROUP_TP_DEFAULT_COOLDOWN;
                 if (mainHand.getItem() instanceof BlockItem blockItem && isFlower(blockItem.getBlock())){
+                        player.getItemCooldownManager().set(mainHand.getItem(), GROUP_TP_DEFAULT_COOLDOWN);
                         boolean success = checkForGateway(player, player.getWorld(), blockItem.getBlock());
                         if (success){
                             mainHand.decrement(1);
@@ -199,7 +200,9 @@ public class LifeMagicHandler implements IMagicHandler {
         int lifeLevel = magicData.getMagicLevel(6);
         if (lifeLevel>=1) {
             growthAuraToggle=!growthAuraToggle;
-            player.sendMessage(Text.of("Growth Aura: " + growthAuraToggle));
+            String growthMsg = "§aGrowth Aura ";
+            growthMsg +=  growthAuraToggle ? "activated!" : "deactived!";
+            player.sendMessage(Text.of(growthMsg), true);
         }
     }
 

@@ -1,14 +1,17 @@
 package com.elementalconvergence.mixin;
 
+import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.effect.ModEffects;
 import com.google.common.base.Objects;
 import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
@@ -39,6 +42,19 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.elementalconvergence.enchantment.ModEnchantments;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 import java.util.Random;
@@ -73,6 +89,9 @@ public abstract class LivingEntityMixin {
     @Shadow public abstract void setAttacker(@Nullable LivingEntity attacker);
     @Shadow @Nullable private LivingEntity attacker;
     //@Shadow public int age;
+
+
+    private static final Identifier STEP_HEIGHT_MODIFIER_ID = ElementalConvergence.id( "high_steps_modifier");
 
     @Inject(method = "onStatusEffectRemoved", at = @At("HEAD"))
     private void onStatusEffectEnd(StatusEffectInstance effect, CallbackInfo ci) {
@@ -213,6 +232,51 @@ public abstract class LivingEntityMixin {
 
             // cancel the rest of the method (awesome)
             ci.cancel();
+        }
+    }
+
+
+    @Inject(method = "onEquipStack", at = @At("TAIL"))
+    private void onEquipStack(EquipmentSlot slot, ItemStack oldStack, ItemStack newStack, CallbackInfo ci) {
+        if (slot == EquipmentSlot.LEGS) {
+            LivingEntity entity = (LivingEntity) (Object) this;
+            updateStepHeight(entity);
+        }
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void onTick(CallbackInfo ci) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+
+        // check 20 ticks to update step height
+        if (entity.age % 20 == 0) {
+            updateStepHeight(entity);
+        }
+    }
+
+    private void updateStepHeight(LivingEntity entity) {
+        //change existing modifier
+        if (entity.getAttributeInstance(EntityAttributes.GENERIC_STEP_HEIGHT) != null) {
+            entity.getAttributeInstance(EntityAttributes.GENERIC_STEP_HEIGHT)
+                    .removeModifier(STEP_HEIGHT_MODIFIER_ID);
+        }
+
+        // verify high steps lvl
+        ItemStack leggings = entity.getEquippedStack(EquipmentSlot.LEGS);
+        RegistryEntry<Enchantment> volcanicEntry = entity.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.HIGH_STEPS);
+        int highStepsLevel = EnchantmentHelper.getLevel(volcanicEntry, leggings);
+
+        if (highStepsLevel > 0) {
+            // add new modifier (doesnt change base steps, so earth can still work properly)
+            float stepHeightIncrease = highStepsLevel * 0.5f;
+            EntityAttributeModifier modifier = new EntityAttributeModifier(
+                    STEP_HEIGHT_MODIFIER_ID,
+                    stepHeightIncrease,
+                    EntityAttributeModifier.Operation.ADD_VALUE
+            );
+
+            entity.getAttributeInstance(EntityAttributes.GENERIC_STEP_HEIGHT)
+                    .addTemporaryModifier(modifier);
         }
     }
 

@@ -1,0 +1,37 @@
+{
+  "parent": "elemental-convergence:shadow_lvl3",
+  "criteria": {
+    "blood_magic_selected": {
+      "conditions": {
+        "requiredMagic": 13
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    },
+    "has_no_magic": {
+      "conditions": {
+        "advancementName": "elemental-convergence:blood_magic_selected",
+        "criterionName": "blood_magic_selected",
+        "parentAdvancement": "elemental-convergence:root"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Convergence of Shadow and Death Magics",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:bat_spawn_egg"
+    },
+    "title": "Blood Convergence Magic"
+  },
+  "requirements": [
+    [
+      "blood_magic_selected"
+    ],
+    [
+      "has_no_magic"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

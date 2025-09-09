@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,part=foot": {
+      "model": "elemental-convergence:block/coffin_foot"
+    },
+    "facing=south,part=foot": {
+      "model": "elemental-convergence:block/coffin_foot",
+      "y": 180
+    },
+    "facing=west,part=foot": {
+      "model": "elemental-convergence:block/coffin_foot",
+      "y": 270
+    },
+    "facing=east,part=foot": {
+      "model": "elemental-convergence:block/coffin_foot",
+      "y": 90
+    },
+    "facing=north,part=head": {
+      "model": "elemental-convergence:block/coffin_head"
+    },
+    "facing=south,part=head": {
+      "model": "elemental-convergence:block/coffin_head",
+      "y": 180
+    },
+    "facing=west,part=head": {
+      "model": "elemental-convergence:block/coffin_head",
+      "y": 270
+    },
+    "facing=east,part=head": {
+      "model": "elemental-convergence:block/coffin_head",
+      "y": 90
+    }
+  }
+}

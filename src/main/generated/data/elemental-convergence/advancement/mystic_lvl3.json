@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:mystic_lvl2",
+  "criteria": {
+    "has_mystic_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:mystic_lvl3",
+        "criterionName": "mystic_criterion_lvl3",
+        "magicIndex": 15
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "mystic_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "elemental-convergence:mystical_energy"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "mystic_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:mystic_lvl3",
+        "criterionName": "mystic_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:mystic_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Craft the mystical energy",
+    "icon": {
+      "count": 1,
+      "id": "elemental-convergence:mystical_energy"
+    },
+    "title": "Mystic Level 3"
+  },
+  "requirements": [
+    [
+      "mystic_criterion_lvl3"
+    ],
+    [
+      "mystic_has_lvl3"
+    ],
+    [
+      "has_mystic_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
