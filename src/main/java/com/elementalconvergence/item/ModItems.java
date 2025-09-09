@@ -174,23 +174,27 @@ public class ModItems {
     }
 
     public static List<RegistryKey<Enchantment>> getEnchantList(int tome){
-        //if (tome==1){
+        if (tome==1){
+            List<RegistryKey<Enchantment>> enchantList = new ArrayList<RegistryKey<Enchantment>>();
+            enchantList.add(ModEnchantments.FANGS);
+            enchantList.add(ModEnchantments.BOUNCY_ARROW);
+            enchantList.add(ModEnchantments.CARRIER);
+            return enchantList;
+        } else {
             List<RegistryKey<Enchantment>> enchantList = new ArrayList<RegistryKey<Enchantment>>();
             enchantList.add(ModEnchantments.LAVA_WALKER);
-            enchantList.add(Enchantments.FLAME);
-            enchantList.add(Enchantments.FIRE_ASPECT);
+            enchantList.add(ModEnchantments.HIGH_STEPS);
+            enchantList.add(ModEnchantments.VOLCANIC_CHARGE);
             return enchantList;
-        //}
+        }
     }
 
     public static List<Integer> getEnchantLevelList(int tome){
-        //if (tome==1){
         List<Integer> lvlList = new ArrayList<Integer>();
         lvlList.add(1);
         lvlList.add(1);
         lvlList.add(1);
         return lvlList;
-        //}
     }
 
     //So that the class exists
