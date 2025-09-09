@@ -177,7 +177,7 @@ public class MysticMagicHandler implements IMagicHandler {
             ItemStack helmet = player.getEquippedStack(EquipmentSlot.HEAD);
             if (rider!=null && !helmet.isEmpty()){
                 //lvl of carrier
-                RegistryEntry<Enchantment> carrierEntry = player.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.VOLCANIC_CHARGE);
+                RegistryEntry<Enchantment> carrierEntry = player.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.CARRIER);
                 int carrierLevel = EnchantmentHelper.getLevel(carrierEntry, helmet);
 
                 //velocity of throw
