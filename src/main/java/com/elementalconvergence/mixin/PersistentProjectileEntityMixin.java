@@ -121,9 +121,8 @@ public abstract class PersistentProjectileEntityMixin {
             double dotProduct = velocity.dotProduct(normal);
             Vec3d reflectedVelocity = velocity.subtract(normal.multiply(2 * dotProduct));
 
-            // dampening
-            double damping = 0.8 - (bounceCount * 0.1);
-            reflectedVelocity = reflectedVelocity.multiply(Math.max(damping, 0.3));
+            // amplification
+            reflectedVelocity = reflectedVelocity.multiply(1.05);
 
             //set new velocity
             arrow.setVelocity(reflectedVelocity);
