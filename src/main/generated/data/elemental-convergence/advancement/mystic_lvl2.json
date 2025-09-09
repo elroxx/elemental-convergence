@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:mystic_lvl1",
+  "criteria": {
+    "has_mystic_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:mystic_lvl2",
+        "criterionName": "mystic_criterion_lvl2",
+        "magicIndex": 15
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "mystic_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "elemental-convergence:mystical_chapter_2"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "mystic_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:mystic_lvl2",
+        "criterionName": "mystic_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:mystic_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Craft the tome 2",
+    "icon": {
+      "count": 1,
+      "id": "elemental-convergence:mystical_chapter_2"
+    },
+    "title": "Mystic Level 2"
+  },
+  "requirements": [
+    [
+      "mystic_criterion_lvl2"
+    ],
+    [
+      "mystic_has_lvl2"
+    ],
+    [
+      "has_mystic_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

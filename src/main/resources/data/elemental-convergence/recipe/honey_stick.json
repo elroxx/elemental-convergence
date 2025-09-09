@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "H",
+    "P",
+    "S"
+  ],
+  "key": {
+    "H": {
+      "item": "minecraft:honey_bottle"
+    },
+    "P": {
+      "tag": "minecraft:planks"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:honey_stick",
+    "count": 1
+  }
+}

@@ -15,7 +15,14 @@
 		"EntityMixin",
 		"ItemStackMixin",
 		"BreadMixin",
-		"EntityAccessor"
+		"EntityAccessor",
+		"InvSlotMixin",
+		"EntityRenderersMixin",
+		"CameraMixin",
+		"InGameOverlayRendererMixin",
+		"TextRendererMixin",
+		"BlockMixin",
+		"PersistentProjectileEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

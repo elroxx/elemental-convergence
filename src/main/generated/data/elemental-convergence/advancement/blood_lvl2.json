@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:blood_lvl1",
+  "criteria": {
+    "blood_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:echo_shard"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "blood_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:blood_lvl2",
+        "criterionName": "blood_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:blood_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "has_blood_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:blood_lvl2",
+        "criterionName": "blood_criterion_lvl2",
+        "magicIndex": 13
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    }
+  },
+  "display": {
+    "description": "Loot an echo shard",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:echo_shard"
+    },
+    "title": "Blood Level 2"
+  },
+  "requirements": [
+    [
+      "blood_criterion_lvl2"
+    ],
+    [
+      "blood_has_lvl2"
+    ],
+    [
+      "has_blood_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

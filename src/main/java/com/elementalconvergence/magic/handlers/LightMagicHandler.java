@@ -67,6 +67,7 @@ public class LightMagicHandler implements IMagicHandler {
         if (lightLevel>=1 && (mainHand.isOf(Items.GLOW_INK_SAC) ||  offHand.isOf(Items.GLOW_INK_SAC))&& glowCooldown==0){
             //cooldown
             glowCooldown=GLOW_DEFAULT_COOLDOWN;
+            player.getItemCooldownManager().set(Items.GLOW_INK_SAC, GLOW_DEFAULT_COOLDOWN);
 
             //consume an item
             if (!player.getAbilities().creativeMode) {
@@ -258,7 +259,7 @@ public class LightMagicHandler implements IMagicHandler {
 
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
-
+        player.kill();
     }
 
     private boolean hasNearbyGlowingEntity(PlayerEntity player) {

@@ -94,6 +94,8 @@ public class AirMagicHandler implements IMagicHandler {
                     }
 
                     windballCooldown=DEFAULT_WINDBALL_COOLDOWN;
+
+                    player.getItemCooldownManager().set(Items.FEATHER, DEFAULT_WINDBALL_COOLDOWN);
                 }
             }
         }

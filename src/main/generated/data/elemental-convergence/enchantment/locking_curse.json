@@ -1,0 +1,32 @@
+{
+  "anvil_cost": 10,
+  "description": {
+    "translate": "enchantment.elemental-convergence.locking_curse"
+  },
+  "effects": {
+    "minecraft:post_attack": [
+      {
+        "affected": "victim",
+        "effect": {
+          "type": "elemental-convergence:locking_curse_effect",
+          "amount": 1.0
+        },
+        "enchanted": "attacker"
+      }
+    ]
+  },
+  "max_cost": {
+    "base": 50,
+    "per_level_above_first": 0
+  },
+  "max_level": 1,
+  "min_cost": {
+    "base": 50,
+    "per_level_above_first": 0
+  },
+  "slots": [
+    "any"
+  ],
+  "supported_items": "#minecraft:enchantable/vanishing",
+  "weight": 1
+}

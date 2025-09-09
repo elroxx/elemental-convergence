@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:honey_lvl2",
+  "criteria": {
+    "has_honey_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:honey_lvl3",
+        "criterionName": "honey_criterion_lvl3",
+        "magicIndex": 12
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "honey_criterion_lvl3": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:pitcher_plant"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "honey_has_lvl3": {
+      "conditions": {
+        "advancementName": "elemental-convergence:honey_lvl3",
+        "criterionName": "honey_criterion_lvl3",
+        "parentAdvancement": "elemental-convergence:honey_lvl2"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Harvest a pitcher plant",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:pitcher_pod"
+    },
+    "title": "Honey Level 3"
+  },
+  "requirements": [
+    [
+      "honey_criterion_lvl3"
+    ],
+    [
+      "honey_has_lvl3"
+    ],
+    [
+      "has_honey_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

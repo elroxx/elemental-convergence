@@ -5,8 +5,11 @@ import com.elementalconvergence.ElementalConvergence;
 //import com.elementalconvergence.item.BlackSnowballItem;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.MapColor;
+import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
@@ -39,6 +42,20 @@ public class ModBlocks {
             .dropsNothing()
             .strength(-1.0f, 3600000.0f)
     ));
+
+    public static final Block REINFORCED_HONEYCOMB = register("reinforced_honeycomb_block", new ReinforcedHoneycombBlock(Block.Settings.create()
+            .strength(-1.0f, 3600000.0f)
+            .dropsNothing()
+            .sounds(BlockSoundGroup.CORAL)
+            .dropsNothing()
+            .mapColor(MapColor.ORANGE)
+            .pistonBehavior(PistonBehavior.BLOCK)
+    ));
+
+    public static final Block COFFIN_BLOCK = register("coffin", new CoffinBlock(AbstractBlock.Settings.copy(Blocks.RED_BED)));
+
+    public static final Block BRITTLE_OBSIDIAN = register("brittle_obsidian", new BrittleObsidianBlock(Block.Settings.create().requiresTool().strength(50.0F, 1200.0F).dropsNothing().mapColor(MapColor.PURPLE)));
+
 
 
     public static <T extends Block> T register(String name, T block) {

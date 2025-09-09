@@ -2,6 +2,7 @@ package com.elementalconvergence.magic.handlers;
 
 import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
+import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -41,12 +42,15 @@ public class FireMagicHandler implements IMagicHandler {
     private int fireResCooldown=50;
     private int waterHurtCooldown=10;
     private int fireIndex=2; //just to keep track
-    private static final int DEFAULT_DIMSWAP_COOLDOWN=50; //2.5 seconds
+    private static final int DEFAULT_DIMSWAP_COOLDOWN=20; //1 second
     private int dimensionSwapCooldown=0;
     private static final int DEFAULT_FIREBALL_COOLDOWN=5; //0.25 seconds
     private int fireballCooldown=0;
     private static final int DEFAULT_NAPALM_COOLDOWN=20*60; //1*60 seconds (so we have 60 seconds aka 1 minute)
     private int napalmCooldown=0;
+
+    private static final int DEFAULT_FURNACE_COOLDOWN=10;
+    private int furnaceCooldown=0;
 
 
     @Override //Spell lvl 1 here
@@ -84,7 +88,11 @@ public class FireMagicHandler implements IMagicHandler {
 
                     player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
                             SoundEvents.ITEM_FIRECHARGE_USE, SoundCategory.PLAYERS, 1.0F, 1.0F);
+
                     fireballCooldown=DEFAULT_FIREBALL_COOLDOWN;
+
+                    player.getItemCooldownManager().set(Items.COAL, DEFAULT_FIREBALL_COOLDOWN);
+                    player.getItemCooldownManager().set(Items.CHARCOAL, DEFAULT_FIREBALL_COOLDOWN);
                 }
             }
         }
@@ -130,6 +138,9 @@ public class FireMagicHandler implements IMagicHandler {
         }
         if (napalmCooldown>0){
             napalmCooldown--;
+        }
+        if (furnaceCooldown>0){
+            furnaceCooldown--;
         }
     }
 
@@ -254,8 +265,23 @@ public class FireMagicHandler implements IMagicHandler {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int fireLevel = magicData.getMagicLevel(2);
-        if (fireLevel>=3) {
-            if (napalmCooldown==0){
+        if (fireLevel>=3 && furnaceCooldown==0) {
+
+            if (player.hasStatusEffect(ModEffects.FURNACE)) {
+                player.removeStatusEffect(ModEffects.FURNACE);
+
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS,0.6f, 1.0f);
+            }
+            else{
+                player.addStatusEffect(new StatusEffectInstance(ModEffects.FURNACE, -1, 0, true, false ,true));
+                player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                        SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS,0.6f, 1.0f);
+            }
+
+
+            //OLD LEVEL 3
+            /*if (napalmCooldown==0){
                 napalmCooldown = DEFAULT_NAPALM_COOLDOWN;
                 int radius=15;
                 int innerRadius=5;
@@ -333,7 +359,7 @@ public class FireMagicHandler implements IMagicHandler {
                         0.1
                 );
                 
-            }
+            }*/
         }
 
     }

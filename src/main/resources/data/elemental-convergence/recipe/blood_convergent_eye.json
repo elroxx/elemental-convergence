@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "HES",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:redstone_block"
+    },
+    "G": {
+      "item": "minecraft:red_glazed_terracotta"
+    },
+    "S": {
+      "item": "elemental-convergence:shadow_magic_eye"
+    },
+    "H": {
+      "item": "elemental-convergence:death_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:blood_convergent_eye",
+    "count": 1
+  }
+}
