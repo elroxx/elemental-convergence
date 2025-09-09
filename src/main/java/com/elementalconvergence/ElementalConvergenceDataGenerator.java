@@ -459,6 +459,32 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//QUANTUM LVL 3
 			AdvancementEntry quantumLevel3 = generateQuantumLevelsAdvancements(quantumSelectedCN, quantumSelectedAdvName, quantumSelectedAdvancement, consumer);
 
+			//MYSTIC MAGIC SELECTED
+			String mysticSelectedCN = "mystic_magic_selected";
+			String mysticSelectedAdvName = ElementalConvergence.MOD_ID + ":mystic_magic_selected";
+			AdvancementEntry mysticSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.END_CRYSTAL,
+							Text.literal("Mystic Convergence Magic"),
+							Text.literal("Convergence of Fire and Earth Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(mysticSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							15)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName, mysticSelectedCN, mysticSelectedAdvName)))
+					.parent(fireLevel3)
+					.build(consumer, mysticSelectedAdvName);
+
+			//MYSTIC LVL 1
+			//MYSTIC LVL 2
+			//MYSTIC LVL 3
+			AdvancementEntry mysticLevel3 = generateMysticLevelsAdvancements(mysticSelectedCN, mysticSelectedAdvName, mysticSelectedAdvancement, consumer);
+
 		}
 
 		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
@@ -1704,6 +1730,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return quantumAdv3;
+		}
+
+		public AdvancementEntry generateMysticLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = MysticMagicHandler.MYSTIC_INDEX;
+			String goodMagicPicked = "has_mystic_selected_concurrent";
+			String achievementTitle = "Mystic Level ";
+			String CN = "mystic_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":mystic_lvl";
+			String haslvl = "mystic_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry mysticAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.MYSTICAL_CHAPTER_1,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft the tome 1"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.MYSTICAL_CHAPTER_1))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = mysticAdv1;
+			lvl = 2;
+			AdvancementEntry mysticAdv2 = Advancement.Builder.create()
+					.display(
+							ModItems.MYSTICAL_CHAPTER_2,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Craft the tome 2"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.MYSTICAL_CHAPTER_2))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = mysticAdv2;
+			lvl = 3;
+			AdvancementEntry mysticAdv3 = Advancement.Builder.create()
+					.display(
+							ModItems.MYSTICAL_ENERGY,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft the mystical energy"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.MYSTICAL_ENERGY))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return mysticAdv3;
 		}
 
 	}
