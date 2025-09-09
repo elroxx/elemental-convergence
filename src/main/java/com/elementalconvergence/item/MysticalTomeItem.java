@@ -39,29 +39,21 @@ public class MysticalTomeItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         if (!world.isClient && user instanceof ServerPlayerEntity serverPlayer) {
-            //check if lvl is the required one
             IMagicDataSaver dataSaver = (IMagicDataSaver) serverPlayer;
             MagicData magicData = dataSaver.getMagicData();
             int mysticLevel = magicData.getMagicLevel(MYSTIC_INDEX);
 
-            if (mysticLevel>=this.requiredMysticLvl && magicData.getSelectedMagic()==MYSTIC_INDEX) {
-
-                //need to check if lvl 30 or not
-                int xpLvl = serverPlayer.experienceLevel;
-                if (xpLvl<30){
+            if (mysticLevel >= this.requiredMysticLvl && magicData.getSelectedMagic() == MYSTIC_INDEX) {
+                if (serverPlayer.experienceLevel < 30) {
                     serverPlayer.sendMessage(Text.of("Not level 30!"), true);
-                }
-                else {
+                } else {
+                    // open screen, no params needed
+                    serverPlayer.openHandledScreen(MysticalTomeScreenHandler.Factory.INSTANCE);
 
-                    //open custom screen
-                    serverPlayer.openHandledScreen(new MysticalTomeScreenHandler.Factory(
-                            this.enchantments,
-                            this.enchantmentLevels
-                    ));
-
-                    //playsound (lectern book)
-                    serverPlayer.getServerWorld().playSound(null, user.getX(), user.getY(), user.getZ(),
-                            SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS,1.0f, 1.0f);
+                    serverPlayer.getServerWorld().playSound(
+                            null, user.getX(), user.getY(), user.getZ(),
+                            SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.PLAYERS, 1.0f, 1.0f
+                    );
 
                     return TypedActionResult.success(user.getStackInHand(hand));
                 }
