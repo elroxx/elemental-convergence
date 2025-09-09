@@ -24,11 +24,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
 import net.minecraft.particle.BlockStateParticleEffect;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -164,6 +166,60 @@ public class MysticMagicHandler implements IMagicHandler {
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
 
+        //carrier throw
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int mysticLevel = magicData.getMagicLevel(MYSTIC_INDEX);
+        if (mysticLevel>=1 && player.hasPassengers()){
+            PlayerEntity rider = (PlayerEntity) player.getFirstPassenger();
+
+            ItemStack helmet = player.getEquippedStack(EquipmentSlot.HEAD);
+            if (rider!=null && !helmet.isEmpty()){
+                //lvl of carrier
+                RegistryEntry<Enchantment> carrierEntry = player.getWorld().getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(ModEnchantments.VOLCANIC_CHARGE);
+                int carrierLevel = EnchantmentHelper.getLevel(carrierEntry, helmet);
+
+                //velocity of throw
+                double power = carrierLevel*10+5;
+                Vec3d look = player.getRotationVec(1.0F).normalize();
+
+                // change rider veloc
+                rider.stopRiding();
+                if (player instanceof ServerPlayerEntity serverPlayer) {
+                    serverPlayer.networkHandler.sendPacket(new EntityPassengersSetS2CPacket(player));
+                } //so that everybody can see they drop.
+
+                rider.stopRiding();
+
+                // schedule velocity for next tick
+                rider.getServer().execute(() -> {
+                    rider.addVelocity(look.x * power, look.y * power + 0.5, look.z * power); // small upward push
+                    rider.velocityModified = true; // need or velocity isnt updated properly
+                    rider.velocityDirty = true;
+                });
+
+
+                ServerWorld world = (ServerWorld) player.getWorld();
+                // playsound
+                world.playSound(
+                        null,
+                        player.getBlockPos(),
+                        SoundEvents.ENTITY_PLAYER_ATTACK_KNOCKBACK,
+                        SoundCategory.PLAYERS,
+                        1.0f, // volume
+                        1.0f  // pitch
+                );
+
+                world.playSound(
+                        null,
+                        player.getBlockPos(),
+                        SoundEvents.ENTITY_PLAYER_ATTACK_SWEEP,
+                        SoundCategory.PLAYERS,
+                        0.6f,
+                        1.2f
+                );
+            }
+        }
     }
 
     @Override

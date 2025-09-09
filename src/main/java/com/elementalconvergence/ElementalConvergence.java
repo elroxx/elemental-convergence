@@ -69,6 +69,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntityPassengersSetS2CPacket;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.Registries;
@@ -263,6 +264,9 @@ public class ElementalConvergence implements ModInitializer {
 					int carrierLevel = EnchantmentHelper.getLevel(carrierEntry, helmet);
 					if (player.isSneaking() && !player.equals(target) && carrierLevel>=1){
 						target.startRiding(player, true);
+						if (player instanceof ServerPlayerEntity serverPlayer) {
+							serverPlayer.networkHandler.sendPacket(new EntityPassengersSetS2CPacket(player));
+						}
 					}
 				}
 			}
