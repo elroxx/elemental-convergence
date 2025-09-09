@@ -233,6 +233,9 @@ public class ElementalConvergence implements ModInitializer {
 			}
 		});
 
+		//pretty much only for carrier
+		ServerTickEvents.END_WORLD_TICK.register(TaskScheduler::tick);
+
 
 		//BLOCK BREAK
 		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, entity) -> {

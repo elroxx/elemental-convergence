@@ -6,6 +6,7 @@ import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
+import com.elementalconvergence.networking.TaskScheduler;
 import com.terraformersmc.modmenu.util.mod.Mod;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -180,7 +181,7 @@ public class MysticMagicHandler implements IMagicHandler {
                 int carrierLevel = EnchantmentHelper.getLevel(carrierEntry, helmet);
 
                 //velocity of throw
-                double power = carrierLevel*10+5;
+                double power = carrierLevel*0.5;
                 Vec3d look = player.getRotationVec(1.0F).normalize();
 
                 // change rider veloc
@@ -192,8 +193,8 @@ public class MysticMagicHandler implements IMagicHandler {
                 rider.stopRiding();
 
                 // schedule velocity for next tick
-                rider.getServer().execute(() -> {
-                    rider.addVelocity(look.x * power, look.y * power + 0.5, look.z * power); // small upward push
+                TaskScheduler.runNextTick((ServerWorld) player.getWorld(), () -> {
+                    rider.addVelocity(look.x * power, look.y * power + 1, look.z * power); // small upward push
                     rider.velocityModified = true; // need or velocity isnt updated properly
                     rider.velocityDirty = true;
                 });
