@@ -86,10 +86,9 @@ public class BlockMixin {
     public void onEntityLand(BlockView blockView, Entity entity, CallbackInfo callbackInfo) {
         if(entity instanceof LivingEntity livingEntity && livingEntity.getVelocity().y < -0.23 && !livingEntity.isSneaking()) {
             if( livingEntity.hasStatusEffect(ModEffects.BOUNCY)) {
-                System.out.println(livingEntity.getVelocity().y);
                 livingEntity.setVelocity(livingEntity.getVelocity().multiply(1F, -0.9,1F));
                 livingEntity.velocityModified=true;
-                livingEntity.getWorld().playSound(null, livingEntity.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.PLAYERS, 1.0F, 0.5F);
+                livingEntity.getWorld().playSound(null, livingEntity.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.PLAYERS, 1.0F, 1F);
                 callbackInfo.cancel();
                 return;
             }
