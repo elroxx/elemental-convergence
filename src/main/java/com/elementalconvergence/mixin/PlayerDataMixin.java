@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
@@ -151,6 +152,14 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
         }
 
         return experience;
+    }
+
+    @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
+    private void fallDamageBouncy(float fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (player.hasStatusEffect(ModEffects.BOUNCY) && !player.isSneaking()){
+            cir.setReturnValue(false);
+        }
     }
 
 }

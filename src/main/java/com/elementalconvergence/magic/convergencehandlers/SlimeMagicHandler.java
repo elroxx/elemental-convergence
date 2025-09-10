@@ -53,8 +53,6 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class SlimeMagicHandler implements IMagicHandler {
     public static final int SLIME_INDEX= (BASE_MAGIC_ID.length-1)+9;
 
-    public static final float SLIME_GRAVITY = 0.001f; //to remove fall damage as much as possible
-
     public static final int LEAP_DEFAULT_COOLDOWN = 3*20; //3 seconds
     private int leapCooldown=0;
 
@@ -77,37 +75,9 @@ public class SlimeMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
-        //buff
-        Vec3d velocity = player.getVelocity();
-
-        //ground bounce
-        /*if (player.isOnGround() && velocity.y < -0.1 && !player.isSneaking()) {
-            System.out.println(velocity.y);
-            double bounceFactor = 1.0;
-            player.setVelocity(velocity.x, -velocity.y * bounceFactor, velocity.z);
-            player.velocityModified = true;
-        }*/
-
-        //wall bounce
-        if (Math.abs(velocity.x) > 0.1 || Math.abs(velocity.z) > 0.1) {
-            BlockPos pos = player.getBlockPos();
-            World world = player.getWorld();
-            if (world.getBlockState(pos.offset(getDirectionFromVelocity(velocity))).isSolidBlock(world, pos)) {
-                player.setVelocity(-velocity.x * 0.8, velocity.y, -velocity.z * 0.8);
-                player.velocityModified = true;
-            }
-        }
-
-        //debuff
-        /*if (player.isOnGround()) {
-            Vec3d vel = player.getVelocity();
-            player.setVelocity(vel.multiply(0.6, 1.0, 0.6)); //slower horizontal movement
-        }*/
-
-        //no fall damage
-        double currentgStrength = GravityChangerAPI.getBaseGravityStrength(player);
-        if (Math.abs(currentgStrength-SLIME_GRAVITY)>=0.005){
-            GravityChangerAPI.setBaseGravityStrength(player, SLIME_GRAVITY);
+        //passive
+        if (!player.hasStatusEffect(ModEffects.BOUNCY)){
+            player.addStatusEffect(new StatusEffectInstance(ModEffects.BOUNCY, -1, 0, false, false, false));
         }
 
 
@@ -182,7 +152,7 @@ public class SlimeMagicHandler implements IMagicHandler {
         int slimeLevel = magicData.getMagicLevel(SLIME_INDEX);
         if (slimeLevel>=2 && player.isOnGround() && leapCooldown==0) {
             Vec3d look = player.getRotationVec(1.0F);
-            double leapStrength = 2.5;
+            double leapStrength = 3;
 
             Vec3d velocity = new Vec3d(look.x * leapStrength, 1.5, look.z * leapStrength);
             player.setVelocity(velocity);
