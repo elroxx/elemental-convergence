@@ -56,11 +56,12 @@ public class SlimeMagicHandler implements IMagicHandler {
     public static final int LEAP_DEFAULT_COOLDOWN = 3*20; //3 seconds
     private int leapCooldown=0;
 
-    public static final int REGAIN_SIZE_FROM_SPLIT_TIMER_MAX=2500; //2:05 minutes
+    public static final int REGAIN_SIZE_FROM_SPLIT_TIMER_MAX=2500; //2:05 minutes 2500
     private int regainSizeTimer=0;
     public static final float BASE_SIZE = 1.0f;
     public static final float SPLIT_SIZE = 0.5f;
     private final float SIZE_INCREMENT = SPLIT_SIZE/REGAIN_SIZE_FROM_SPLIT_TIMER_MAX;
+    private final int SIZE_INCREMENT_INTERVAL = 50;
 
 
     @Override
@@ -88,18 +89,26 @@ public class SlimeMagicHandler implements IMagicHandler {
 
         if (regainSizeTimer>0){
             regainSizeTimer--;
-
             //scaling up logic goes here.
-
-
 
             if (regainSizeTimer==0){
                 ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
                 ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
-                playerHeight.setBaseScale(BASE_SIZE);
-                playerWidth.setBaseScale(BASE_SIZE);
+                playerHeight.setScale(BASE_SIZE);
+                playerWidth.setScale(BASE_SIZE);
 
-                //playsound as well (like an egg pop or something like that to say that its done and everything can be reused again)
+                //regained full size
+                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SNIFFER_EGG_PLOP, SoundCategory.PLAYERS, 1.0F, 1.5F);
+            }
+            else if (regainSizeTimer%SIZE_INCREMENT_INTERVAL==0){
+                //regrow a bit every 2.5 seconds
+                ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
+                ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+                int flippedIndex=REGAIN_SIZE_FROM_SPLIT_TIMER_MAX-regainSizeTimer;
+                float sizeToChange = flippedIndex*SIZE_INCREMENT+0.5f;
+                playerHeight.setScale(sizeToChange);
+                playerWidth.setScale(sizeToChange);
+
             }
         }
 
@@ -134,7 +143,10 @@ public class SlimeMagicHandler implements IMagicHandler {
 
             ServerWorld world = (ServerWorld) player.getWorld();
 
-
+            ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
+            ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+            playerHeight.setScale(SPLIT_SIZE);
+            playerWidth.setScale(SPLIT_SIZE);
 
             //spawning minion part
             SlimeEntity slime1 = new SlimeEntity(EntityType.SLIME, world);
@@ -150,7 +162,7 @@ public class SlimeMagicHandler implements IMagicHandler {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int slimeLevel = magicData.getMagicLevel(SLIME_INDEX);
-        if (slimeLevel>=2 && player.isOnGround() && leapCooldown==0) {
+        if (slimeLevel>=2 && leapCooldown==0) {
             Vec3d look = player.getRotationVec(1.0F);
             double leapStrength = 3;
 
@@ -158,10 +170,6 @@ public class SlimeMagicHandler implements IMagicHandler {
             player.setVelocity(velocity);
             player.velocityModified = true;
 
-            ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
-            ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
-            playerHeight.setBaseScale(SPLIT_SIZE);
-            playerWidth.setBaseScale(SPLIT_SIZE);
 
 
             // playsound+particles
