@@ -84,10 +84,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
+import net.minecraft.text.TextColor.*;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -109,6 +107,8 @@ import virtuoel.pehkui.api.PehkuiConfig;
 import java.util.*;
 
 import static com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler.QUANTUM_INDEX;
+import static net.minecraft.text.TextColor.fromFormatting;
+import static net.minecraft.text.TextColor.fromRgb;
 
 public class ElementalConvergence implements ModInitializer {
 	public static final String MOD_ID = "elemental-convergence";
@@ -134,6 +134,32 @@ public class ElementalConvergence implements ModInitializer {
 		System.arraycopy(CONVERGENCE_MAGIC_ID, 0, FULL_MAGIC_ID, BASE_MAGIC_ID.length, CONVERGENCE_MAGIC_ID.length);
 	}
 
+	public static final TextColor[] FULL_MAGIC_COLORS = {
+			fromRgb(0x543c2b), fromFormatting(Formatting.GRAY), fromFormatting(Formatting.RED), fromFormatting(Formatting.BLUE), fromFormatting(Formatting.BLACK), fromFormatting(Formatting.GREEN), fromFormatting(Formatting.DARK_GRAY),
+			fromRgb(0xc7784e), fromRgb(0xb270dc), fromRgb(0x94b0af), fromRgb(0xffffaa), fromFormatting(Formatting.GOLD), fromFormatting(Formatting.DARK_RED), fromRgb(0x295d72), fromFormatting(Formatting.DARK_PURPLE), fromRgb(0x75ba6b)
+	};
+	/*
+	default: white - mc
+
+	earth: dirt brown - custom
+	air: gray - mc
+	fire: red - mc
+	water: blue - mc
+	Shadow: black - mc
+	Light: yellow - mc
+	Life: green - mc
+	Death: dark gray - mc
+
+	Plague: rat brown - custom
+	Gravity: lila purple - custom
+	Steam: steam blue - custom
+	Holy: light yellow - custom
+	Honey: gold - mc
+	Blood: dark red - mc
+	Quantum: favourite blue - custom
+	Mystic: dark purple - mc
+	Slime: slime green - custom
+	 */
 
 	public static ArrayList<String> deathList = new ArrayList<>(); //THEY ARE INITIALIZED AUTOMATICALLY
 	public static HashMap<String, DeathTuple> deathMap = new HashMap<>();
