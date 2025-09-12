@@ -4,6 +4,7 @@ import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.enchantment.ModEnchantments;
+import com.elementalconvergence.entity.MinionSlimeEntity;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import com.elementalconvergence.networking.TaskScheduler;
@@ -58,9 +59,10 @@ public class SlimeMagicHandler implements IMagicHandler {
 
     public static final int REGAIN_SIZE_FROM_SPLIT_TIMER_MAX=2500; //2:05 minutes 2500
     private int regainSizeTimer=0;
+    private float sizeBeforeSplit = 1.0f;
+
     public static final float BASE_SIZE = 1.0f;
     public static final float SPLIT_SIZE = 0.5f;
-    private final float SIZE_INCREMENT = SPLIT_SIZE/REGAIN_SIZE_FROM_SPLIT_TIMER_MAX;
     private final int SIZE_INCREMENT_INTERVAL = 50;
 
 
@@ -87,28 +89,32 @@ public class SlimeMagicHandler implements IMagicHandler {
             leapCooldown--;
         }
 
-        if (regainSizeTimer>0){
+        if (regainSizeTimer > 0){
             regainSizeTimer--;
-            //scaling up logic goes here.
 
-            if (regainSizeTimer==0){
+
+
+            if (regainSizeTimer == 0){
                 ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
                 ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+
                 playerHeight.setScale(BASE_SIZE);
                 playerWidth.setScale(BASE_SIZE);
-
-                //regained full size
                 player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SNIFFER_EGG_PLOP, SoundCategory.PLAYERS, 1.0F, 1.5F);
             }
-            else if (regainSizeTimer%SIZE_INCREMENT_INTERVAL==0){
-                //regrow a bit every 2.5 seconds
+            else if (regainSizeTimer % SIZE_INCREMENT_INTERVAL == 0){
+                // how much of timer has elapsed
+                int elapsedTime = REGAIN_SIZE_FROM_SPLIT_TIMER_MAX - regainSizeTimer;
+                float progress = (float) elapsedTime / REGAIN_SIZE_FROM_SPLIT_TIMER_MAX;
+
+                //linear interpolation towards normal size again
+                float currentSize = sizeBeforeSplit + (BASE_SIZE - sizeBeforeSplit) * progress;
+
                 ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
                 ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
-                int flippedIndex=REGAIN_SIZE_FROM_SPLIT_TIMER_MAX-regainSizeTimer;
-                float sizeToChange = flippedIndex*SIZE_INCREMENT+0.5f;
-                playerHeight.setScale(sizeToChange);
-                playerWidth.setScale(sizeToChange);
 
+                playerHeight.setScale(currentSize);
+                playerWidth.setScale(currentSize);
             }
         }
 
@@ -139,21 +145,45 @@ public class SlimeMagicHandler implements IMagicHandler {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int slimeLevel = magicData.getMagicLevel(SLIME_INDEX);
-        if (slimeLevel>=1 && regainSizeTimer==0){
 
+        if (slimeLevel >= 1 && regainSizeTimer == 0){
             ServerWorld world = (ServerWorld) player.getWorld();
 
+            //get current player size
             ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
             ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
-            playerHeight.setScale(SPLIT_SIZE);
-            playerWidth.setScale(SPLIT_SIZE);
+            float currentSize = playerHeight.getScale();
 
-            //spawning minion part
-            SlimeEntity slime1 = new SlimeEntity(EntityType.SLIME, world);
-            world.spawnEntity(slime1);
+            // new size after split
+            float newSize = currentSize / 2.0f;
+            playerHeight.setScale(newSize);
+            playerWidth.setScale(newSize);
 
-            //playsound + particles
-            regainSizeTimer=REGAIN_SIZE_FROM_SPLIT_TIMER_MAX;
+            // slime minion
+            MinionSlimeEntity slimeMinion = new MinionSlimeEntity(EntityType.SLIME, world);
+
+            //minion pos
+            Vec3d playerPos = player.getPos();
+            slimeMinion.setPos(playerPos.x + 1.0, playerPos.y, playerPos.z);
+
+            //change minion size
+            slimeMinion.setMinionSize(newSize);
+
+            // new owner
+            slimeMinion.setOwner(player);
+
+            // spawned
+            world.spawnEntity(slimeMinion);
+
+            // playsound+particles
+            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_STEP, SoundCategory.PLAYERS, 1.0F, 0.8F);
+            ((ServerWorld) player.getWorld()).spawnParticles(ParticleTypes.ITEM_SLIME, player.getX(), player.getY() + 1, player.getZ(), 20, 0.5, 0.5, 0.5, 0.1);
+
+            // only start cooldown if below base_size
+            if (newSize < BASE_SIZE) {
+                regainSizeTimer = REGAIN_SIZE_FROM_SPLIT_TIMER_MAX;
+                sizeBeforeSplit = newSize; //store the size that was before for scaling up computations
+            }
         }
     }
 
