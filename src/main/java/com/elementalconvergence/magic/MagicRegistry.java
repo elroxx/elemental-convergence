@@ -6,12 +6,15 @@ import com.elementalconvergence.magic.convergencehandlers.*;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
 import gravity_changer.api.GravityChangerAPI;
+import net.minecraft.entity.SkinOverlayOwner;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
+import org.samo_lego.fabrictailor.command.SkinCommand;
+import org.samo_lego.fabrictailor.util.SkinFetcher;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
@@ -109,7 +112,12 @@ public class MagicRegistry {
         playerMotion.setScale(BASE_SCALE);
         playerFlightSpeed.setScale(BASE_SCALE);
 
-        ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
+
+        //((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
+        //((TailoredPlayer) player).fabrictailor_reloadSkin();
+        //((TailoredPlayer) player).
+        resetPlayerSkin(player);
+
         ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
         ((HoneyMagicHandler)getHandler(player, HoneyMagicHandler.HONEY_INDEX)).resetBeeSkinToggle(); //RESET THE HASSKINON FOR Bee skin
 
@@ -136,6 +144,18 @@ public class MagicRegistry {
             if (currentStack.isOf(ModItems.LOCK_ITEM)) {
                 inventory.setStack(i, ItemStack.EMPTY);
             }
+        }
+    }
+
+
+    public static void resetPlayerSkin(PlayerEntity player){
+        String name = player.getDisplayName().getString();
+        String value = SkinFetcher.fetchSkinByName(name).value();
+        String signature = SkinFetcher.fetchSkinByName(name).signature();
+        TailoredPlayer tailoredPlayer = (TailoredPlayer) player;
+
+        if (value!=null && signature!=null){
+            tailoredPlayer.fabrictailor_setSkin(value, signature, true);
         }
     }
 }

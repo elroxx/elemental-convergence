@@ -167,10 +167,7 @@ public class ElementalConvergence implements ModInitializer {
 	private static Random random = new Random();
 	private static final int DEATH_PARTICLES_COUNT=4; //So either no particles, 1 particle or 2 particles
 
-	// Keybindings
-	private static KeyBinding primarySpellKb;
-	private static KeyBinding secondarySpellKb;
-	private static KeyBinding tertiarySpellKb;
+
 
 	//Section for quantum debuff/teleportation part
 	private static final Map<UUID, Long> lastTeleportTimes = new HashMap<>();
@@ -199,7 +196,6 @@ public class ElementalConvergence implements ModInitializer {
 		//Basic Initialization
 		ModBlocks.initialize(); //Blocks
 		ModItems.initialize(); //Items
-		registerKeybindings(); //Keybinds
 		ModEntities.initialize(); //Entities
 		ModEffects.initialize();
 		ModCriterions.initialize(); //Criterions for advancements
@@ -425,53 +421,6 @@ public class ElementalConvergence implements ModInitializer {
 		});
 	}
 
-	private void registerKeybindings() {
-		//
-		primarySpellKb = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key." + MOD_ID + ".primary_spell",
-				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_Z,
-				"category." + MOD_ID + ".spells"
-		));
-
-		secondarySpellKb = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key." + MOD_ID + ".secondary_spell",
-				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_X,
-				"category." + MOD_ID + ".spells"
-		));
-
-		tertiarySpellKb = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key." + MOD_ID + ".tertiary_spell",
-				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_C,
-				"category." + MOD_ID + ".spells"
-		));
-
-		// TICK EVENTS FOR KEYPRESSES
-		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-			if (primarySpellKb.wasPressed()) {
-				handleSpellKey(1);
-			}
-			if (secondarySpellKb.wasPressed()) {
-				handleSpellKey(2);
-			}
-			if (tertiarySpellKb.wasPressed()) {
-				handleSpellKey(3);
-			}
-		});
-	}
-
-	private void handleSpellKey(int spellNumber) {
-		LOGGER.info("Spell key " + spellNumber + " got pressed"); // FOR TESTING PURPOSES
-		if (!(spellNumber == 1 || spellNumber == 2 || spellNumber == 3)) {
-			System.out.println("Error: Wrong spellkey number somehow?");
-			return;
-		}
-
-		// Send packet to server asking for the  spell cast payload
-		ClientPlayNetworking.send(new SpellCastPayload(spellNumber));
-	}
 
 
 	public static Identifier id(String path){
