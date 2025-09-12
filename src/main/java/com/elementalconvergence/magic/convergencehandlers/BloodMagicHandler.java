@@ -45,7 +45,7 @@ import virtuoel.pehkui.api.ScaleTypes;
 import java.util.*;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
-import static com.elementalconvergence.magic.MagicRegistry.resetPlayerSkin;
+import static com.elementalconvergence.data.SkinUtils.resetPlayerSkin;
 
 public class BloodMagicHandler implements IMagicHandler {
     public static final int BLOOD_INDEX= (BASE_MAGIC_ID.length-1)+6;

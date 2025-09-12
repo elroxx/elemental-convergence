@@ -51,7 +51,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import static com.elementalconvergence.ElementalConvergence.hasAdvancement;
-import static com.elementalconvergence.magic.MagicRegistry.resetPlayerSkin;
+import static com.elementalconvergence.data.SkinUtils.resetPlayerSkin;
 
 public class EarthMagicHandler implements IMagicHandler {
     public static final float WOODEN_PICKAXE_MULTIPLIER=2.0f;

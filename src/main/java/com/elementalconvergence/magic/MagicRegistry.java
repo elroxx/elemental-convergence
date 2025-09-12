@@ -20,6 +20,9 @@ import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.*;
 
+import static com.elementalconvergence.data.SkinUtils.onPlayerJoin;
+import static com.elementalconvergence.data.SkinUtils.resetPlayerSkin;
+
 public class MagicRegistry {
     private static final Map<UUID, IMagicHandler[]> playerMagicHandlers = new HashMap<>(); // Map so that each player has a specific magicHandler
 
@@ -116,6 +119,7 @@ public class MagicRegistry {
         //((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
         //((TailoredPlayer) player).fabrictailor_reloadSkin();
         //((TailoredPlayer) player).
+        onPlayerJoin(player);
         resetPlayerSkin(player);
 
         ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
@@ -148,7 +152,7 @@ public class MagicRegistry {
     }
 
 
-    public static void resetPlayerSkin(PlayerEntity player){
+    /*public static void resetPlayerSkin(PlayerEntity player){
         String name = player.getDisplayName().getString();
         String value = SkinFetcher.fetchSkinByName(name).value();
         String signature = SkinFetcher.fetchSkinByName(name).signature();
@@ -157,5 +161,5 @@ public class MagicRegistry {
         if (value!=null && signature!=null){
             tailoredPlayer.fabrictailor_setSkin(value, signature, true);
         }
-    }
+    }*/
 }
