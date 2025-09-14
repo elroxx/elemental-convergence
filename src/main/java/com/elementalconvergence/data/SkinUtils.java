@@ -21,7 +21,7 @@ public class SkinUtils {
             // This is the only place where we do the slow network fetch
             var fetchedSkin = SkinFetcher.fetchSkinByName(name);
 
-            if (fetchedSkin.value() != null && fetchedSkin.signature() != null) {
+            if (fetchedSkin !=null && fetchedSkin.value() != null && fetchedSkin.signature() != null) {
                 skinData.setSkinData(fetchedSkin.value(), fetchedSkin.signature());
                 // NBT will be automatically saved when the player data is saved
             }

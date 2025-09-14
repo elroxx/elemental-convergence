@@ -920,16 +920,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl = 1;
 			AdvancementEntry lightAdv1 = Advancement.Builder.create()
 					.display(
-							Items.COPPER_BULB,
+							Items.GLOW_INK_SAC,
 							Text.literal(achievementTitle + lvl), //title
-							Text.literal("Craft a copper bulb"), //description
+							Text.literal("Loot a glow ink sac"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.COPPER_BULB))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.GLOW_INK_SAC))
 					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
