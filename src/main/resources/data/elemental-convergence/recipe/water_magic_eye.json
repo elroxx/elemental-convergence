@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PTP",
+    "PPP",
     "SES",
     "WWW"
   ],
@@ -15,9 +15,6 @@
     },
     "W": {
       "item": "minecraft:water_bucket"
-    },
-    "T": {
-      "item": "minecraft:turtle_scute"
     },
     "E": {
       "item": "elemental-convergence:bland_magic_eye"

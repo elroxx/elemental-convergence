@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:deepslate_emerald_ore"
+            "items": "minecraft:netherite_pickaxe"
           }
         ]
       },
@@ -29,10 +29,10 @@
     }
   },
   "display": {
-    "description": "Obtain a deepslate emerald ore",
+    "description": "Craft a netherite pickaxe",
     "icon": {
       "count": 1,
-      "id": "minecraft:emerald"
+      "id": "minecraft:netherite_pickaxe"
     },
     "title": "Earth Level 3"
   },

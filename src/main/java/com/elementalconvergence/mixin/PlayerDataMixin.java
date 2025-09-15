@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.session.report.ReporterEnvironment;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
@@ -27,7 +28,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
-public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver {
+public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver, IOriginalSkinDataSaver {
     private float miningSpeedMultiplier = 1.0f;
 
     //START OF STUFF FOR MAGIC
@@ -48,6 +49,15 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
         return teleportData;
     }
 
+    //START OF STUFF FOR ORIGINAL SKIN DATA
+    @Unique
+    private final OriginalSkinData originalSkinData = new OriginalSkinData();
+
+    @Override
+    public OriginalSkinData getOriginalSkinData() {
+        return originalSkinData;
+    }
+
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo info) {
         NbtCompound magicNbt = new NbtCompound();
@@ -58,6 +68,11 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
         NbtCompound teleportNbt = new NbtCompound();
         teleportData.writeNbt(teleportNbt);
         nbt.put("teleport_data", teleportNbt);
+
+        //original skin data
+        NbtCompound skinNbt = new NbtCompound();
+        originalSkinData.writeNbt(skinNbt);
+        nbt.put("original_skin_data", skinNbt);
     }
 
     @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
@@ -69,6 +84,11 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
         //quantum tp read
         if (nbt.contains("teleport_data")) {
             teleportData.readNbt(nbt.getCompound("teleport_data"));
+        }
+
+        //original skin read
+        if (nbt.contains("original_skin_data")) {
+            originalSkinData.readNbt(nbt.getCompound("original_skin_data"));
         }
     }
 
@@ -151,6 +171,14 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
         }
 
         return experience;
+    }
+
+    @Inject(method = "handleFallDamage", at = @At("HEAD"), cancellable = true)
+    private void fallDamageBouncy(float fallDistance, float damageMultiplier, DamageSource damageSource, CallbackInfoReturnable<Boolean> cir){
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (player.hasStatusEffect(ModEffects.BOUNCY) && !player.isSneaking()){
+            cir.setReturnValue(false);
+        }
     }
 
 }

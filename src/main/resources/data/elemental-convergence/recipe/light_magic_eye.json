@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "LIL",
+    "LLL",
     "GEG",
     "SGS"
   ],
@@ -15,9 +15,6 @@
     },
     "L": {
       "item": "minecraft:lantern"
-    },
-    "I": {
-      "item": "minecraft:glow_lichen"
     },
     "E": {
       "item": "elemental-convergence:bland_magic_eye"

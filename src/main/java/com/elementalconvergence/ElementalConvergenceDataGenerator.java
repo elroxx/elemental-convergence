@@ -550,16 +550,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl = 3;
 			AdvancementEntry earthAdv3 = Advancement.Builder.create()
 					.display(
-							Items.EMERALD,
+							Items.NETHERITE_PICKAXE,
 							Text.literal(achievementTitle + lvl), //title
-							Text.literal("Obtain a deepslate emerald ore"), //description
+							Text.literal("Craft a netherite pickaxe"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.DEEPSLATE_EMERALD_ORE))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.NETHERITE_PICKAXE))
 					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
@@ -920,16 +920,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl = 1;
 			AdvancementEntry lightAdv1 = Advancement.Builder.create()
 					.display(
-							Items.COPPER_BULB,
+							Items.GLOW_INK_SAC,
 							Text.literal(achievementTitle + lvl), //title
-							Text.literal("Craft a copper bulb"), //description
+							Text.literal("Loot a glow ink sac"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.COPPER_BULB))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.GLOW_INK_SAC))
 					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
@@ -1131,16 +1131,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl = 3;
 			AdvancementEntry deathAdv3 = Advancement.Builder.create()
 					.display(
-							Items.NETHER_STAR,
+							Items.SKULL_POTTERY_SHERD,
 							Text.literal(achievementTitle + lvl), //title
-							Text.literal("Harvest a wither rose"), //description
+							Text.literal("Dust off a skull pottery sherd"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.WITHER_ROSE))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.SKULL_POTTERY_SHERD))
 					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),

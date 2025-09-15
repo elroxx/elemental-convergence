@@ -242,7 +242,7 @@ public class LightMagicHandler implements IMagicHandler {
 
             player.getWorld().playSound(
                     null,
-                    currentPos.x, currentPos.y, currentPos.z,
+                    newPos.x, newPos.y, newPos.z,
                     SoundEvents.ENTITY_EVOKER_CAST_SPELL,
                     SoundCategory.PLAYERS,
                     1.0F,

@@ -7,10 +7,13 @@ import java.util.stream.Collectors;
 
 import com.elementalconvergence.container.SmeltingInventory;
 import com.elementalconvergence.effect.ModEffects;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.recipe.input.SingleStackRecipeInput;
+import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.Block;
@@ -76,5 +79,21 @@ public class BlockMixin {
                 .getFirstMatch(RecipeType.SMELTING, recipeInput, world)
                 .map(recipeEntry -> recipeEntry.value().getResult(world.getRegistryManager()).copy());
     }
+
+
+
+    @Inject(method = "onEntityLand", at = @At("HEAD"), cancellable = true)
+    public void onEntityLand(BlockView blockView, Entity entity, CallbackInfo callbackInfo) {
+        if(entity instanceof LivingEntity livingEntity && livingEntity.getVelocity().y < -0.23 && !livingEntity.isSneaking()) {
+            if( livingEntity.hasStatusEffect(ModEffects.BOUNCY)) {
+                livingEntity.setVelocity(livingEntity.getVelocity().multiply(1F, -0.9,1F));
+                livingEntity.velocityModified=true;
+                livingEntity.getWorld().playSound(null, livingEntity.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.PLAYERS, 1.0F, 1F);
+                callbackInfo.cancel();
+                return;
+            }
+        }
+    }
+
 }
 

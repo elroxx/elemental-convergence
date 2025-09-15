@@ -6,6 +6,7 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.stat.Stat;
 
 public class ModEffects {
 
@@ -25,6 +26,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> MYSTICAL_CRAZE = register("mystical_craze", new MysticalEffect());
     public static final RegistryEntry<StatusEffect> MYSTICAL_TOUCH = register("mystical_touch", new MysticalEffect());
     public static final RegistryEntry<StatusEffect> FURNACE = register("furnace", new FurnaceEffect());
+    public static final RegistryEntry<StatusEffect> BOUNCY = register("bouncy", new BouncyEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {

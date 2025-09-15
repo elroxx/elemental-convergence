@@ -1,9 +1,7 @@
 package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.ElementalConvergence;
-import com.elementalconvergence.data.IMagicDataSaver;
-import com.elementalconvergence.data.ISchrodingerTPDataSaver;
-import com.elementalconvergence.data.SchrodingerTPData;
+import com.elementalconvergence.data.*;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,5 +44,13 @@ public class ServerPlayerDataMixin {
         newTPData.setSavedDimension(oldTPData.getSavedDimension());
 
         newTPData.setHasSavedPosition(oldTPData.hasSavedPosition());
+
+        //also copy original skin data
+        OriginalSkinData newSkinData = ((IOriginalSkinDataSaver) this).getOriginalSkinData();
+        OriginalSkinData oldSkinData = ((IOriginalSkinDataSaver) oldPlayer).getOriginalSkinData();
+
+        newSkinData.setOriginalSkinValue(oldSkinData.getOriginalSkinValue());
+        newSkinData.setOriginalSkinSignature(oldSkinData.getOriginalSkinSignature());
+        newSkinData.setHasFetchedOnce(oldSkinData.hasFetchedOnce());
     }
 }

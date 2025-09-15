@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "MAM",
+    "MBM",
     "LEL",
-    "BBB"
+    "MBM"
   ],
   "key": {
     "L": {
@@ -15,9 +15,6 @@
     },
     "B": {
       "item": "minecraft:blaze_rod"
-    },
-    "A": {
-      "item": "minecraft:allium"
     },
     "E": {
       "item": "elemental-convergence:bland_magic_eye"

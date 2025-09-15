@@ -1,4 +1,4 @@
-// 1.21.1	2025-09-08T20:54:24.0393238	Elemental Convergence/Advancements
+// 1.21.1	2025-09-15T14:57:26.7018831	Elemental Convergence/Advancements
 bce082b6765daae6866149f062e6c2f3ba100a2c data\elemental-convergence\advancement\mystic_lvl1.json
 073293a2f3037b161dbbb6e01bf94f2f59115d99 data\elemental-convergence\advancement\root.json
 b2fed419b864401a9f71c4cb8c2a8d1e379cc9f4 data\elemental-convergence\advancement\death_lvl2.json
@@ -25,7 +25,7 @@ b5362847bd6fec82cd3639c9d0ddcc4b42c7ff42 data\elemental-convergence\advancement\
 a47f599b041787849b9a981d1238bf9864eccdc8 data\elemental-convergence\advancement\steam_lvl2.json
 7fef63824e19e86c48289289c3dae3993f8bc00b data\elemental-convergence\advancement\death_magic_selected.json
 9a17a2e674111e7d681924aabc8d1b5aec4aa711 data\elemental-convergence\advancement\holy_lvl2.json
-e0e41e4a324bb26f1d07a2cba839487ee9a05c67 data\elemental-convergence\advancement\light_lvl1.json
+5f6ee7fb5a5067622007d1b1962b0fb6a90c4c41 data\elemental-convergence\advancement\light_lvl1.json
 f298245499a4d1bf7e061cc98b7ea9949ef30288 data\elemental-convergence\advancement\honey_magic_selected.json
 2c8ae970120bd9c8fcb1e74e384afe13a938101e data\elemental-convergence\advancement\quantum_lvl2.json
 db236d3af38708a60aaf51dfaa0f07e049385da5 data\elemental-convergence\advancement\water_magic_selected.json
@@ -50,7 +50,7 @@ d8de2857c73c2d3b757b1d90df3f56ae37a19209 data\elemental-convergence\advancement\
 4bdf870abc865605d003c976bc22a38767d22867 data\elemental-convergence\advancement\light_lvl2.json
 aa39f9dbf463b81a42b6c4b0755a788c465b422b data\elemental-convergence\advancement\life_magic_selected.json
 c16b3c9f50214977fc17b9dcaa8dacf0baabf568 data\elemental-convergence\advancement\shadow_magic_selected.json
-5f9107f5cbcb9bcfd6a6e5e2fafb35866f05e358 data\elemental-convergence\advancement\earth_lvl3.json
+bc02344fef2403b260ae0ab2825ef3fb3375e2d9 data\elemental-convergence\advancement\earth_lvl3.json
 527ac829150232896bb2b1201220bb4f778db760 data\elemental-convergence\advancement\gravity_lvl3.json
 97aa316f84a838c6008c912fe85749ecdd0f729d data\elemental-convergence\advancement\earth_magic_selected.json
 db83c827536ca7b1581b467d868ad92c530222ef data\elemental-convergence\advancement\mystic_magic_selected.json
@@ -63,4 +63,4 @@ d7e27123aadbb4ae88d0f2df042732e656628aa1 data\elemental-convergence\advancement\
 8976e035b95f864c79435ffc751c1449218d83d9 data\elemental-convergence\advancement\blood_lvl3.json
 1d4b8f0e5d7e8a5cc7fd347b60eff90e7e0be33b data\elemental-convergence\advancement\fire_lvl3.json
 0fb390b1c4ee8e12d7947ccfb93f2de5abbf1a7e data\elemental-convergence\advancement\light_magic_selected.json
-aa8f274dc28333dd36ed80129dcc9bd607530377 data\elemental-convergence\advancement\death_lvl3.json
+a4e9c15699515d9e35e407544a17c2474944e633 data\elemental-convergence\advancement\death_lvl3.json

@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:wither_rose"
+            "items": "minecraft:skull_pottery_sherd"
           }
         ]
       },
@@ -29,10 +29,10 @@
     }
   },
   "display": {
-    "description": "Harvest a wither rose",
+    "description": "Dust off a skull pottery sherd",
     "icon": {
       "count": 1,
-      "id": "minecraft:nether_star"
+      "id": "minecraft:skull_pottery_sherd"
     },
     "title": "Death Level 3"
   },

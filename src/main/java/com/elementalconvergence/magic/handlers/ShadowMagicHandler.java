@@ -27,6 +27,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.*;
 
@@ -39,11 +41,14 @@ public class ShadowMagicHandler implements IMagicHandler {
     private int invisCooldown=0;
     private static final int DEFAULT_LIGHT_UPDATE_COOLDOWN=10;
     private int lightUpdateCooldown=0;
-    private static final int INVIS_DURATION=219; //almost 11 seconds so that it stays 10 a long time
+    private static final int INVIS_DURATION=-1; //almost 11 seconds so that it stays 10 a long time
     private static final int DEFAULT_SHADOWTP_COOLDOWN=30; //1.5 seconds
     private int shadowTPCooldown = 0;
     private static final int SHADOWTP_MAXRANGE=50;
     private static final float CHANCE_OF_STEAL=0.01f;
+
+    public static final float SHADOW_HELD_ITEM=0f;
+    public static final float BASE_HELD_ITEM=1.0f;
 
     private static boolean backstabToggle=false;
     public static final int DEFAULT_BACKSTAB_TOGGLE_COOLDOWN=5;
@@ -70,18 +75,24 @@ public class ShadowMagicHandler implements IMagicHandler {
             if (lightLevel<=LIGHT_THRESHOLD){
                 if (invisCooldown==0) {
                     invisCooldown = DEFAULT_INVIS_COOLDOWN;
-                    StatusEffectInstance invisibility = new StatusEffectInstance(StatusEffects.INVISIBILITY,
-                            INVIS_DURATION, //DURATON
-                            0, //AMPLIFIER
-                            true,
-                            false,
-                            false
-                    );
-                    player.addStatusEffect(invisibility);
+                    if (!player.hasStatusEffect(StatusEffects.INVISIBILITY)) {
+                        StatusEffectInstance invisibility = new StatusEffectInstance(StatusEffects.INVISIBILITY,
+                                INVIS_DURATION, //DURATON
+                                0, //AMPLIFIER
+                                true,
+                                false,
+                                false
+                        );
+                        player.addStatusEffect(invisibility);
+                    }
                     player.setInvisible(true);
                 }
                 if (player.getMaxHealth() != 20.0F) {
                     player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F);
+                }
+                ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
+                if (playerHeldItem.getScale()-SHADOW_HELD_ITEM>0.1){
+                    playerHeldItem.setScale(SHADOW_HELD_ITEM);
                 }
 
             }
@@ -93,6 +104,11 @@ public class ShadowMagicHandler implements IMagicHandler {
                 if (player.getMaxHealth() != 20.0F) {
                     player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F);
                 }
+
+                ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
+                if (playerHeldItem.getScale()-BASE_HELD_ITEM>0.1){
+                    playerHeldItem.setScale(BASE_HELD_ITEM);
+                }
             }
             else{
                 player.setInvisible(false);
@@ -101,6 +117,10 @@ public class ShadowMagicHandler implements IMagicHandler {
 
                 if (player.getMaxHealth() != 10.0F) {
                     player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(10.0F);
+                }
+                ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
+                if (playerHeldItem.getScale()-BASE_HELD_ITEM>0.1){
+                    playerHeldItem.setScale(BASE_HELD_ITEM);
                 }
             }
         }

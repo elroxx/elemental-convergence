@@ -124,7 +124,7 @@ public class AirMagicHandler implements IMagicHandler {
 
 
         //reset double jumps
-        boolean isCurrentlyOnGround = player.isOnGround() || player.isSubmergedInWater() || player.isClimbing();
+        boolean isCurrentlyOnGround = (player.isOnGround() || player.isClimbing()) && !player.isTouchingWater();
         if (isCurrentlyOnGround) {
             if (leapResetCooldown==0) {
                 jumpsUsed = 0;
@@ -180,7 +180,7 @@ public class AirMagicHandler implements IMagicHandler {
 
         if (airLevel >= 2 && leapCooldown <= 0) {
             //see if still has leaps
-            boolean isOnGround = player.isOnGround() || player.isSubmergedInWater() || player.isClimbing();
+            boolean isOnGround = (player.isOnGround() || player.isClimbing()) && !player.isTouchingWater();
 
             if (!isOnGround && jumpsUsed >= AIR_MAX_LEAPS) {
                 return;
