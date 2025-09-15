@@ -27,7 +27,10 @@ public class MagicRegistry {
     private static final Map<UUID, IMagicHandler[]> playerMagicHandlers = new HashMap<>(); // Map so that each player has a specific magicHandler
 
     public static IMagicHandler[] createHandlersForPlayer() {
-        IMagicHandler[] magic_handlers = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length];
+        IMagicHandler[] magic_handlers = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length+1];
+
+        //no magics
+        magic_handlers[ElementalConvergence.FULL_MAGIC_ID.length] = new NoMagicHandler();
 
         //base magics
         magic_handlers[0] = new EarthMagicHandler();
@@ -61,8 +64,11 @@ public class MagicRegistry {
     }
 
     public static IMagicHandler getHandler(PlayerEntity player, int magicIndex) {
-        if (magicIndex < 0 || magicIndex >= ElementalConvergence.FULL_MAGIC_ID.length) {
+        if (magicIndex >= ElementalConvergence.FULL_MAGIC_ID.length) {
             return null;
+        } else if (magicIndex<0){
+            IMagicHandler[] handlers = getHandlersForPlayer(player);
+            return handlers[ElementalConvergence.FULL_MAGIC_ID.length]; //no magic
         }
         IMagicHandler[] handlers = getHandlersForPlayer(player);
         return handlers[magicIndex];
