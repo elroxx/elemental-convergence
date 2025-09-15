@@ -2,19 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "B B",
+    "OTO",
     "PEP",
-    "OSO"
+    "OTO"
   ],
   "key": {
     "P": {
       "item": "minecraft:chiseled_polished_blackstone"
     },
-    "S": {
-      "item": "minecraft:sculk"
-    },
-    "B": {
-      "item": "minecraft:black_candle"
+    "T": {
+      "item": "minecraft:tinted_glass"
     },
     "O": {
       "item": "minecraft:obsidian"

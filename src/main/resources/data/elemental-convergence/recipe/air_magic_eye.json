@@ -2,22 +2,19 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "FLF",
+    "FPF",
     "AEA",
-    "BBB"
+    "FPF"
   ],
   "key": {
-    "B": {
-      "item": "minecraft:slime_block"
-    },
     "A": {
       "item": "minecraft:arrow"
     },
     "F": {
       "item": "minecraft:feather"
     },
-    "L": {
-      "item": "minecraft:lily_of_the_valley"
+    "P": {
+      "item": "minecraft:phantom_membrane"
     },
     "E": {
       "item": "elemental-convergence:bland_magic_eye"
