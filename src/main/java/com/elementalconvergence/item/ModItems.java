@@ -113,19 +113,13 @@ public class ModItems {
     public static final Item WINE = register("wine", new WineItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
 
     public static final Item HALO = register("halo", new ArmorItem(HALO_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
-
     public static final BlockItem PRAYING_ALTAR_ITEM = register("praying_altar", new BlockItem(ModBlocks.PRAYING_ALTAR, new Item.Settings()));
 
     public static final Item PORTABLE_BEEHIVE = register("portable_beehive", new PortableBeehiveItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
-
     public static final Item REINFORCED_HONEYCOMB_BLOCK_ITEM = register("reinforced_honeycomb_block", new BlockItem(ModBlocks.REINFORCED_HONEYCOMB, new Item.Settings()));
-
     public static final Item HONEY_STICK = register("honey_stick", new Item(new Item.Settings().maxCount(1).maxDamage(10)));
-
     public static final Item LOCK_ITEM = register("lock", new Item(new Item.Settings().maxCount(1)));
-
     public static final Item CROWN = register("crown", new ArmorItem(CROWN_ARMOR_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().maxCount(1)));
-
     public static final Item POLLEN_WHITE = register("pollen_white", new PollenItem(StatusEffects.DOLPHINS_GRACE, 20*60*2, 2, new Item.Settings().maxCount(8)));
     public static final Item POLLEN_RED = register("pollen_red", new PollenItem(StatusEffects.DARKNESS, 20*60, 0, new Item.Settings().maxCount(8)));
     public static final Item POLLEN_BLUE = register("pollen_blue", new PollenItem(ModEffects.INSECT_WEIGHT, 20*60*2, 0, new Item.Settings().maxCount(8)));
@@ -143,6 +137,8 @@ public class ModItems {
     public static final Item MYSTICAL_ENERGY = register("mystical_energy", new Item(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
     public static final Item MYSTICAL_CHAPTER_1 = register("mystical_chapter_1", new MysticalTomeItem(getEnchantList(1), getEnchantLevelList(1), 1,new Item.Settings().maxCount(1)));
     public static final Item MYSTICAL_CHAPTER_2 = register("mystical_chapter_2", new MysticalTomeItem(getEnchantList(2), getEnchantLevelList(2), 2,new Item.Settings().maxCount(1)));
+
+    public static final Item DISSOLVING_SLIME = register("dissolving_slime", new Item(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
 
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight

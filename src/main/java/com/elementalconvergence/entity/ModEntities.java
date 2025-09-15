@@ -1,36 +1,32 @@
 package com.elementalconvergence.entity;
 
 import com.elementalconvergence.ElementalConvergence;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.client.render.entity.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.passive.ChickenEntity;
+import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.entity.passive.BeeEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.entity.passive.BeeEntity;
 
 public class ModEntities {
 
     public static final Identifier DEATH_SOUND_ID = ElementalConvergence.id("life_death_sound");
-    public static final SoundEvent DEATH_SOUND_EVENT = SoundEvent.of(DEATH_SOUND_ID); //ALSO HAVE TO WRITE AT BOTTOM
+    public static final SoundEvent DEATH_SOUND_EVENT = SoundEvent.of(DEATH_SOUND_ID);
 
     public static final Identifier TRAINWHISTLE_SOUND_ID = ElementalConvergence.id("train_whistle_sound");
     public static final SoundEvent TRAINWHISTLE_SOUND_EVENT = SoundEvent.of(TRAINWHISTLE_SOUND_ID);
 
-    // Entity Registration
+    // Entity Registration (server-side)
     public static final EntityType<ShadowballEntity> SHADOWBALL = Registry.register(
             Registries.ENTITY_TYPE,
             ElementalConvergence.id("shadowball"),
             EntityType.Builder.<ShadowballEntity>create(ShadowballEntity::new, SpawnGroup.MISC)
-                    .dimensions(0.25f, 0.25f) // Same size as snowball
+                    .dimensions(0.25f, 0.25f)
                     .build()
     );
 
@@ -66,45 +62,22 @@ public class ModEntities {
                     .build()
     );
 
-
-
-
-
-
-    // Register method to register the entity type with the game
     public static <T extends Entity> EntityType<T> register(String name, EntityType<T> entityType) {
         return Registry.register(Registries.ENTITY_TYPE, ElementalConvergence.id(name), entityType);
     }
 
-    // Initialize the class by printing a message
+    // Server-side initialization (no renderers!)
     public static void initialize() {
-        EntityRendererRegistry.register(SHADOWBALL, (context) ->
-                new FlyingItemEntityRenderer<>(context));
-        EntityRendererRegistry.register(MINION_ZOMBIE, MinionZombieRenderer::new);
-
-        // Register the custom entity attributes
+        // Register entity attributes (server-side)
         FabricDefaultAttributeRegistry.register(MINION_ZOMBIE, MinionZombieEntity.createMinionZombieAttributes());
-
-
-        EntityRendererRegistry.register(ModEntities.PEGASUS,
-                (EntityRendererFactory.Context context) -> new HorseEntityRenderer(context));
         FabricDefaultAttributeRegistry.register(PEGASUS, HorseEntity.createBaseHorseAttributes());
-
-        EntityRendererRegistry.register(ModEntities.POULET,
-                (EntityRendererFactory.Context context) -> new ChickenEntityRenderer(context));
         FabricDefaultAttributeRegistry.register(POULET, ChickenEntity.createChickenAttributes());
-
-        EntityRendererRegistry.register(ModEntities.MINION_BEE,
-                (EntityRendererFactory.Context context) -> new BeeEntityRenderer(context));
         FabricDefaultAttributeRegistry.register(MINION_BEE, BeeEntity.createBeeAttributes());
 
-        System.out.println("ModEntities initialized");
-
-
+        System.out.println("ModEntities initialized (server-side)");
 
         registerSounds();
         System.out.println("Sounds initialized");
-
     }
 
     public static void registerSounds() {
@@ -112,4 +85,3 @@ public class ModEntities {
         Registry.register(Registries.SOUND_EVENT, TRAINWHISTLE_SOUND_ID, TRAINWHISTLE_SOUND_EVENT);
     }
 }
-

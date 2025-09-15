@@ -6,23 +6,25 @@
 		"ExampleMixin",
 		"PlayerDataMixin",
 		"ServerPlayerDataMixin",
-		"ArmorFeatureRendererMixin",
 		"MobEntityMixin",
 		"HungerManagerMixin",
 		"LivingEntityMixin",
 		"AbstractBlockMixin",
-		"GameRendererMixin",
 		"EntityMixin",
 		"ItemStackMixin",
 		"BreadMixin",
 		"EntityAccessor",
 		"InvSlotMixin",
+		"BlockMixin",
+		"PersistentProjectileEntityMixin"
+	],
+	"client": [
+		"ArmorFeatureRendererMixin",
+		"GameRendererMixin",
 		"EntityRenderersMixin",
 		"CameraMixin",
 		"InGameOverlayRendererMixin",
-		"TextRendererMixin",
-		"BlockMixin",
-		"PersistentProjectileEntityMixin"
+		"TextRendererMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

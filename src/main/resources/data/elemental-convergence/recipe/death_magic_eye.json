@@ -2,14 +2,11 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "SOS",
+    "SRS",
     "BEB",
     "SRS"
   ],
   "key": {
-    "O": {
-      "item": "minecraft:ominous_bottle"
-    },
     "R": {
       "item": "minecraft:respawn_anchor"
     },

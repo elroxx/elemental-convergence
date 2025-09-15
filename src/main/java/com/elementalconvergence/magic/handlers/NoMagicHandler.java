@@ -22,9 +22,9 @@ public class NoMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
-        if (!player.hasStatusEffect(StatusEffects.MINING_FATIGUE)){
+        /*if (!player.hasStatusEffect(StatusEffects.MINING_FATIGUE)){
             player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, -1, 9, false, false, false));
-        }
+        }*/
 
     }
 

@@ -2,13 +2,10 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "OEO",
+    "OOO",
     "OSO"
   ],
   "key": {
-    "E": {
-      "item": "minecraft:ender_pearl"
-    },
     "O": {
       "item": "minecraft:oak_log"
     },

@@ -6,22 +6,31 @@ import com.elementalconvergence.magic.convergencehandlers.*;
 import com.elementalconvergence.magic.handlers.*;
 import com.elementalconvergence.ElementalConvergence;
 import gravity_changer.api.GravityChangerAPI;
+import net.minecraft.entity.SkinOverlayOwner;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.samo_lego.fabrictailor.casts.TailoredPlayer;
+import org.samo_lego.fabrictailor.command.SkinCommand;
+import org.samo_lego.fabrictailor.util.SkinFetcher;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.*;
 
+import static com.elementalconvergence.data.SkinUtils.onPlayerJoin;
+import static com.elementalconvergence.data.SkinUtils.resetPlayerSkin;
+
 public class MagicRegistry {
     private static final Map<UUID, IMagicHandler[]> playerMagicHandlers = new HashMap<>(); // Map so that each player has a specific magicHandler
 
     public static IMagicHandler[] createHandlersForPlayer() {
-        IMagicHandler[] magic_handlers = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length];
+        IMagicHandler[] magic_handlers = new IMagicHandler[ElementalConvergence.FULL_MAGIC_ID.length+1];
+
+        //no magics
+        magic_handlers[ElementalConvergence.FULL_MAGIC_ID.length] = new NoMagicHandler();
 
         //base magics
         magic_handlers[0] = new EarthMagicHandler();
@@ -42,6 +51,7 @@ public class MagicRegistry {
         magic_handlers[BloodMagicHandler.BLOOD_INDEX] = new BloodMagicHandler();
         magic_handlers[QuantumMagicHandler.QUANTUM_INDEX] = new QuantumMagicHandler();
         magic_handlers[MysticMagicHandler.MYSTIC_INDEX] = new MysticMagicHandler();
+        magic_handlers[SlimeMagicHandler.SLIME_INDEX] = new SlimeMagicHandler();
         //magic_handlers[StarMagicHandler.STAR_INDEX] = new StarMagicHandler(); //star removed
 
         System.out.println("MAGICREGISTRY CREATED");
@@ -54,8 +64,11 @@ public class MagicRegistry {
     }
 
     public static IMagicHandler getHandler(PlayerEntity player, int magicIndex) {
-        if (magicIndex < 0 || magicIndex >= ElementalConvergence.FULL_MAGIC_ID.length) {
+        if (magicIndex >= ElementalConvergence.FULL_MAGIC_ID.length) {
             return null;
+        } else if (magicIndex<0){
+            IMagicHandler[] handlers = getHandlersForPlayer(player);
+            return handlers[ElementalConvergence.FULL_MAGIC_ID.length]; //no magic
         }
         IMagicHandler[] handlers = getHandlersForPlayer(player);
         return handlers[magicIndex];
@@ -108,7 +121,13 @@ public class MagicRegistry {
         playerMotion.setScale(BASE_SCALE);
         playerFlightSpeed.setScale(BASE_SCALE);
 
-        ((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
+
+        //((TailoredPlayer) player).fabrictailor_clearSkin();//RESET THE MODIFIED SKIN
+        //((TailoredPlayer) player).fabrictailor_reloadSkin();
+        //((TailoredPlayer) player).
+        onPlayerJoin(player);
+        resetPlayerSkin(player);
+
         ((RatMagicHandler)getHandler(player, RatMagicHandler.RAT_INDEX)).resetRatSkinToggle(); //RESET THE HASSKINON FOR RATSKIN
         ((HoneyMagicHandler)getHandler(player, HoneyMagicHandler.HONEY_INDEX)).resetBeeSkinToggle(); //RESET THE HASSKINON FOR Bee skin
 
@@ -137,4 +156,16 @@ public class MagicRegistry {
             }
         }
     }
+
+
+    /*public static void resetPlayerSkin(PlayerEntity player){
+        String name = player.getDisplayName().getString();
+        String value = SkinFetcher.fetchSkinByName(name).value();
+        String signature = SkinFetcher.fetchSkinByName(name).signature();
+        TailoredPlayer tailoredPlayer = (TailoredPlayer) player;
+
+        if (value!=null && signature!=null){
+            tailoredPlayer.fabrictailor_setSkin(value, signature, true);
+        }
+    }*/
 }

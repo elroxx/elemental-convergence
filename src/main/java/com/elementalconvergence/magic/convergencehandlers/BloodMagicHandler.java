@@ -45,6 +45,7 @@ import virtuoel.pehkui.api.ScaleTypes;
 import java.util.*;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
+import static com.elementalconvergence.data.SkinUtils.resetPlayerSkin;
 
 public class BloodMagicHandler implements IMagicHandler {
     public static final int BLOOD_INDEX= (BASE_MAGIC_ID.length-1)+6;
@@ -241,7 +242,8 @@ public class BloodMagicHandler implements IMagicHandler {
             if (player.hasStatusEffect(ModEffects.BAT_FORM)) {
                 player.removeStatusEffect(ModEffects.BAT_FORM);
 
-                ((TailoredPlayer) player).fabrictailor_clearSkin();
+                //((TailoredPlayer) player).fabrictailor_clearSkin();
+                resetPlayerSkin(player);
             } else {
                 player.addStatusEffect(new StatusEffectInstance(ModEffects.BAT_FORM, -1, 0,false, false, false));
 
