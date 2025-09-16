@@ -140,6 +140,9 @@ public class ModItems {
 
     public static final Item DISSOLVING_SLIME = register("dissolving_slime", new Item(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
 
+    public static final Item VOID_DRILL = register("void_drill", new Item(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item VOID_ESSENCE = register("void_essence", new Item(new Item.Settings().maxCount(1).rarity(Rarity.EPIC)));
+
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight
     //common: white, red, blue
