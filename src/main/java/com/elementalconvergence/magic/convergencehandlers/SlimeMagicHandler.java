@@ -196,7 +196,7 @@ public class SlimeMagicHandler implements IMagicHandler {
             Vec3d look = player.getRotationVec(1.0F);
             double leapStrength = 3;
 
-            Vec3d velocity = new Vec3d(look.x * leapStrength, 1.5, look.z * leapStrength);
+            Vec3d velocity = new Vec3d(look.x * leapStrength, look.z*leapStrength+1.0, look.z * leapStrength);
             player.setVelocity(velocity);
             player.velocityModified = true;
 
