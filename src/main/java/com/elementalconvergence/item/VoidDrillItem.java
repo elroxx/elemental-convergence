@@ -61,6 +61,11 @@ public class VoidDrillItem extends Item {
                             0.25,
                             0);
 
+                    //remove item if not in creative
+                    if (!player.isCreative()){
+                        context.getStack().setCount(0);
+                    }
+
                     return ActionResult.SUCCESS;
                 }
             }
