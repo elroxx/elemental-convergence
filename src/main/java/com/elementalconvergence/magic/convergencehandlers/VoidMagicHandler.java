@@ -26,6 +26,8 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class VoidMagicHandler implements IMagicHandler {
     public static final int VOID_INDEX= (BASE_MAGIC_ID.length-1)+10;
 
+    public static final int DEFAULT_VOID_DRILL_COOLDOWN = 20*10; //10 seconds
+
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
