@@ -63,6 +63,13 @@ public class VoidMagicHandler implements IMagicHandler {
         RegistryKey<World> currentWorld = serverPlayer.getServerWorld().getRegistryKey();
         if (currentWorld.equals(World.OVERWORLD) || currentWorld.equals(World.NETHER)) {
 
+            //if player can fly and he isnt in creative, remove this ability
+            if (player.getAbilities().allowFlying && !player.isCreative()) {
+                player.getAbilities().allowFlying = false;
+                player.getAbilities().flying = false;
+                ((ServerPlayerEntity) player).sendAbilitiesUpdate();
+            }
+
             if (dimensionSickCooldown == 0) {
                 float hpLeft = player.getHealth()-1.0f;
                 if (hpLeft>=2.0f) { //so if one heart is left
@@ -76,6 +83,15 @@ public class VoidMagicHandler implements IMagicHandler {
         }
         else{
             dimensionSickCooldown=DEFAULT_DIMENSIONSICK_COOLDOWN;
+        }
+
+        //give creative flight in his own custom dimension
+        if (currentWorld.equals(VOID_DIMENSION)){
+            if (!player.getAbilities().allowFlying) {
+                player.getAbilities().allowFlying = true;
+                player.getAbilities().flying = true;
+                ((ServerPlayerEntity) player).sendAbilitiesUpdate();
+            }
         }
 
         //cooldowns
