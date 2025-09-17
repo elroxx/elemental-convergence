@@ -4,7 +4,7 @@
   "pattern": [
     "FGF",
     "BEB",
-    "PGP"
+    "BGB"
   ],
   "key": {
     "G": {
@@ -15,9 +15,6 @@
     },
     "B": {
       "item": "minecraft:bamboo"
-    },
-    "P": {
-      "item": "minecraft:pink_petals"
     },
     "E": {
       "item": "elemental-convergence:bland_magic_eye"
