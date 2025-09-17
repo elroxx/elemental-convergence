@@ -42,12 +42,12 @@ public class VoidDrillItem extends Item {
                 int voidLevel = magicData.getMagicLevel(VOID_INDEX);
                 //if you are currently void and lvl 1 in void
                 if (voidLevel>=1 && selectedMagic==VOID_INDEX){
-                    player.getServerWorld().setBlockState(positionClicked, Blocks.BEDROCK.getDefaultState());
+                    player.getServerWorld().setBlockState(positionClicked, Blocks.AIR.getDefaultState());
 
                     player.getItemCooldownManager().set(this, DEFAULT_VOID_DRILL_COOLDOWN);
 
                     //play sound
-                    player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_ANVIL_BREAK,
+                    player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_ANVIL_USE,
                             SoundCategory.PLAYERS, 1.0F, 0.75F);
 
                     player.getServerWorld().spawnParticles(

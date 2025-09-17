@@ -27,6 +27,7 @@ import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
+import static com.elementalconvergence.world.dimension.ModDimensions.VOID_WORLD_KEY;
 
 public class VoidMagicHandler implements IMagicHandler {
     public static final int VOID_INDEX= (BASE_MAGIC_ID.length-1)+10;
@@ -34,11 +35,11 @@ public class VoidMagicHandler implements IMagicHandler {
     public static final int DEFAULT_DIMENSIONSICK_COOLDOWN = 20*10; //every 10 seconds take half a heart of dmg
     private int dimensionSickCooldown=0;
 
-    public static final int DEFAULT_VOID_DRILL_COOLDOWN = 20*10; //10 seconds
+    public static final int DEFAULT_VOID_DRILL_COOLDOWN = 20*5; //5 seconds
 
     public static final int DEFAULT_VOID_SWAP_COOLDOWN = 5;
     private int voidSwapCooldown=0;
-    public static final RegistryKey<World> VOID_DIMENSION = World.END; //to change once i have the void dimension done
+    public static final RegistryKey<World> VOID_DIMENSION = VOID_WORLD_KEY; //to change once i have the void dimension done
     //void dimension needs to go from 0 to 96 because i want to do *4 everywhere (and its 384 blocks in the overworld.
 
     //DONT TAKE DAMAGE IN END OR IN VOID
