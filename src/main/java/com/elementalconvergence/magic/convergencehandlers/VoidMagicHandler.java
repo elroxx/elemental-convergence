@@ -31,12 +31,12 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class VoidMagicHandler implements IMagicHandler {
     public static final int VOID_INDEX= (BASE_MAGIC_ID.length-1)+10;
 
-    public static final int DEFAULT_DIMENSIONSICK_COOLDOWN = 10;
+    public static final int DEFAULT_DIMENSIONSICK_COOLDOWN = 20*10; //every 10 seconds take half a heart of dmg
     private int dimensionSickCooldown=0;
 
     public static final int DEFAULT_VOID_DRILL_COOLDOWN = 20*10; //10 seconds
 
-    public static final int DEFAULT_VOID_SWAP_COOLDOWN = 20;
+    public static final int DEFAULT_VOID_SWAP_COOLDOWN = 5;
     private int voidSwapCooldown=0;
     public static final RegistryKey<World> VOID_DIMENSION = World.END; //to change once i have the void dimension done
     //void dimension needs to go from 0 to 96 because i want to do *4 everywhere (and its 384 blocks in the overworld.
@@ -44,6 +44,11 @@ public class VoidMagicHandler implements IMagicHandler {
     //DONT TAKE DAMAGE IN END OR IN VOID
     //CANT USE THE ABILITY IN THE NETHER, ONLY OVERWORLD
 
+    //lvl 1 is drill
+    //crafted with 1 diamond pickaxe, 3 copper and 3 iron blocks
+    //lvl 2 is something kind of random like a void essence or something hard to get that is relatively dark ig.
+    //void essence being crafted with something like idk a 4x netherite ingot, 4x black dye, 1x ominous trial key
+    //lvl 3 is Music Disc 5
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -75,6 +80,8 @@ public class VoidMagicHandler implements IMagicHandler {
                 if (hpLeft>=2.0f) { //so if one heart is left
                     DamageSource withered = player.getWorld().getDamageSources().wither();
                     player.damage(withered, 1.0f);
+                }else if (hpLeft>1.0f) {
+                    player.setHealth(2.0f);
                 }
                 dimensionSickCooldown = DEFAULT_DIMENSIONSICK_COOLDOWN;
             } else {
@@ -123,9 +130,15 @@ public class VoidMagicHandler implements IMagicHandler {
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
         //dimension swap:
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int voidLevel = magicData.getMagicLevel(VOID_INDEX);
+
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
         if (serverPlayer.getServerWorld().getRegistryKey().equals(VOID_DIMENSION)){
-
+            double owPosX = player.getPos().x * 4.0;
+            double owPosY = (player.getPos().y * 4.0)+64.0;
+            double owPosZ = player.getPos().z * 4.0;
         }
     }
 
