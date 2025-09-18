@@ -9,6 +9,8 @@ Convergences are magics that are only playable when have its parents magics maxe
 
 Index: 8
 
+Parent Magics: Life, Death
+
 Convergence Impact: **Medium**
 
 Playstyle: Fighter, PvP, DoT
@@ -31,6 +33,8 @@ Playstyle: Fighter, PvP, DoT
 ## Gravity
 
 Index: 9
+
+Parent Magics: Earth, Shadow
 
 Convergence Impact: **Extreme**
 
@@ -55,6 +59,9 @@ Playstyle: Movement, Building
 
 Index: 10
 
+
+Parent Magics: Water, Fire
+
 Convergence Impact: **Extreme**
 
 Playstyle: Tank, Support
@@ -77,6 +84,8 @@ Playstyle: Tank, Support
 ## Holy
 
 Index: 11
+
+Parent Magics: Light, Air
 
 Convergence Impact: **Low**
 
@@ -103,6 +112,8 @@ Playstyle: Support, Cook
 
 Index: 12
 
+Parent Magics: Life, Air
+
 Convergence Impact: **High**
 
 Playstyle: Summoner, Flying
@@ -128,6 +139,8 @@ Playstyle: Summoner, Flying
 
 Index: 13
 
+Parent Magics: Shadow, Death
+
 Convergence Impact: **High**
 
 Playstyle: Fighter, Stealth, Flying
@@ -152,6 +165,8 @@ Playstyle: Fighter, Stealth, Flying
 
 Index: 14
 
+Parent Magics: Light, Water
+
 Convergence Impact: **Medium**
 
 Playstyle: Phaser, Loot Transportation
@@ -172,6 +187,8 @@ Playstyle: Phaser, Loot Transportation
 ## Mystic
 
 Index: 15
+
+Parent Magics: Fire, Earth
 
 Convergence Impact: **Low**
 
@@ -195,6 +212,8 @@ Playstyle: Enchantments, Support
 ## Void
 
 Index: 17
+
+Parent Magics: Air, Death
 
 Convergence Impact: **High**
 
