@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BOB",
+    "AED",
+    "BOB"
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:black_dye"
+    },
+    "O": {
+      "item": "minecraft:ominous_bottle"
+    },
+    "A": {
+      "item": "elemental-convergence:air_magic_eye"
+    },
+    "D": {
+      "item": "elemental-convergence:death_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:void_convergent_eye",
+    "count": 1
+  }
+}
