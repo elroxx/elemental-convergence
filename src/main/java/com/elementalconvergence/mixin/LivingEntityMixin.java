@@ -2,6 +2,7 @@ package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.effect.ModEffects;
+import com.elementalconvergence.effect.VoidSicknessEffect;
 import com.google.common.base.Objects;
 import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.block.Blocks;
@@ -59,6 +60,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Optional;
 import java.util.Random;
 
+import static com.elementalconvergence.world.dimension.ModDimensions.VOID_WORLD_KEY;
+
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
 
@@ -102,6 +105,19 @@ public abstract class LivingEntityMixin {
             LivingEntity entity = (LivingEntity) (Object) this;
             //Put gravity back to normal in those case
             GravityChangerAPI.setBaseGravityDirection(entity, Direction.DOWN);
+        }
+
+        //check if its the end of void sickness
+        if (statusEffect.equals(ModEffects.VOID_SICKNESS)){
+            LivingEntity entity = (LivingEntity) (Object) this;
+            if (entity.getWorld().isClient()) {
+                return; // Only run on server side
+            }
+
+            // When effect ends, teleport back to overworld
+            if (entity.getWorld().getRegistryKey().equals(VOID_WORLD_KEY)) {
+                VoidSicknessEffect.teleportToOverworld(entity);
+            }
         }
     }
 

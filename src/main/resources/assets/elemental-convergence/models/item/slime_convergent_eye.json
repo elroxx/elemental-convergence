@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "elemental-convergence:item/slime_convergent_eye"
+  }
+}

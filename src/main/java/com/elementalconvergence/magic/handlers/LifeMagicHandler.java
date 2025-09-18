@@ -49,7 +49,7 @@ public class LifeMagicHandler implements IMagicHandler {
     public static final float GROWTH_RADIUS = 5.0f;
     public static final int REGEN_DEFAULT_COOLDOWN=50;
     public static final int GROWTH_DEFAULT_COOLDOWN=65;
-    public static final int RESURRECTION_DEFAULT_COOLDOWN=20*60*3; //3 minutes
+    public static final int RESURRECTION_DEFAULT_COOLDOWN=20*60*2; //2 minutes
     public static final int GROUP_TP_DEFAULT_COOLDOWN=60;
     //public static final int RESURRECTION_DEFAULT_COOLDOWN=20;
 
@@ -327,7 +327,7 @@ public class LifeMagicHandler implements IMagicHandler {
 
 
         for (int x = -radius; x <= radius; x++) {
-            for (int y = 0; y < maxY; y++) {
+            for (int y = -30; y < maxY; y++) {
                 for (int z = -radius; z <= radius; z++) {
                     BlockPos pos = playerPos.add(x, y - playerPos.getY(), z);
                     if (world.getBlockState(pos).getBlock() == BLOCK_FOR_GATEWAY) {
