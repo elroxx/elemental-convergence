@@ -28,6 +28,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> FURNACE = register("furnace", new FurnaceEffect());
     public static final RegistryEntry<StatusEffect> BOUNCY = register("bouncy", new BouncyEffect());
     public static final RegistryEntry<StatusEffect> VOID_SICKNESS = register("void_sickness", new VoidSicknessEffect());
+    //public static final RegistryEntry<StatusEffect> ARACHNID = register("arachnid", new ArachnidEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {
