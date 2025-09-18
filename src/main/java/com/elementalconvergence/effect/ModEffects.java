@@ -27,6 +27,7 @@ public class ModEffects {
     public static final RegistryEntry<StatusEffect> MYSTICAL_TOUCH = register("mystical_touch", new MysticalEffect());
     public static final RegistryEntry<StatusEffect> FURNACE = register("furnace", new FurnaceEffect());
     public static final RegistryEntry<StatusEffect> BOUNCY = register("bouncy", new BouncyEffect());
+    public static final RegistryEntry<StatusEffect> VOID_SICKNESS = register("void_sickness", new VoidSicknessEffect());
 
 
     private static RegistryEntry<StatusEffect> register(String id, StatusEffect statusEffect) {

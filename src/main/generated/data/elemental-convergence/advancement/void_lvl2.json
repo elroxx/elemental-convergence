@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:void_lvl1",
+  "criteria": {
+    "has_void_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:void_lvl2",
+        "criterionName": "void_criterion_lvl2",
+        "magicIndex": 17
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "void_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "elemental-convergence:void_essence"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "void_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:void_lvl2",
+        "criterionName": "void_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:void_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Craft a void essence",
+    "icon": {
+      "count": 1,
+      "id": "elemental-convergence:void_essence"
+    },
+    "title": "Void Level 2"
+  },
+  "requirements": [
+    [
+      "void_criterion_lvl2"
+    ],
+    [
+      "void_has_lvl2"
+    ],
+    [
+      "has_void_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

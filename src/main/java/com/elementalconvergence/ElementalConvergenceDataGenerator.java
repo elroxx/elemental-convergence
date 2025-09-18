@@ -485,6 +485,34 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//MYSTIC LVL 3
 			AdvancementEntry mysticLevel3 = generateMysticLevelsAdvancements(mysticSelectedCN, mysticSelectedAdvName, mysticSelectedAdvancement, consumer);
 
+			//SLIME HERE
+
+			//VOID MAGIC SELECTED
+			String voidSelectedCN = "void_magic_selected";
+			String voidSelectedAdvName = ElementalConvergence.MOD_ID + ":void_magic_selected";
+			AdvancementEntry voidSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.BLACK_STAINED_GLASS_PANE,
+							Text.literal("Void Convergence Magic"),
+							Text.literal("Convergence of Air and Death Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(voidSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							17)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName, voidSelectedCN, voidSelectedAdvName)))
+					.parent(deathLevel3)
+					.build(consumer, voidSelectedAdvName);
+
+			//VOID LVL 1
+			//VOID LVL 2
+			//VOID LVL 3
+			AdvancementEntry voidLevel3 = generateVoidLevelsAdvancements(voidSelectedCN, voidSelectedAdvName, voidSelectedAdvancement, consumer);
+
 		}
 
 		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
@@ -1813,6 +1841,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return mysticAdv3;
+		}
+
+		public AdvancementEntry generateVoidLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = VoidMagicHandler.VOID_INDEX;
+			String goodMagicPicked = "has_void_selected_concurrent";
+			String achievementTitle = "Void Level ";
+			String CN = "void_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":void_lvl";
+			String haslvl = "void_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry voidAdv1 = Advancement.Builder.create()
+					.display(
+							ModItems.VOID_DRILL,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft Bob's drill"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.VOID_DRILL))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = voidAdv1;
+			lvl = 2;
+			AdvancementEntry voidAdv2 = Advancement.Builder.create()
+					.display(
+							ModItems.VOID_ESSENCE,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Craft a void essence"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.VOID_ESSENCE))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = voidAdv2;
+			lvl = 3;
+			AdvancementEntry voidAdv3 = Advancement.Builder.create()
+					.display(
+							Items.MUSIC_DISC_11,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Loot the music disc 11"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.MUSIC_DISC_11))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return voidAdv3;
 		}
 
 	}

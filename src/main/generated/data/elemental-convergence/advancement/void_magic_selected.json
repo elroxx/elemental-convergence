@@ -1,0 +1,37 @@
+{
+  "parent": "elemental-convergence:death_lvl3",
+  "criteria": {
+    "has_no_magic": {
+      "conditions": {
+        "advancementName": "elemental-convergence:void_magic_selected",
+        "criterionName": "void_magic_selected",
+        "parentAdvancement": "elemental-convergence:root"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "void_magic_selected": {
+      "conditions": {
+        "requiredMagic": 17
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    }
+  },
+  "display": {
+    "description": "Convergence of Air and Death Magics",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:black_stained_glass_pane"
+    },
+    "title": "Void Convergence Magic"
+  },
+  "requirements": [
+    [
+      "void_magic_selected"
+    ],
+    [
+      "has_no_magic"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
