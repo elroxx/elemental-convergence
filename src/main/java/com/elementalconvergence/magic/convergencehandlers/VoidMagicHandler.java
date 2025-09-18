@@ -4,16 +4,19 @@ import com.elementalconvergence.data.IMagicDataSaver;
 import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.entity.MinionSlimeEntity;
+import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKey;
@@ -49,6 +52,11 @@ public class VoidMagicHandler implements IMagicHandler {
     public static final int DEFAULT_VOID_SWAP_COOLDOWN = 5;
     private int voidSwapCooldown=0;
     public static final RegistryKey<World> VOID_DIMENSION = VOID_WORLD_KEY; //to change once i have the void dimension done
+
+
+    public static final int DEFAULT_ESSENCE_COOLDOWN = 20;
+    private int essenceCooldown=0;
+
     //void dimension needs to go from 0 to 96 because i want to do *4 everywhere (and its 384 blocks in the overworld.
 
     //DONT TAKE DAMAGE IN END OR IN VOID
@@ -57,8 +65,7 @@ public class VoidMagicHandler implements IMagicHandler {
     //lvl 1 is drill
     //crafted with 1 diamond pickaxe, 3 copper and 3 iron blocks
     //lvl 2 is something kind of random like a void essence or something hard to get that is relatively dark ig.
-    //void essence being crafted with something like idk a 4x netherite ingot, 4x black dye, 1x ominous trial key
-    //lvl 3 is Music Disc 5
+    //lvl 3 is Music Disc 11
 
     @Override
     public void handleItemRightClick(PlayerEntity player) {
@@ -68,6 +75,50 @@ public class VoidMagicHandler implements IMagicHandler {
     @Override
     public void handleEntityRightClick(PlayerEntity player, Entity targetEntity) {
 
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int voidLevel = magicData.getMagicLevel(VOID_INDEX);
+
+        if (voidLevel>=3 && essenceCooldown==0 && player.getMainHandStack().isOf(ModItems.VOID_ESSENCE) && targetEntity instanceof LivingEntity livingTarget) {
+
+            //only works in overworld
+            if (!player.getWorld().getRegistryKey().equals(World.OVERWORLD)) {
+                player.sendMessage(Text.of("§cVoid essence can only be used in the overworld!"), true);
+                return;
+            }
+
+            // consume
+            if (!player.isCreative()) {
+                player.getMainHandStack().decrement(1);
+            }
+
+            // 2 minutes
+            StatusEffectInstance voidSickness = new StatusEffectInstance( ModEffects.VOID_SICKNESS,20*60*2, 0,false, true,  true);
+
+            livingTarget.addStatusEffect(voidSickness);
+
+            //cooldown
+            essenceCooldown = DEFAULT_ESSENCE_COOLDOWN;
+            player.getItemCooldownManager().set(ModItems.VOID_ESSENCE, DEFAULT_ESSENCE_COOLDOWN);
+
+            //playsound
+            player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.0F, 0.5F);
+
+            //particles
+            if (player.getWorld() instanceof ServerWorld serverWorld) {
+                serverWorld.spawnParticles(
+                        ParticleTypes.SQUID_INK,
+                        targetEntity.getX() + 0.5,
+                        targetEntity.getY() + 0.5,
+                        targetEntity.getZ() + 0.5,
+                        10,
+                        0.25,
+                        0.25, //so that they rise a little
+                        0.25,
+                        0);
+            }
+        }
     }
 
     @Override
@@ -85,7 +136,7 @@ public class VoidMagicHandler implements IMagicHandler {
         if (currentWorld.equals(World.OVERWORLD)) {
 
             //if player can fly and he isnt in creative, remove this ability
-            if (player.getAbilities().allowFlying && !player.isCreative()) {
+            if (player.getAbilities().allowFlying && !(player.isCreative() || player.isSpectator())) {
                 player.getAbilities().allowFlying = false;
                 player.getAbilities().flying = false;
                 ((ServerPlayerEntity) player).sendAbilitiesUpdate();
@@ -119,6 +170,10 @@ public class VoidMagicHandler implements IMagicHandler {
         //cooldowns
         if (voidSwapCooldown>0){
             voidSwapCooldown--;
+        }
+
+        if (essenceCooldown>0){
+            essenceCooldown--;
         }
     }
 
