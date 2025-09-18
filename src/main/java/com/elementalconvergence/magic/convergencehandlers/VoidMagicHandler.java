@@ -13,18 +13,24 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.PositionFlag;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 import static com.elementalconvergence.world.dimension.ModDimensions.VOID_WORLD_KEY;
@@ -67,7 +73,7 @@ public class VoidMagicHandler implements IMagicHandler {
         //debuff dimension sickness
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
         RegistryKey<World> currentWorld = serverPlayer.getServerWorld().getRegistryKey();
-        if (currentWorld.equals(World.OVERWORLD) || currentWorld.equals(World.NETHER)) {
+        if (currentWorld.equals(World.OVERWORLD)) {
 
             //if player can fly and he isnt in creative, remove this ability
             if (player.getAbilities().allowFlying && !player.isCreative()) {
@@ -97,7 +103,6 @@ public class VoidMagicHandler implements IMagicHandler {
         if (currentWorld.equals(VOID_DIMENSION)){
             if (!player.getAbilities().allowFlying) {
                 player.getAbilities().allowFlying = true;
-                player.getAbilities().flying = true;
                 ((ServerPlayerEntity) player).sendAbilitiesUpdate();
             }
         }
@@ -135,11 +140,81 @@ public class VoidMagicHandler implements IMagicHandler {
         MagicData magicData = dataSaver.getMagicData();
         int voidLevel = magicData.getMagicLevel(VOID_INDEX);
 
-        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
-        if (serverPlayer.getServerWorld().getRegistryKey().equals(VOID_DIMENSION)){
-            double owPosX = player.getPos().x * 4.0;
-            double owPosY = (player.getPos().y * 4.0)+64.0;
-            double owPosZ = player.getPos().z * 4.0;
+        if (voidLevel>=2) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            RegistryKey<World> worldKey = serverPlayer.getServerWorld().getRegistryKey();
+            MinecraftServer server = player.getWorld().getServer();
+            if (server!=null) {
+                if (worldKey.equals(VOID_DIMENSION)) {
+                    //particles before tp
+                    serverPlayer.getServerWorld().spawnParticles(
+                            ParticleTypes.SQUID_INK,
+                            serverPlayer.getX() + 0.5,
+                            serverPlayer.getY() + 0.5,
+                            serverPlayer.getZ() + 0.5,
+                            10,
+                            0.25,
+                            0.25, //so that they rise a little
+                            0.25,
+                            0);
+
+
+
+                    double owPosX = player.getPos().x * 4.0;
+                    double owPosY = (player.getPos().y * 4.0) + 64.0;
+                    double owPosZ = player.getPos().z * 4.0;
+
+                    //tp
+                    ServerWorld owWorld = server.getWorld(World.OVERWORLD);
+                    float yaw = player.getYaw();
+                    float pitch = player.getPitch();
+
+                    Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+                    player.teleport(owWorld, owPosX, owPosY, owPosZ, flags, yaw, pitch);
+                    onDimSwapSuccess(serverPlayer);
+
+                } else if (worldKey.equals(World.OVERWORLD)) {
+                    //particles before tp
+                    serverPlayer.getServerWorld().spawnParticles(
+                            ParticleTypes.SQUID_INK,
+                            serverPlayer.getX() + 0.5,
+                            serverPlayer.getY() + 0.5,
+                            serverPlayer.getZ() + 0.5,
+                            10,
+                            0.25,
+                            0.25, //so that they rise a little
+                            0.25,
+                            0);
+
+                    player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
+                            SoundEvents.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.0F, 0.5F);
+
+                    double voidPosX = player.getPos().x / 4.0;
+                    double voidPosY = (player.getPos().y - 64.0) / 4.0;
+                    double voidPosZ = player.getPos().z / 4.0;
+
+                    ServerWorld voidWorld = server.getWorld(VOID_DIMENSION);
+                    float yaw = player.getYaw();
+                    float pitch = player.getPitch();
+                    Set<PositionFlag> flags = EnumSet.of(PositionFlag.X, PositionFlag.Y, PositionFlag.Z, PositionFlag.X_ROT, PositionFlag.Y_ROT);
+                    player.teleport(voidWorld, voidPosX, voidPosY, voidPosZ, flags, yaw, pitch);
+                    onDimSwapSuccess(serverPlayer);
+
+                    //add flight for ease
+                    if (!player.getAbilities().allowFlying) {
+                        player.getAbilities().allowFlying = true;
+                        ((ServerPlayerEntity) player).sendAbilitiesUpdate();
+                    }
+                    if (!player.getAbilities().flying){
+                        player.getAbilities().flying = true;
+                        ((ServerPlayerEntity) player).sendAbilitiesUpdate();
+                    }
+
+                } else {
+                    player.sendMessage(Text.of("§cCannot access the void in this dimension!"), true);
+                }
+                voidSwapCooldown = DEFAULT_VOID_SWAP_COOLDOWN;
+            }
         }
     }
 
@@ -150,6 +225,24 @@ public class VoidMagicHandler implements IMagicHandler {
 
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
+
+    }
+
+    private void onDimSwapSuccess(ServerPlayerEntity serverPlayer){
+        //particles before tp
+        serverPlayer.getServerWorld().spawnParticles(
+                ParticleTypes.SQUID_INK,
+                serverPlayer.getX() + 0.5,
+                serverPlayer.getY() + 0.5,
+                serverPlayer.getZ() + 0.5,
+                10,
+                0.25,
+                0.25, //so that they rise a little
+                0.25,
+                0);
+
+        serverPlayer.getWorld().playSound(null, serverPlayer.getX(), serverPlayer.getY(), serverPlayer.getZ(),
+                SoundEvents.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.0F, 0.5F);
 
     }
 }
