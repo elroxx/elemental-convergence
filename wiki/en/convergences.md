@@ -192,3 +192,27 @@ Playstyle: Enchantments, Support
 
 ***Energy Channeling* (Level 3) - Item**: Right click with solid mystical energy (in main hand) and an enchanted piece of equipment (in off hand) to add one level to every enchantment that is on the piece of equipment.
 
+## Void
+
+Index: 17
+
+Convergence Impact: **High**
+
+Playstyle: Builder, Stealth
+
+### Passives
+
+***Void's Herald* (Buff)**: Can fly in the void.
+
+***Empty Feets* (Buff)**: Very low fall damage.
+
+***Dimension Sickness* (Debuff)**: Takes damage when in the overworld.
+
+### Spells
+
+
+***Bob's Drill* (Level 1) - Item**: Right click with Bob's drill to destroy a block of bedrock.
+
+***Void Swap* (Level 2) - Keybind**: Press to teleport in the void. 1 block in the void is 4 blocks in the overworld.
+
+***Void Infusion* (Level 3) - Item**: Right click an entity with a void essence to infuse them with void. This teleports the entity in the void for a moment. The entity gets to have a block platform placed under them. How nice.
