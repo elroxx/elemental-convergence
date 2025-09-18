@@ -505,7 +505,7 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 							17)))
 					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							rootAdvName, voidSelectedCN, voidSelectedAdvName)))
-					.parent(fireLevel3)
+					.parent(deathLevel3)
 					.build(consumer, voidSelectedAdvName);
 
 			//VOID LVL 1
