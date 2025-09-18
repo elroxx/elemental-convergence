@@ -5,6 +5,7 @@ import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.entity.MinionSlimeEntity;
 import com.elementalconvergence.magic.IMagicHandler;
+import gravity_changer.api.GravityChangerAPI;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
@@ -38,6 +39,8 @@ import static com.elementalconvergence.world.dimension.ModDimensions.VOID_WORLD_
 public class VoidMagicHandler implements IMagicHandler {
     public static final int VOID_INDEX= (BASE_MAGIC_ID.length-1)+10;
 
+    public static final float VOID_GRAVITY = 0.02f; // 1/50 grav
+
     public static final int DEFAULT_DIMENSIONSICK_COOLDOWN = 20*10; //every 10 seconds take half a heart of dmg
     private int dimensionSickCooldown=0;
 
@@ -69,6 +72,12 @@ public class VoidMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePassive(PlayerEntity player) {
+
+        //buff lower gravity
+        double currentgStrength = GravityChangerAPI.getBaseGravityStrength(player);
+        if (Math.abs(currentgStrength-VOID_GRAVITY)>=0.005){
+            GravityChangerAPI.setBaseGravityStrength(player, VOID_GRAVITY);
+        }
 
         //debuff dimension sickness
         ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
