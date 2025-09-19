@@ -857,6 +857,7 @@ public class ElementalConvergence implements ModInitializer {
 		allRecipesList.add(id("void_drill"));
 		allRecipesList.add(id("void_essence"));
 		allRecipesList.add(id("water_magic_eye"));
+		allRecipesList.add(id("lodestone"));
 
 
 		return allRecipesList;
