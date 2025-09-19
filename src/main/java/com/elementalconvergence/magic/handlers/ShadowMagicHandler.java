@@ -77,11 +77,11 @@ public class ShadowMagicHandler implements IMagicHandler {
                     invisCooldown = DEFAULT_INVIS_COOLDOWN;
                     if (!player.hasStatusEffect(StatusEffects.INVISIBILITY)) {
                         StatusEffectInstance invisibility = new StatusEffectInstance(StatusEffects.INVISIBILITY,
-                                INVIS_DURATION, //DURATON
-                                0, //AMPLIFIER
+                                INVIS_DURATION,
+                                0,
                                 true,
                                 false,
-                                false
+                                true
                         );
                         player.addStatusEffect(invisibility);
                     }
@@ -91,7 +91,7 @@ public class ShadowMagicHandler implements IMagicHandler {
                     player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(20.0F);
                 }
                 ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
-                if (playerHeldItem.getScale()-SHADOW_HELD_ITEM>0.1){
+                if (Math.abs(playerHeldItem.getScale()-SHADOW_HELD_ITEM)>0.1){
                     playerHeldItem.setScale(SHADOW_HELD_ITEM);
                 }
 
@@ -106,7 +106,7 @@ public class ShadowMagicHandler implements IMagicHandler {
                 }
 
                 ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
-                if (playerHeldItem.getScale()-BASE_HELD_ITEM>0.1){
+                if (Math.abs(playerHeldItem.getScale()-BASE_HELD_ITEM)>0.01){
                     playerHeldItem.setScale(BASE_HELD_ITEM);
                 }
             }
@@ -119,7 +119,7 @@ public class ShadowMagicHandler implements IMagicHandler {
                     player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(10.0F);
                 }
                 ScaleData playerHeldItem = ScaleTypes.HELD_ITEM.getScaleData(player);
-                if (playerHeldItem.getScale()-BASE_HELD_ITEM>0.1){
+                if (Math.abs(playerHeldItem.getScale()-BASE_HELD_ITEM)>0.01){
                     playerHeldItem.setScale(BASE_HELD_ITEM);
                 }
             }
