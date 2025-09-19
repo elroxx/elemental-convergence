@@ -65,7 +65,7 @@ public class HoneyMagicHandler implements IMagicHandler {
     public static final float BEE_MOTION= 0.25f;
     public static final float BEE_REACH=0.8f;
     public static final float BEE_HEALTH=16.0f;
-    public static final float BEE_FLIGHT_SPEED=2.4f; //so 0.6 the speed of a creative player
+    public static final float BEE_FLIGHT_SPEED=4.0f; //so 0.6 the speed of a creative player
 
     public static final int INVENTORY_LOCK_DEFAULT_COOLDOWN = 20; //aka 1 seconds
     private int inventoryLockCooldown=0;
