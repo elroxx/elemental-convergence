@@ -599,6 +599,12 @@ public class ElementalConvergence implements ModInitializer {
 		void_requirements.add(7); //DEATH
 		arrayForRequirements[9]=void_requirements;
 
+		//SPIDER REQUIREMENTS
+		/*ArrayList<Integer> spider_requirements = new ArrayList<>();
+		spider_requirements.add(4); //SHADOW
+		spider_requirements.add(6); //LIFE
+		arrayForRequirements[10]=spider_requirements;*/
+
 
 		for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
 			convergenceRequirementsMap.put(CONVERGENCE_MAGIC_ID[i], arrayForRequirements[i]);
@@ -851,6 +857,7 @@ public class ElementalConvergence implements ModInitializer {
 		allRecipesList.add(id("void_drill"));
 		allRecipesList.add(id("void_essence"));
 		allRecipesList.add(id("water_magic_eye"));
+		allRecipesList.add(id("lodestone"));
 
 
 		return allRecipesList;

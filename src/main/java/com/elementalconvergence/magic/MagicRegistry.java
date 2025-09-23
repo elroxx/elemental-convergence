@@ -53,6 +53,7 @@ public class MagicRegistry {
         magic_handlers[MysticMagicHandler.MYSTIC_INDEX] = new MysticMagicHandler();
         magic_handlers[SlimeMagicHandler.SLIME_INDEX] = new SlimeMagicHandler();
         magic_handlers[VoidMagicHandler.VOID_INDEX] = new VoidMagicHandler();
+        //magic_handlers[SpiderMagicHandler.SPIDER_INDEX] = new SpiderMagicHandler();
         //magic_handlers[StarMagicHandler.STAR_INDEX] = new StarMagicHandler(); //star removed
 
         System.out.println("MAGICREGISTRY CREATED");

@@ -90,9 +90,13 @@ public class WaterMagicHandler implements IMagicHandler {
                     RegistryEntry<Enchantment> lureEntry = world.getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.LURE);
                     int lureLvl = EnchantmentHelper.getLevel(luckEntry, mainHand);
 
-                    if (lureLvl<3 || luckLvl<3){
+                    RegistryEntry<Enchantment> unbreakingEntry = world.getRegistryManager().getWrapperOrThrow(RegistryKeys.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING);
+                    int unbreakingLvl = EnchantmentHelper.getLevel(unbreakingEntry, mainHand);
+
+                    if (lureLvl<3 || luckLvl<3 || unbreakingLvl<3){
                         mainHand.addEnchantment(lureEntry, 3);
                         mainHand.addEnchantment(luckEntry, 3);
+                        mainHand.addEnchantment(unbreakingEntry, 3);
                         onNautilusEnchant(player, offHand);
                     }
 
