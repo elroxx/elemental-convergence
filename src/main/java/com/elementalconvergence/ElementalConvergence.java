@@ -118,8 +118,8 @@ public class ElementalConvergence implements ModInitializer {
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
 
 	//star was removed
-	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy", "Honey", "Blood", "Quantum", "Mystic", "Slime", "Void"};
-	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity", "steam", "holy", "honey", "blood", "quantum", "mystic", "slime", "void"};
+	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy", "Honey", "Blood", "Quantum", "Mystic", "Slime", "Void", "Spider", "Electricity", "Emotions"};
+	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity", "steam", "holy", "honey", "blood", "quantum", "mystic", "slime", "void", "spider", "electricity", "emotions"};
 	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
 
 	//FOR THINGS THAT NEED ALL THE MAGICS IN THE LOGIC
@@ -600,10 +600,28 @@ public class ElementalConvergence implements ModInitializer {
 		arrayForRequirements[9]=void_requirements;
 
 		//SPIDER REQUIREMENTS
-		/*ArrayList<Integer> spider_requirements = new ArrayList<>();
+		ArrayList<Integer> spider_requirements = new ArrayList<>();
 		spider_requirements.add(4); //SHADOW
 		spider_requirements.add(6); //LIFE
-		arrayForRequirements[10]=spider_requirements;*/
+		arrayForRequirements[10]=spider_requirements;
+
+		//ELECTRICITY REQUIREMENTS
+		ArrayList<Integer> electricity_requirements = new ArrayList<>();
+		electricity_requirements.add(2); //FIRE
+		electricity_requirements.add(5); //LIGHT
+		arrayForRequirements[11]=electricity_requirements;
+
+		//EMOTIONS REQUIREMENTS
+		ArrayList<Integer> emotions_requirements = new ArrayList<>();
+		emotions_requirements.add(0); //EARTH
+		emotions_requirements.add(1); //AIR
+		emotions_requirements.add(2); //FIRE
+		emotions_requirements.add(3); //WATER
+		emotions_requirements.add(4); //SHADOW
+		emotions_requirements.add(5); //LIGHT
+		emotions_requirements.add(6); //LIFE
+		emotions_requirements.add(7); //DEATH
+		arrayForRequirements[12]=emotions_requirements;
 
 
 		for (int i=0; i<CONVERGENCE_MAGIC_ID.length; i++){
