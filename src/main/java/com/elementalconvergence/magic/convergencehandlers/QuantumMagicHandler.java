@@ -12,6 +12,8 @@ import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -61,7 +63,7 @@ public class QuantumMagicHandler implements IMagicHandler {
         MagicData magicData = dataSaver.getMagicData();
         int quantumLevel = magicData.getMagicLevel(QUANTUM_INDEX);
         if (quantumLevel >= 3) {
-            if (player.isSneaking() && targetEntity instanceof LivingEntity livingEntity) {
+            if (player.isSneaking() && targetEntity instanceof LivingEntity livingEntity && !(targetEntity instanceof PlayerEntity || targetEntity instanceof WitherEntity || targetEntity instanceof EnderDragonEntity)) {
                 ItemStack eggStack = createMobEgg(livingEntity);
 
                 if (eggStack != null) {

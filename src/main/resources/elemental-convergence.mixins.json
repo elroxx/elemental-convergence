@@ -16,7 +16,9 @@
 		"EntityAccessor",
 		"InvSlotMixin",
 		"BlockMixin",
-		"PersistentProjectileEntityMixin"
+		"PersistentProjectileEntityMixin",
+		"BambooBlockMixin",
+		"HorizontalConnectingBlockMixin"
 	],
 	"client": [
 		"ArmorFeatureRendererMixin",
