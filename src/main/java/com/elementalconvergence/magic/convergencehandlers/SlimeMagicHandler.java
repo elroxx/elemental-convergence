@@ -57,9 +57,9 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class SlimeMagicHandler implements IMagicHandler {
     public static final int SLIME_INDEX= (BASE_MAGIC_ID.length-1)+9;
 
-    public static final int LEAP_DEFAULT_COOLDOWN = 30; //1.5 seconds
+    public static final int LEAP_DEFAULT_COOLDOWN = 40; //2 seconds
     private int leapCooldown=0;
-    public static final float SLIME_LEAP_STRENGTH = 3.0f;
+    public static final float SLIME_LEAP_STRENGTH = 2.5f;
 
 
     public static final float BASE_SIZE = 1.0f;
