@@ -54,10 +54,11 @@ import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
 public class SlimeMagicHandler implements IMagicHandler {
     public static final int SLIME_INDEX= (BASE_MAGIC_ID.length-1)+9;
 
-    public static final int LEAP_DEFAULT_COOLDOWN = 3*20; //3 seconds
+    public static final int LEAP_DEFAULT_COOLDOWN = 30; //1.5 seconds
     private int leapCooldown=0;
+    public static final float SLIME_LEAP_STRENGTH = 3.0f;
 
-    public static final int REGAIN_SIZE_FROM_SPLIT_TIMER_MAX=2500; //2:05 minutes 2500
+    public static final int REGAIN_SIZE_FROM_SPLIT_TIMER_MAX=2000; //2:05 minutes 2500
     private int regainSizeTimer=0;
     private float sizeBeforeSplit = 1.0f;
 
@@ -82,6 +83,36 @@ public class SlimeMagicHandler implements IMagicHandler {
         if (!player.hasStatusEffect(ModEffects.BOUNCY)){
             player.addStatusEffect(new StatusEffectInstance(ModEffects.BOUNCY, -1, 0, false, false, false));
         }
+
+        //wall bounce
+        Vec3d velocity = player.getVelocity();
+        /*if (Math.abs(velocity.x) > 0.05 || Math.abs(velocity.z) > 0.05) {
+            BlockPos pos = player.getBlockPos();
+            World world = player.getWorld();
+            if (world.getBlockState(pos.offset(getDirectionFromVelocity(velocity))).isSolidBlock(world, pos)) {
+                player.setVelocity(-velocity.x * 0.9, velocity.y, -velocity.z * 0.9);
+                player.velocityModified = true;
+            }
+        }*/
+        //x boucne
+        if (Math.abs(velocity.x) > 0.05){
+            BlockPos pos = player.getBlockPos();
+            World world = player.getWorld();
+            if (world.getBlockState(pos.offset(getHorizontalDirectionFromVelocity(velocity, true))).isSolidBlock(world, pos)) {
+                player.setVelocity(-velocity.x * 0.9, velocity.y, velocity.z);
+                player.velocityModified = true;
+            }
+        }
+        //z bounce
+        if (Math.abs(velocity.z) > 0.05){
+            BlockPos pos = player.getBlockPos();
+            World world = player.getWorld();
+            if (world.getBlockState(pos.offset(getHorizontalDirectionFromVelocity(velocity, false))).isSolidBlock(world, pos)) {
+                player.setVelocity(velocity.x, velocity.y, -velocity.z * 0.9);
+                player.velocityModified = true;
+            }
+        }
+
 
 
         //cooldowns
@@ -159,21 +190,25 @@ public class SlimeMagicHandler implements IMagicHandler {
             playerHeight.setScale(newSize);
             playerWidth.setScale(newSize);
 
-            // slime minion
-            MinionSlimeEntity slimeMinion = new MinionSlimeEntity(EntityType.SLIME, world);
+            //spawn minions
+            for (int i=0; i<2; i++) {
+                // slime minion
+                MinionSlimeEntity slimeMinion = new MinionSlimeEntity(EntityType.SLIME, world);
 
-            //minion pos
-            Vec3d playerPos = player.getPos();
-            slimeMinion.setPos(playerPos.x + 1.0, playerPos.y, playerPos.z);
+                //minion pos
+                Vec3d playerPos = player.getPos();
+                slimeMinion.setPos(playerPos.x, playerPos.y, playerPos.z);
 
-            //change minion size
-            slimeMinion.setMinionSize(newSize);
+                //change minion size
+                float slimeMinionSize = 5 * newSize;
+                slimeMinion.setMinionSize(slimeMinionSize);
 
-            // new owner
-            slimeMinion.setOwner(player);
+                // new owner
+                slimeMinion.setOwner(player);
 
-            // spawned
-            world.spawnEntity(slimeMinion);
+                // spawned
+                world.spawnEntity(slimeMinion);
+            }
 
             // playsound+particles
             player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_STEP, SoundCategory.PLAYERS, 1.0F, 0.8F);
@@ -192,18 +227,30 @@ public class SlimeMagicHandler implements IMagicHandler {
         IMagicDataSaver dataSaver = (IMagicDataSaver) player;
         MagicData magicData = dataSaver.getMagicData();
         int slimeLevel = magicData.getMagicLevel(SLIME_INDEX);
-        if (slimeLevel>=2 && leapCooldown==0) {
-            Vec3d look = player.getRotationVec(1.0F);
-            double leapStrength = 3;
+        //so the player is not in elytra
+        if (slimeLevel>=2 && leapCooldown==0 && !player.isFallFlying()) {
 
-            Vec3d velocity = new Vec3d(look.x * leapStrength, look.z*leapStrength+1.0, look.z * leapStrength);
-            player.setVelocity(velocity);
-            player.velocityModified = true;
+            Vec3d lookDir = player.getRotationVec(1.0f);
+            Vec3d leapVelocityHorizontalPlane = new Vec3d(
+                    lookDir.x * SLIME_LEAP_STRENGTH,
+                    0,
+                    lookDir.z * SLIME_LEAP_STRENGTH
+            );
 
+            // ADDING the horizontal velocity while resetting fully the vertical one
+            Vec3d horizontalVelocity = player.getVelocity().add(leapVelocityHorizontalPlane);
+            Vec3d finalVelocity = new Vec3d(
+                    horizontalVelocity.getX(),
+                    lookDir.y * SLIME_LEAP_STRENGTH,
+                    horizontalVelocity.getZ()
+            );
+
+            player.setVelocity(finalVelocity);
+            player.velocityModified=true; //IMPORTANT COZ IF NOT THIS DOESNT CHANGE THE PLAYERS VELOCITY AT ALL
 
 
             // playsound+particles
-            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_STEP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENTITY_SLIME_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
             ((ServerWorld) player.getWorld()).spawnParticles(ParticleTypes.ITEM_SLIME, player.getX(), player.getY(), player.getZ(), 30, 0.5, 0.5, 0.5, 0.1);
 
             //cooldown
@@ -217,17 +264,15 @@ public class SlimeMagicHandler implements IMagicHandler {
 
     }
 
-    public static Direction getDirectionFromVelocity(Vec3d velocity) {
+    public static Direction getHorizontalDirectionFromVelocity(Vec3d velocity, boolean isInX) {
         double x = velocity.x;
         double z = velocity.z;
 
-        if (Math.abs(x) > Math.abs(z)) {
+        if (isInX) {
             return x > 0 ? Direction.EAST : Direction.WEST;
-        } else if (Math.abs(z) > 0) {
+        } else{
             return z > 0 ? Direction.SOUTH : Direction.NORTH;
         }
-
-        return Direction.UP; //fallback in error ig
     }
 
 }
