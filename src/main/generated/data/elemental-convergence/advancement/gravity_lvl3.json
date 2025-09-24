@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "minecraft:netherite_block"
+            "items": "minecraft:heavy_core"
           }
         ]
       },
@@ -29,10 +29,10 @@
     }
   },
   "display": {
-    "description": "Craft a Netherite block",
+    "description": "Loot a heavy core",
     "icon": {
       "count": 1,
-      "id": "minecraft:netherite_block"
+      "id": "minecraft:heavy_core"
     },
     "title": "Gravity Level 3"
   },

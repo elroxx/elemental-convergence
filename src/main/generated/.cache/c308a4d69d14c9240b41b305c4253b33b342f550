@@ -1,4 +1,4 @@
-// 1.21.1	2025-09-17T22:04:57.2562185	Elemental Convergence/Advancements
+// 1.21.1	2025-09-24T19:20:17.4778839	Elemental Convergence/Advancements
 bce082b6765daae6866149f062e6c2f3ba100a2c data\elemental-convergence\advancement\mystic_lvl1.json
 6715c97d9b22a777b25489439aea8a8265bb8bb6 data\elemental-convergence\advancement\void_lvl1.json
 073293a2f3037b161dbbb6e01bf94f2f59115d99 data\elemental-convergence\advancement\root.json
@@ -55,7 +55,7 @@ d8de2857c73c2d3b757b1d90df3f56ae37a19209 data\elemental-convergence\advancement\
 aa39f9dbf463b81a42b6c4b0755a788c465b422b data\elemental-convergence\advancement\life_magic_selected.json
 c16b3c9f50214977fc17b9dcaa8dacf0baabf568 data\elemental-convergence\advancement\shadow_magic_selected.json
 bc02344fef2403b260ae0ab2825ef3fb3375e2d9 data\elemental-convergence\advancement\earth_lvl3.json
-527ac829150232896bb2b1201220bb4f778db760 data\elemental-convergence\advancement\gravity_lvl3.json
+b18bb8eaccd616dac421ca4ae1d4b5748bbed0b1 data\elemental-convergence\advancement\gravity_lvl3.json
 97aa316f84a838c6008c912fe85749ecdd0f729d data\elemental-convergence\advancement\earth_magic_selected.json
 db83c827536ca7b1581b467d868ad92c530222ef data\elemental-convergence\advancement\mystic_magic_selected.json
 be09f5ab09fc9e6059b1ed29d19bb61478b3f4aa data\elemental-convergence\advancement\honey_lvl3.json

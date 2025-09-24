@@ -1325,16 +1325,16 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			lvl = 3;
 			AdvancementEntry gravityAdv3 = Advancement.Builder.create()
 					.display(
-							Items.NETHERITE_BLOCK,
+							Items.HEAVY_CORE,
 							Text.literal(achievementTitle + lvl), //title
-							Text.literal("Craft a Netherite block"), //description
+							Text.literal("Loot a heavy core"), //description
 							null,
 							AdvancementFrame.TASK,
 							true,
 							true,
 							false
 					)
-					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.NETHERITE_BLOCK))
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.HEAVY_CORE))
 					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
 							previousAdvName, CN + lvl, advName + lvl)))
 					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
