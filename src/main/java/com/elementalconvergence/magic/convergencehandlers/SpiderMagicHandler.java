@@ -38,7 +38,7 @@ public class SpiderMagicHandler implements IMagicHandler {
 
     //buff: wall climb
     //debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
-    //buff normal zombies, skeleton, creeper and spider+cave spiders dont attack you. (MAYBE NOT??)
+    //buff normal zombies, skeleton, creeper and spider+cave spiders dont attack you. (MAYBE NOT??) //actually i dont want, buff is wall climb.
     //Passive: Spider webs are solid blocks.
 
     //lvl 1: When right clicking with a stack of string in the air. Create a line of cobwebs in the sky. Consume 1 string per block placed. Place them 1 by 1 with a small delay like the vein miner ability.
@@ -70,6 +70,9 @@ public class SpiderMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
+        if (!player.hasStatusEffect(ModEffects.ARACHNID)){
+            player.addStatusEffect(new StatusEffectInstance(ModEffects.ARACHNID, -1, 0, false, false, false));
+        }
     }
 
     @Override

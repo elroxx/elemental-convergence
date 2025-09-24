@@ -18,7 +18,8 @@
 		"BlockMixin",
 		"PersistentProjectileEntityMixin",
 		"BambooBlockMixin",
-		"HorizontalConnectingBlockMixin"
+		"HorizontalConnectingBlockMixin",
+		"CobwebBlockMixin"
 	],
 	"client": [
 		"ArmorFeatureRendererMixin",
