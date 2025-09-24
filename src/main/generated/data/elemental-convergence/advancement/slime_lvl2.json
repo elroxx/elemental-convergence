@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:slime_lvl1",
+  "criteria": {
+    "has_slime_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:slime_lvl2",
+        "criterionName": "slime_criterion_lvl2",
+        "magicIndex": 16
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "slime_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:lily_pad"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "slime_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:slime_lvl2",
+        "criterionName": "slime_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:slime_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Find a lily pad",
+    "icon": {
+      "count": 1,
+      "id": "minecraft:lily_pad"
+    },
+    "title": "Slime Level 2"
+  },
+  "requirements": [
+    [
+      "slime_criterion_lvl2"
+    ],
+    [
+      "slime_has_lvl2"
+    ],
+    [
+      "has_slime_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

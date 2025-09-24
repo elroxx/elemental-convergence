@@ -485,7 +485,31 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//MYSTIC LVL 3
 			AdvancementEntry mysticLevel3 = generateMysticLevelsAdvancements(mysticSelectedCN, mysticSelectedAdvName, mysticSelectedAdvancement, consumer);
 
-			//SLIME HERE
+			//SLIME MAGIC SELECTED
+			String slimeSelectedCN = "slime_magic_selected";
+			String slimeSelectedAdvName = ElementalConvergence.MOD_ID + ":slime_magic_selected";
+			AdvancementEntry slimeSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.SLIME_BALL,
+							Text.literal("Slime Convergence Magic"),
+							Text.literal("Convergence of Water and Earth Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(slimeSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							16)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName, slimeSelectedCN, slimeSelectedAdvName)))
+					.parent(waterLevel3)
+					.build(consumer, slimeSelectedAdvName);
+
+			//SLIME LVL 1
+			//SLIME LVL 2
+			//SLIME LVL 3
+			AdvancementEntry slimeLevel3 = generateSlimeLevelsAdvancements(slimeSelectedCN, slimeSelectedAdvName, slimeSelectedAdvancement, consumer);
 
 			//VOID MAGIC SELECTED
 			String voidSelectedCN = "void_magic_selected";
@@ -1841,6 +1865,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return mysticAdv3;
+		}
+
+		public AdvancementEntry generateSlimeLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = SlimeMagicHandler.SLIME_INDEX;
+			String goodMagicPicked = "has_slime_selected_concurrent";
+			String achievementTitle = "Slime Level ";
+			String CN = "slime_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":slime_lvl";
+			String haslvl = "slime_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry slimeAdv1 = Advancement.Builder.create()
+					.display(
+							Items.SLIME_BLOCK,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a slime block"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.SLIME_BLOCK))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = slimeAdv1;
+			lvl = 2;
+			AdvancementEntry slimeAdv2 = Advancement.Builder.create()
+					.display(
+							Items.LILY_PAD,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Find a lily pad"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.LILY_PAD))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = slimeAdv2;
+			lvl = 3;
+			AdvancementEntry slimeAdv3 = Advancement.Builder.create()
+					.display(
+							ModItems.DISSOLVING_SLIME,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Craft a dissolving slime"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.DISSOLVING_SLIME))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return slimeAdv3;
 		}
 
 		public AdvancementEntry generateVoidLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {

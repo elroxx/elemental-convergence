@@ -1,0 +1,37 @@
+{
+  "parent": "elemental-convergence:water_lvl3",
+  "criteria": {
+    "has_no_magic": {
+      "conditions": {
+        "advancementName": "elemental-convergence:slime_magic_selected",
+        "criterionName": "slime_magic_selected",
+        "parentAdvancement": "elemental-convergence:root"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    },
+    "slime_magic_selected": {
+      "conditions": {
+        "requiredMagic": 16
+      },
+      "trigger": "minecraft:elemental-convergence/selected_magic"
+    }
+  },
+  "display": {
+    "description": "Convergence of Water and Earth Magics",
+    "hidden": true,
+    "icon": {
+      "count": 1,
+      "id": "minecraft:slime_ball"
+    },
+    "title": "Slime Convergence Magic"
+  },
+  "requirements": [
+    [
+      "slime_magic_selected"
+    ],
+    [
+      "has_no_magic"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

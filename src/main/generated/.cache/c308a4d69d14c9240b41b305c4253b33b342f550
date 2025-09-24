@@ -1,4 +1,4 @@
-// 1.21.1	2025-09-24T19:20:17.4778839	Elemental Convergence/Advancements
+// 1.21.1	2025-09-24T19:26:03.7947584	Elemental Convergence/Advancements
 bce082b6765daae6866149f062e6c2f3ba100a2c data\elemental-convergence\advancement\mystic_lvl1.json
 6715c97d9b22a777b25489439aea8a8265bb8bb6 data\elemental-convergence\advancement\void_lvl1.json
 073293a2f3037b161dbbb6e01bf94f2f59115d99 data\elemental-convergence\advancement\root.json
@@ -8,6 +8,7 @@ b2fed419b864401a9f71c4cb8c2a8d1e379cc9f4 data\elemental-convergence\advancement\
 5ca21d7b1956d70e843892dd583eeb921558a681 data\elemental-convergence\advancement\blood_lvl2.json
 deb1564b1f6c3d4c71f63432db00c311433c3aa2 data\elemental-convergence\advancement\rat_lvl3.json
 cbb05b69e263ecc9a2281979e739f1add6b9aa56 data\elemental-convergence\advancement\air_lvl1.json
+d0e3dc1fdf0455b01c6146b3e0f067b4e27b36b2 data\elemental-convergence\advancement\slime_lvl1.json
 3c96df5c42b0aa1d67dca380ff10dd2688056870 data\elemental-convergence\advancement\fire_lvl1.json
 c08a6912c317adc0c074e840b65d500971a2971b data\elemental-convergence\advancement\steam_magic_selected.json
 d06e2f723c50385889721e34fb716f234cefda32 data\elemental-convergence\advancement\honey_lvl1.json
@@ -38,9 +39,11 @@ d46d4983174a34838b71378564f0e237c86fc442 data\elemental-convergence\advancement\
 589090617a6e8fba1f883b6c21e5229c00bb27c2 data\elemental-convergence\advancement\water_lvl3.json
 0b39ebf2121ef43c9d91654435dd452a7e4081c0 data\elemental-convergence\advancement\gravity_lvl1.json
 4910e058e6e7f19e92aa7c7a796e8ced6c2ec4c3 data\elemental-convergence\advancement\quantum_lvl1.json
+0303faa7d3e058b19cabcb75706bf9a820ca7cca data\elemental-convergence\advancement\slime_lvl3.json
 b2363e3ca1d44cbf4bf63fab2c409ddf1216e6d6 data\elemental-convergence\advancement\light_lvl3.json
 75c5f79e779980ec62b307ae88f7e6fbfdd888e5 data\elemental-convergence\advancement\air_lvl3.json
 7b1eba4f141140824b367f1e74fe20aed73fda52 data\elemental-convergence\advancement\shadow_lvl2.json
+415b61b76ce2954c2c358e481192382c49575352 data\elemental-convergence\advancement\slime_magic_selected.json
 2da3a8fc0365ae5d91dfb6bb31b4aa685e50efdc data\elemental-convergence\advancement\life_lvl2.json
 1e7137a65eecaf1264abe35c2ff8999e1c2ecaa1 data\elemental-convergence\advancement\void_lvl3.json
 6baf456d91010c1dbb791af649c32eaefaee50d0 data\elemental-convergence\advancement\life_lvl3.json
@@ -49,6 +52,7 @@ b2363e3ca1d44cbf4bf63fab2c409ddf1216e6d6 data\elemental-convergence\advancement\
 6eba435f4cd710bfedece8de1449f1a0a39d025f data\elemental-convergence\advancement\water_lvl2.json
 0c597bc8562a4a23113e4d41aacb12979eec6c6a data\elemental-convergence\advancement\holy_lvl3.json
 44034f22985a9793c7fa4f62a5ea8a46570bbf0a data\elemental-convergence\advancement\shadow_lvl3.json
+4210bf25d186dcc3dbf65996c051a4e401e7dbd3 data\elemental-convergence\advancement\slime_lvl2.json
 d8de2857c73c2d3b757b1d90df3f56ae37a19209 data\elemental-convergence\advancement\steam_lvl3.json
 7b92745fd9d5a1e2aeb892f932f4af2f73fda413 data\elemental-convergence\advancement\rat_magic_selected.json
 4bdf870abc865605d003c976bc22a38767d22867 data\elemental-convergence\advancement\light_lvl2.json
