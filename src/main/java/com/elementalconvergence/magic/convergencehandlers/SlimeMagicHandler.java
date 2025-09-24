@@ -60,14 +60,15 @@ public class SlimeMagicHandler implements IMagicHandler {
     private int leapCooldown=0;
     public static final float SLIME_LEAP_STRENGTH = 3.0f;
 
-    public static final int REGAIN_SIZE_FROM_SPLIT_TIMER_MAX=2000; //2:05 minutes 2500
-    private int regainSizeTimer=0;
-    private float sizeBeforeSplit = 1.0f;
 
     public static final float BASE_SIZE = 1.0f;
-    public static final float SIZE_INCREASE_PER_HEART = 0.25f;
+    public static final float SPLIT_SIZE = 0.5f;
+    public static final float SIZE_INCREASE_PER_HEART = 0.05f;
     public static final float BASE_HEALTH = 20.0f;
-    private final int SIZE_INCREMENT_INTERVAL = 50;
+    public static final float SIZE_RECOVERY_RATE = 0.005f;
+    public static final int SIZE_RECOVERY_INTERVAL = 10;
+
+    private int sizeRecoveryTicks = 0;
 
     private DissolvingSession activeSession = null;
     private int dissolvingTicks = 0;
@@ -143,31 +144,27 @@ public class SlimeMagicHandler implements IMagicHandler {
             leapCooldown--;
         }
 
-        if (regainSizeTimer > 0){
-            regainSizeTimer--;
+        //Size recovery for players smaller than normal size
+        ScaleData playerHeight2 = ScaleTypes.HEIGHT.getScaleData(player);
+        ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+        float currentSize2 = playerHeight2.getScale();
 
-            if (regainSizeTimer == 0){
-                ScaleData playerHeight2 = ScaleTypes.HEIGHT.getScaleData(player);
-                ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+        if (currentSize2 < BASE_SIZE) {
+            sizeRecoveryTicks++;
 
-                playerHeight2.setScale(BASE_SIZE);
-                playerWidth.setScale(BASE_SIZE);
-                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SNIFFER_EGG_PLOP, SoundCategory.PLAYERS, 1.0F, 1.5F);
+            if (sizeRecoveryTicks >= SIZE_RECOVERY_INTERVAL) {
+                float newSize = Math.min(currentSize2 + SIZE_RECOVERY_RATE, BASE_SIZE);
+                playerHeight2.setScale(newSize);
+                playerWidth.setScale(newSize);
+                sizeRecoveryTicks = 0;
+
+                // Play sound when reaching normal size
+                if (newSize >= BASE_SIZE) {
+                    player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SNIFFER_EGG_PLOP, SoundCategory.PLAYERS, 1.0F, 1.5F);
+                }
             }
-            else if (regainSizeTimer % SIZE_INCREMENT_INTERVAL == 0){
-                // how much of timer has elapsed
-                int elapsedTime = REGAIN_SIZE_FROM_SPLIT_TIMER_MAX - regainSizeTimer;
-                float progress = (float) elapsedTime / REGAIN_SIZE_FROM_SPLIT_TIMER_MAX;
-
-                //linear interpolation towards normal size again
-                float currentSize2 = sizeBeforeSplit + (BASE_SIZE - sizeBeforeSplit) * progress;
-
-                ScaleData playerHeight2 = ScaleTypes.HEIGHT.getScaleData(player);
-                ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
-
-                playerHeight2.setScale(currentSize2);
-                playerWidth.setScale(currentSize2);
-            }
+        } else {
+            sizeRecoveryTicks = 0; // Reset counter when at or above normal size
         }
     }
 
@@ -200,13 +197,18 @@ public class SlimeMagicHandler implements IMagicHandler {
         MagicData magicData = dataSaver.getMagicData();
         int slimeLevel = magicData.getMagicLevel(SLIME_INDEX);
 
-        if (slimeLevel >= 1 && regainSizeTimer == 0){
+        if (slimeLevel >= 1){
             ServerWorld world = (ServerWorld) player.getWorld();
 
             //get current player size
             ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
             ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
             float currentSize = playerHeight.getScale();
+
+            //if player is too small to split
+            if (currentSize < BASE_SIZE * 0.95f) {
+                return;
+            }
 
             // new size after split
             float newSize = currentSize / 2.0f;
@@ -236,12 +238,6 @@ public class SlimeMagicHandler implements IMagicHandler {
             // playsound+particles
             player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_STEP, SoundCategory.PLAYERS, 1.0F, 0.8F);
             ((ServerWorld) player.getWorld()).spawnParticles(ParticleTypes.ITEM_SLIME, player.getX(), player.getY() + 1, player.getZ(), 20, 0.5, 0.5, 0.5, 0.1);
-
-            // only start cooldown if below base_size
-            if (newSize < BASE_SIZE) {
-                regainSizeTimer = REGAIN_SIZE_FROM_SPLIT_TIMER_MAX;
-                sizeBeforeSplit = newSize; //store the size that was before for scaling up computations
-            }
         }
     }
 
@@ -407,7 +403,7 @@ public class SlimeMagicHandler implements IMagicHandler {
             player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.BLOCK_SLIME_BLOCK_PLACE, SoundCategory.PLAYERS, 1.0f, 0.8f);
 
-            // Particles showing growth
+            //particles
             ((ServerWorld) player.getWorld()).spawnParticles(ParticleTypes.ITEM_SLIME,
                     player.getX(), player.getY() + 1, player.getZ(), 15, 0.3, 0.3, 0.3, 0.1);
         } else {
@@ -432,7 +428,7 @@ public class SlimeMagicHandler implements IMagicHandler {
         }
     }
 
-    //datastructure for dissolving people
+    //datastrcture to dissolve stuff
     private static class DissolvingSession {
         final LivingEntity target;
         Vec3d playerInitialPos = null;
