@@ -21,6 +21,10 @@ public class ModEntitiesClient {
         EntityRendererRegistry.register(ModEntities.MINION_BEE,
                 (EntityRendererFactory.Context context) -> new BeeEntityRenderer(context));
 
+        EntityRendererRegistry.register(ModEntities.MINION_SLIME,
+                (EntityRendererFactory.Context context) -> new SlimeEntityRenderer(context));
+
+
         System.out.println("ModEntities client renderers initialized");
     }
 }

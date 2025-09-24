@@ -1,11 +1,14 @@
 package com.elementalconvergence.entity;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.TargetPredicate;
 import net.minecraft.entity.ai.control.MoveControl;
 import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
@@ -26,11 +29,24 @@ import java.util.UUID;
 public class MinionSlimeEntity extends SlimeEntity {
     private PlayerEntity owner;
     private UUID ownerUuid;
+    private LivingEntity ownerLastAttacker;
+    private int attackerCheckCooldown = 0;
+    private float currentScale = 1.0f;
+
+    private static final float BASE_HEALTH = 16.0f; // Base health for size 1.0
+    private static final float BASE_DAMAGE = 4.0f;  // Base damage for size 1.0
 
     public MinionSlimeEntity(EntityType<? extends SlimeEntity> entityType, World world) {
         super(entityType, world);
         // Set up custom move control
         this.moveControl = new MinionSlimeMoveControl(this);
+    }
+
+    // Create attributes for this entity
+    public static DefaultAttributeContainer.Builder createMinionSlimeAttributes() {
+        return SlimeEntity.createMobAttributes()
+                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE, BASE_DAMAGE)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, BASE_HEALTH);
     }
 
     @Override
@@ -42,14 +58,71 @@ public class MinionSlimeEntity extends SlimeEntity {
         // Add custom slime-compatible goals
         this.goalSelector.add(1, new MinionSlimeSwimmingGoal(this));
         this.goalSelector.add(2, new FollowOwnerSlimeGoal(this));
-        this.goalSelector.add(3, new MinionSlimeFaceTowardTargetGoal(this));
-        this.goalSelector.add(4, new MinionSlimeRandomLookGoal(this));
-        this.goalSelector.add(5, new MinionSlimeMoveGoal(this));
+        this.goalSelector.add(3, new MinionSlimeAttackGoal(this)); // Custom attack goal
+        this.goalSelector.add(4, new MinionSlimeFaceTowardTargetGoal(this));
+        this.goalSelector.add(5, new MinionSlimeRandomLookGoal(this));
+        this.goalSelector.add(6, new MinionSlimeMoveGoal(this));
 
-        // Custom targeting goals for minion behavior
-        this.targetSelector.add(1, new DefendOwnerGoal(this));
-        this.targetSelector.add(2, new AttackOwnerTargetGoal(this));
+        // Targeting goals - attack who owner attacks, and who attacks owner
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, LivingEntity.class, 10, true, false, entity -> {
+            // If owner is null or entity is null, don't attack anything
+            if (this.owner == null || entity == null) {
+                return false;
+            }
+            // Attack who the owner is attacking
+            return entity != this.owner && entity == this.owner.getAttacking();
+        }));
+
+        this.targetSelector.add(2, new ActiveTargetGoal<>(this, LivingEntity.class, 10, true, false, entity -> {
+            // If owner is null or entity is null, don't attack anything
+            if (this.owner == null || entity == null) {
+                return false;
+            }
+
+            // Don't attack the owner
+            if (entity == this.owner) {
+                return false;
+            }
+
+            // Attack whoever attacked the owner
+            return entity == this.ownerLastAttacker && this.ownerLastAttacker != null;
+        }));
+
     }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        // Check for owner's attacker every 10 ticks (0.5 seconds)
+        if (this.owner != null && !this.getWorld().isClient) {
+            this.attackerCheckCooldown--;
+            if (this.attackerCheckCooldown <= 0) {
+                this.attackerCheckCooldown = 10;
+                this.checkOwnerAttacker();
+            }
+        }
+    }
+
+    private void checkOwnerAttacker() {
+        if (this.owner == null) {
+            return;
+        }
+
+        // Check if owner has a recent attacker
+        LivingEntity attacker = this.owner.getAttacker();
+        if (attacker != null && attacker != this.owner && attacker.isAlive()) {
+            // Only update if it's a different attacker or if we don't have one yet
+            if (this.ownerLastAttacker != attacker) {
+                this.ownerLastAttacker = attacker;
+
+                // Clear current target to re-evaluate
+                this.setTarget(null);
+            }
+        }
+    }
+
+
 
     // Prevent XP drops
     @Override
@@ -62,16 +135,21 @@ public class MinionSlimeEntity extends SlimeEntity {
         return false;
     }
 
-    // Prevent loot drops
+    // Prevent ALL loot drops including slimeballs
     @Override
     protected void dropLoot(DamageSource damageSource, boolean causedByPlayer) {
-        // Don't drop any loot
+        // Don't drop any loot at all
     }
 
-    // Prevent splitting when killed - ensure minion has size 1 so it won't split
+
+    @Override
+    protected void dropInventory() {
+        // Don't drop inventory
+    }
+
+    //set size to 1 so no splitting, and then change its actual size via pekhui
     @Override
     public void setSize(int size, boolean heal) {
-        // Always set minion slimes to size 1 to prevent splitting
         super.setSize(1, heal);
     }
 
@@ -99,12 +177,35 @@ public class MinionSlimeEntity extends SlimeEntity {
         return super.canTarget(target);
     }
 
-    // Set the minion's size using Pehkui
+    // Set the minion's size using Pehkui and update health/damage accordingly
     public void setMinionSize(float size) {
         ScaleData heightScale = ScaleTypes.HEIGHT.getScaleData(this);
         ScaleData widthScale = ScaleTypes.WIDTH.getScaleData(this);
+
+        // Use Pehkui's built-in hitbox scaling
+        ScaleData hitboxHeightScale = ScaleTypes.HITBOX_HEIGHT.getScaleData(this);
+        ScaleData hitboxWidthScale = ScaleTypes.HITBOX_WIDTH.getScaleData(this);
+
         heightScale.setScale(size);
         widthScale.setScale(size);
+        hitboxHeightScale.setScale(size);
+        hitboxWidthScale.setScale(size);
+
+        // Store the current scale for reference
+        this.currentScale = size;
+
+        // Update health based on size
+        float newMaxHealth = BASE_HEALTH * size;
+        this.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).setBaseValue(newMaxHealth);
+        this.setHealth(newMaxHealth); // Set current health to max
+
+        // Update attack damage based on size
+        float newDamage = BASE_DAMAGE * size;
+        this.getAttributeInstance(EntityAttributes.GENERIC_ATTACK_DAMAGE).setBaseValue(newDamage);
+    }
+
+    public final boolean cannotFollowOwner() {
+        return this.hasVehicle() || this.getOwner() != null && this.getOwner().isSpectator();
     }
 
     // Save/load owner data
@@ -114,6 +215,7 @@ public class MinionSlimeEntity extends SlimeEntity {
         if (this.ownerUuid != null) {
             nbt.putUuid("Owner", this.ownerUuid);
         }
+        nbt.putFloat("CurrentScale", this.currentScale);
     }
 
     @Override
@@ -121,6 +223,101 @@ public class MinionSlimeEntity extends SlimeEntity {
         super.readCustomDataFromNbt(nbt);
         if (nbt.containsUuid("Owner")) {
             this.ownerUuid = nbt.getUuid("Owner");
+        }
+        if (nbt.contains("CurrentScale")) {
+            this.currentScale = nbt.getFloat("CurrentScale");
+            // Reapply the scale when loading from NBT
+            ScaleData heightScale = ScaleTypes.HEIGHT.getScaleData(this);
+            ScaleData widthScale = ScaleTypes.WIDTH.getScaleData(this);
+            ScaleData hitboxHeightScale = ScaleTypes.HITBOX_HEIGHT.getScaleData(this);
+            ScaleData hitboxWidthScale = ScaleTypes.HITBOX_WIDTH.getScaleData(this);
+
+            heightScale.setScale(this.currentScale);
+            widthScale.setScale(this.currentScale);
+            hitboxHeightScale.setScale(this.currentScale);
+            hitboxWidthScale.setScale(this.currentScale);
+        }
+    }
+
+    // Custom attack goal for slime minions
+    public static class MinionSlimeAttackGoal extends Goal {
+        private final MinionSlimeEntity slime;
+        private int growTieredTimer;
+
+        public MinionSlimeAttackGoal(MinionSlimeEntity slime) {
+            this.slime = slime;
+            this.setControls(EnumSet.of(Goal.Control.LOOK, Goal.Control.MOVE));
+        }
+
+        @Override
+        public boolean canStart() {
+            LivingEntity target = this.slime.getTarget();
+            if (target == null) {
+                return false;
+            }
+            return this.slime.canTarget(target) && this.slime.getMoveControl() instanceof MinionSlimeMoveControl;
+        }
+
+        @Override
+        public void start() {
+            this.growTieredTimer = toGoalTicks(300);
+            super.start();
+        }
+
+        @Override
+        public boolean shouldContinue() {
+            LivingEntity target = this.slime.getTarget();
+            if (target == null || !this.slime.canTarget(target)) {
+                return false;
+            }
+            return --this.growTieredTimer > 0;
+        }
+
+        @Override
+        public boolean shouldRunEveryTick() {
+            return true;
+        }
+
+        @Override
+        public void tick() {
+            LivingEntity target = this.slime.getTarget();
+            if (target == null) {
+                return;
+            }
+
+            this.slime.lookAtEntity(target, 10.0F, 10.0F);
+
+            MoveControl moveControl = this.slime.getMoveControl();
+            if (moveControl instanceof MinionSlimeMoveControl slimeMoveControl) {
+                slimeMoveControl.look(this.slime.getYaw(), true);
+
+                double distance = this.slime.squaredDistanceTo(target);
+                if (distance < 4.0) { // Close enough to attack
+                    if (this.slime.isOnGround()) {
+                        // Make the slime jump towards the target to attack
+                        double dx = target.getX() - this.slime.getX();
+                        double dz = target.getZ() - this.slime.getZ();
+                        double distance2d = Math.sqrt(dx * dx + dz * dz);
+
+                        if (distance2d > 0) {
+                            this.slime.setVelocity(
+                                    dx / distance2d * 0.5,
+                                    0.4,
+                                    dz / distance2d * 0.5
+                            );
+                            this.slime.velocityModified = true;
+                        }
+
+                        // Deal damage if very close
+                        if (distance < 1.5) {
+                            this.slime.tryAttack(target);
+                        }
+                    }
+                } else {
+                    // Move towards target
+                    slimeMoveControl.move(1.5);
+                }
+            }
         }
     }
 
@@ -337,6 +534,15 @@ public class MinionSlimeEntity extends SlimeEntity {
                 return false;
             }
 
+            // Don't follow if we have a target to attack
+            if (this.slime.getTarget() != null) {
+                return false;
+            }
+
+            if (this.slime.cannotFollowOwner()) {
+                return false;
+            }
+
             double distance = this.slime.squaredDistanceTo(owner);
             if (distance < 6.0 * 6.0) { // Too close
                 return false;
@@ -351,6 +557,16 @@ public class MinionSlimeEntity extends SlimeEntity {
             if (this.owner == null || this.owner.isSpectator()) {
                 return false;
             }
+
+            // Stop following if we have a target to attack
+            if (this.slime.getTarget() != null) {
+                return false;
+            }
+
+            if (this.slime.cannotFollowOwner()) {
+                return false;
+            }
+
             double distance = this.slime.squaredDistanceTo(this.owner);
             return distance > 4.0 * 4.0; // Continue until close enough
         }
@@ -393,74 +609,6 @@ public class MinionSlimeEntity extends SlimeEntity {
                     slimeMoveControl.move(this.speed);
                 }
             }
-        }
-    }
-
-    // Goal to defend the owner
-    public static class DefendOwnerGoal extends ActiveTargetGoal<LivingEntity> {
-        private final MinionSlimeEntity slime;
-        private LivingEntity attacker;
-        private int timestamp;
-
-        public DefendOwnerGoal(MinionSlimeEntity slime) {
-            super(slime, LivingEntity.class, 5, false, false, null);
-            this.slime = slime;
-        }
-
-        @Override
-        public boolean canStart() {
-            PlayerEntity owner = this.slime.getOwner();
-            if (owner == null) {
-                return false;
-            }
-
-            this.attacker = owner.getAttacker();
-            int i = owner.getLastAttackedTime();
-            return i != this.timestamp && this.canTrack(this.attacker, TargetPredicate.DEFAULT) && this.slime.canTarget(this.attacker);
-        }
-
-        @Override
-        public void start() {
-            this.mob.setTarget(this.attacker);
-            PlayerEntity owner = this.slime.getOwner();
-            if (owner != null) {
-                this.timestamp = owner.getLastAttackedTime();
-            }
-            super.start();
-        }
-    }
-
-    // Goal to attack owner's target
-    public static class AttackOwnerTargetGoal extends ActiveTargetGoal<LivingEntity> {
-        private final MinionSlimeEntity slime;
-        private LivingEntity ownerTarget;
-        private int timestamp;
-
-        public AttackOwnerTargetGoal(MinionSlimeEntity slime) {
-            super(slime, LivingEntity.class, 5, false, false, null);
-            this.slime = slime;
-        }
-
-        @Override
-        public boolean canStart() {
-            PlayerEntity owner = this.slime.getOwner();
-            if (owner == null) {
-                return false;
-            }
-
-            this.ownerTarget = owner.getAttacking();
-            int i = owner.getLastAttackTime();
-            return i != this.timestamp && this.canTrack(this.ownerTarget, TargetPredicate.DEFAULT) && this.slime.canTarget(this.ownerTarget);
-        }
-
-        @Override
-        public void start() {
-            this.mob.setTarget(this.ownerTarget);
-            PlayerEntity owner = this.slime.getOwner();
-            if (owner != null) {
-                this.timestamp = owner.getLastAttackTime();
-            }
-            super.start();
         }
     }
 }

@@ -5,6 +5,7 @@ import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.enchantment.ModEnchantments;
 import com.elementalconvergence.entity.MinionSlimeEntity;
+import com.elementalconvergence.entity.ModEntities;
 import com.elementalconvergence.item.ModItems;
 import com.elementalconvergence.magic.IMagicHandler;
 import com.elementalconvergence.networking.TaskScheduler;
@@ -218,18 +219,18 @@ public class SlimeMagicHandler implements IMagicHandler {
             //spawn minions
             for (int i=0; i<2; i++) {
                 // slime minion
-                MinionSlimeEntity slimeMinion = new MinionSlimeEntity(EntityType.SLIME, world);
+                MinionSlimeEntity slimeMinion = new MinionSlimeEntity(ModEntities.MINION_SLIME, world);
 
                 //minion pos
                 Vec3d playerPos = player.getPos();
                 slimeMinion.setPos(playerPos.x, playerPos.y, playerPos.z);
 
-                //change minion size
+                // new owner (set before setting size to ensure proper initialization)
+                slimeMinion.setOwner(player);
+
+                //change minion size (this now also sets health and damage)
                 float slimeMinionSize = 5 * newSize;
                 slimeMinion.setMinionSize(slimeMinionSize);
-
-                // new owner
-                slimeMinion.setOwner(player);
 
                 // spawned
                 world.spawnEntity(slimeMinion);
