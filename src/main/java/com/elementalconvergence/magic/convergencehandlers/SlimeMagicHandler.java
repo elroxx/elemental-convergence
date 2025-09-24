@@ -122,19 +122,25 @@ public class SlimeMagicHandler implements IMagicHandler {
         //wall bounce
         Vec3d velocity = player.getVelocity();
         //x bounce
-        if (Math.abs(velocity.x) > 0.05){
+        if (Math.abs(velocity.x) > 0.01){
             BlockPos pos = player.getBlockPos();
+            BlockPos posAbove = player.getBlockPos().add(0, 1, 0);
             World world = player.getWorld();
-            if (world.getBlockState(pos.offset(getHorizontalDirectionFromVelocity(velocity, true))).isSolidBlock(world, pos)) {
+            if (world.getBlockState(pos.offset(getHorizontalDirectionFromVelocity(velocity, true))).isFullCube(world, pos) ||
+                world.getBlockState(posAbove.offset(getHorizontalDirectionFromVelocity(velocity, true))).isFullCube(world, pos)
+            ) {
                 player.setVelocity(-velocity.x * 0.9, velocity.y, velocity.z);
                 player.velocityModified = true;
             }
         }
         //z bounce
-        if (Math.abs(velocity.z) > 0.05){
+        if (Math.abs(velocity.z) > 0.01){
             BlockPos pos = player.getBlockPos();
+            BlockPos posAbove = player.getBlockPos().add(0, 1, 0);
             World world = player.getWorld();
-            if (world.getBlockState(pos.offset(getHorizontalDirectionFromVelocity(velocity, false))).isSolidBlock(world, pos)) {
+            if (world.getBlockState(pos.offset(getHorizontalDirectionFromVelocity(velocity, false))).isFullCube(world, pos) ||
+                world.getBlockState(posAbove.offset(getHorizontalDirectionFromVelocity(velocity, false))).isFullCube(world, pos)
+            ) {
                 player.setVelocity(velocity.x, velocity.y, -velocity.z * 0.9);
                 player.velocityModified = true;
             }
