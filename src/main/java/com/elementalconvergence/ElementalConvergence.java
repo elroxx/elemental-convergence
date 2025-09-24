@@ -845,6 +845,7 @@ public class ElementalConvergence implements ModInitializer {
 		allRecipesList.add(id("convergent_eye_furnace"));
 		allRecipesList.add(id("crown"));
 		allRecipesList.add(id("death_magic_eye"));
+		allRecipesList.add(id("dissolving_slime"));
 		allRecipesList.add(id("earth_magic_eye"));
 		allRecipesList.add(id("epsilon_dust"));
 		allRecipesList.add(id("fire_magic_eye"));
@@ -869,6 +870,7 @@ public class ElementalConvergence implements ModInitializer {
 		allRecipesList.add(id("schrodinger_cat"));
 		allRecipesList.add(id("shadow_magic_eye"));
 		allRecipesList.add(id("shadowball"));
+		allRecipesList.add(id("slime_convergent_eye"));
 		allRecipesList.add(id("steam_convergent_eye"));
 		allRecipesList.add(id("train_whistle"));
 		allRecipesList.add(id("void_convergent_eye"));
