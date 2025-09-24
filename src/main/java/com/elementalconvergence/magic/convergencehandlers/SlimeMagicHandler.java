@@ -131,6 +131,7 @@ public class SlimeMagicHandler implements IMagicHandler {
             ) {
                 player.setVelocity(-velocity.x * 0.9, velocity.y, velocity.z);
                 player.velocityModified = true;
+                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.PLAYERS, 0.5F, 1.2F);
             }
         }
         //z bounce
@@ -143,6 +144,7 @@ public class SlimeMagicHandler implements IMagicHandler {
             ) {
                 player.setVelocity(velocity.x, velocity.y, -velocity.z * 0.9);
                 player.velocityModified = true;
+                player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.PLAYERS, 0.5F, 1.2F);
             }
         }
 
