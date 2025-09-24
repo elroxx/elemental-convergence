@@ -138,7 +138,7 @@ public class ModItems {
     public static final Item MYSTICAL_CHAPTER_1 = register("mystical_chapter_1", new MysticalTomeItem(getEnchantList(1), getEnchantLevelList(1), 1,new Item.Settings().maxCount(1)));
     public static final Item MYSTICAL_CHAPTER_2 = register("mystical_chapter_2", new MysticalTomeItem(getEnchantList(2), getEnchantLevelList(2), 2,new Item.Settings().maxCount(1)));
 
-    public static final Item DISSOLVING_SLIME = register("dissolving_slime", new Item(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
+    public static final Item DISSOLVING_SLIME = register("dissolving_slime", new Item(new Item.Settings().maxCount(1)));
 
     public static final Item VOID_DRILL = register("void_drill", new VoidDrillItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item VOID_ESSENCE = register("void_essence", new Item(new Item.Settings().rarity(Rarity.EPIC)));
