@@ -90,7 +90,7 @@ public class SlimeMagicHandler implements IMagicHandler {
 
         if (slimeLevel >= 3 && mainHand.isOf(ModItems.DISSOLVING_SLIME)) {
             //can't dissolve yourself, nor dissolve a nonliving entity or if you are already dissolving
-            if (targetEntity instanceof LivingEntity target && !target.equals(player) && activeSession == null) {
+            if (targetEntity instanceof LivingEntity target && !target.equals(player) && activeSession == null && !(target instanceof SlimeEntity)) {
                 //start dissolving session
                 startDissolving(player, target);
             }
@@ -156,6 +156,7 @@ public class SlimeMagicHandler implements IMagicHandler {
         //Size recovery for players smaller than normal size
         ScaleData playerHeight2 = ScaleTypes.HEIGHT.getScaleData(player);
         ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+        ScaleData playerReach = ScaleTypes.REACH.getScaleData(player);
         float currentSize2 = playerHeight2.getScale();
 
         if (currentSize2 < BASE_SIZE) {
@@ -165,6 +166,7 @@ public class SlimeMagicHandler implements IMagicHandler {
                 float newSize = Math.min(currentSize2 + SIZE_RECOVERY_RATE, BASE_SIZE);
                 playerHeight2.setScale(newSize);
                 playerWidth.setScale(newSize);
+                playerReach.setScale(Math.max(newSize, 1.0f));
                 sizeRecoveryTicks = 0;
 
                 // Play sound when reaching normal size
@@ -212,6 +214,7 @@ public class SlimeMagicHandler implements IMagicHandler {
             //get current player size
             ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
             ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+            ScaleData playerReach = ScaleTypes.REACH.getScaleData(player);
             float currentSize = playerHeight.getScale();
 
             //if player is too small to split
@@ -223,6 +226,7 @@ public class SlimeMagicHandler implements IMagicHandler {
             float newSize = currentSize / 2.0f;
             playerHeight.setScale(newSize);
             playerWidth.setScale(newSize);
+            playerReach.setScale(Math.max(newSize, 1.0f));
 
             //spawn minions
             for (int i=0; i<2; i++) {
@@ -237,7 +241,7 @@ public class SlimeMagicHandler implements IMagicHandler {
                 slimeMinion.setOwner(player);
 
                 //change minion size (this now also sets health and damage)
-                float slimeMinionSize = 5 * newSize;
+                float slimeMinionSize = newSize*5;
                 slimeMinion.setMinionSize(slimeMinionSize);
 
                 // spawned
@@ -402,12 +406,14 @@ public class SlimeMagicHandler implements IMagicHandler {
 
             ScaleData playerHeight = ScaleTypes.HEIGHT.getScaleData(player);
             ScaleData playerWidth = ScaleTypes.WIDTH.getScaleData(player);
+            ScaleData playerReach = ScaleTypes.REACH.getScaleData(player);
 
             float currentSize = playerHeight.getScale();
             float newSize = currentSize + sizeIncrease;
 
             playerHeight.setScale(newSize);
             playerWidth.setScale(newSize);
+            playerReach.setScale(Math.max(newSize, 1.0f));
 
             player.getWorld().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.BLOCK_SLIME_BLOCK_PLACE, SoundCategory.PLAYERS, 1.0f, 0.8f);
