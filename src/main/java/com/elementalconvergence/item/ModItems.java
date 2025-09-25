@@ -143,6 +143,8 @@ public class ModItems {
     public static final Item VOID_DRILL = register("void_drill", new VoidDrillItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item VOID_ESSENCE = register("void_essence", new Item(new Item.Settings().rarity(Rarity.EPIC)));
 
+    public static final Item SPIDER_GRAPPLING_HOOK = register("spider_grappling_hook", new SpiderGrapplingHookItem(new Item.Settings().maxCount(1).rarity(Rarity.RARE)));
+
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight
     //common: white, red, blue

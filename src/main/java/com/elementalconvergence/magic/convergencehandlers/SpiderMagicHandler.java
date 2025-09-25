@@ -70,9 +70,13 @@ public class SpiderMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
+        //for cobweb and climbing related stuff
         if (!player.hasStatusEffect(ModEffects.ARACHNID)){
             player.addStatusEffect(new StatusEffectInstance(ModEffects.ARACHNID, -1, 0, false, false, false));
         }
+
+        //can't attack in daylight
+
     }
 
     @Override

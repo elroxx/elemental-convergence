@@ -24,6 +24,8 @@ public class ModEntitiesClient {
         EntityRendererRegistry.register(ModEntities.MINION_SLIME,
                 (EntityRendererFactory.Context context) -> new SlimeEntityRenderer(context));
 
+        EntityRendererRegistry.register(ModEntities.SPIDER_GRAPPLING_HOOK, SpiderGrapplingHookEntityRenderer::new);
+
 
         System.out.println("ModEntities client renderers initialized");
     }

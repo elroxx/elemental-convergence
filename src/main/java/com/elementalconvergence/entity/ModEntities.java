@@ -71,6 +71,14 @@ public class ModEntities {
                     .build()
     );
 
+    public static final EntityType<SpiderGrapplingHookEntity> SPIDER_GRAPPLING_HOOK = Registry.register(
+            Registries.ENTITY_TYPE,
+            ElementalConvergence.id("spider_grappling_hook"),
+            EntityType.Builder.<SpiderGrapplingHookEntity>create(SpiderGrapplingHookEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.25f, 0.25f)
+                    .build()
+    );
+
     public static <T extends Entity> EntityType<T> register(String name, EntityType<T> entityType) {
         return Registry.register(Registries.ENTITY_TYPE, ElementalConvergence.id(name), entityType);
     }
