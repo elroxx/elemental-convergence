@@ -209,6 +209,34 @@ Playstyle: Enchantments, Support
 
 ***Energy Channeling* (Level 3) - Item**: Right click with solid mystical energy (in main hand) and an enchanted piece of equipment (in off hand) to add one level to every enchantment that is on the piece of equipment.
 
+## Slime
+
+Index: 16
+
+Parent Magics: Water, Earth
+
+Convergence Impact: **Low**
+
+Playstyle: Summoner, Movement, Size Modification
+
+### Passives
+
+***Boiiing* (Passive)**: Bounces on every single blocks. Blocks are also bouncy when hit on the side. This can be disabled by sneaking.
+
+***Regenerating Slime* (Passive)**: Grows back in size when under the normal player size.
+
+***Squishy body* (Passive)**: Health and reach scales on the player size.
+
+
+### Spells
+
+
+***Body Split* (Level 1) - Keybind**: Press to split. This cuts your current size in half and summons appropriately sized slime minions. Can only be done if you are at least as big as a normal player. 
+
+***Elastic Jump* (Level 2) - Keybind**: Press to leap in the direction you are looking.
+
+***Dissolve and Absorb* (Level 3) - Item**: Right click an entity with dissolving slime to dissolve them into your body for absorption. This locks the entity in place until they jump, you move or you get hit. Every heart of damage dealt by dissolving them increases your height upon termination of the ability. This size increase is kept until Body Split is used again.
+
 ## Void
 
 Index: 17
