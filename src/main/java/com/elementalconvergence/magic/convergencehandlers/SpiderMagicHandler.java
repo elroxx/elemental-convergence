@@ -24,6 +24,8 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import virtuoel.pehkui.api.ScaleData;
+import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -35,6 +37,10 @@ public class SpiderMagicHandler implements IMagicHandler {
     public static final int SPIDER_INDEX= (BASE_MAGIC_ID.length-1)+11;
 
     public static final int SPIDER_LIGHT_THRESHOLD = 9;
+    public static final float SPIDER_LIGHT_ATTACK=0.01f;
+    public static final float SPIDER_DARK_ATTACK=1.0f;
+    public static final float SPIDER_LIGHT_KB=0.01f;
+    public static final float SPIDER_DARK_KB=1.0f;
 
     //buff: wall climb
     //debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
@@ -75,7 +81,22 @@ public class SpiderMagicHandler implements IMagicHandler {
             player.addStatusEffect(new StatusEffectInstance(ModEffects.ARACHNID, -1, 0, false, false, false));
         }
 
-        //can't attack in daylight
+        //can't attack in daylight (DEBUFF)
+        BlockPos playerPosition = player.getBlockPos();
+        int lightLevel = player.getWorld().getLightLevel(playerPosition);
+        ScaleData playerAttack = ScaleTypes.ATTACK.getScaleData(player);
+        ScaleData playerKnockback = ScaleTypes.KNOCKBACK.getScaleData(player);
+        if (lightLevel<=SPIDER_LIGHT_THRESHOLD){
+            if (!(Math.abs(playerAttack.getScale()-SPIDER_DARK_ATTACK)<0.02f)){
+                playerAttack.setScale(SPIDER_DARK_ATTACK);
+                playerKnockback.setScale(SPIDER_DARK_KB);
+            }
+        }else{
+            if (!(Math.abs(playerAttack.getScale()-SPIDER_LIGHT_ATTACK)<0.02f)){
+                playerAttack.setScale(SPIDER_LIGHT_ATTACK);
+                playerKnockback.setScale(SPIDER_LIGHT_ATTACK);
+            }
+        }
 
     }
 
