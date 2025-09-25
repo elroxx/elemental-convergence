@@ -67,7 +67,7 @@ public class ModEntities {
             Registries.ENTITY_TYPE,
             ElementalConvergence.id("minion_slime"),
             EntityType.Builder.create(MinionSlimeEntity::new, SpawnGroup.MONSTER)
-                    .dimensions(0.25f, 0.25f)
+                    .dimensions(0.5f, 0.5f)
                     .build()
     );
 

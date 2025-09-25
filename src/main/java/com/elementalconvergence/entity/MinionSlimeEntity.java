@@ -39,8 +39,8 @@ public class MinionSlimeEntity extends SlimeEntity {
     private float currentScale = 1.0f;
     private int attackCooldown = 0; //prevent combo
 
-    private static final float BASE_HEALTH = 4.0f; //base hp for size 1.0
-    private static final float BASE_DAMAGE = 1.0f;  //base dmg for size 1.0
+    private static final float BASE_HEALTH = 8.0f; //base hp for size 1.0
+    private static final float BASE_DAMAGE = 4.0f;  //base dmg for size 1.0
 
     public MinionSlimeEntity(EntityType<? extends SlimeEntity> entityType, World world) {
         super(entityType, world);
@@ -219,13 +219,13 @@ public class MinionSlimeEntity extends SlimeEntity {
         ScaleData heightScale = ScaleTypes.HEIGHT.getScaleData(this);
         ScaleData widthScale = ScaleTypes.WIDTH.getScaleData(this);
 
-        ScaleData hitboxHeightScale = ScaleTypes.HITBOX_HEIGHT.getScaleData(this); //I NEED HITBOX BECAUSE THIS DOESNT SCALE VS PLAYERS
-        ScaleData hitboxWidthScale = ScaleTypes.HITBOX_WIDTH.getScaleData(this);
+        //ScaleData hitboxHeightScale = ScaleTypes.HITBOX_HEIGHT.getScaleData(this); //I NEED HITBOX BECAUSE THIS DOESNT SCALE VS PLAYERS
+        //ScaleData hitboxWidthScale = ScaleTypes.HITBOX_WIDTH.getScaleData(this);
 
         heightScale.setScale(size);
         widthScale.setScale(size);
-        hitboxHeightScale.setScale(size);
-        hitboxWidthScale.setScale(size);
+        //hitboxHeightScale.setScale(size);
+        //hitboxWidthScale.setScale(size);
 
         this.currentScale = size;
 
@@ -261,13 +261,13 @@ public class MinionSlimeEntity extends SlimeEntity {
             //reapply scale when loading in nbt
             ScaleData heightScale = ScaleTypes.HEIGHT.getScaleData(this);
             ScaleData widthScale = ScaleTypes.WIDTH.getScaleData(this);
-            ScaleData hitboxHeightScale = ScaleTypes.HITBOX_HEIGHT.getScaleData(this);
-            ScaleData hitboxWidthScale = ScaleTypes.HITBOX_WIDTH.getScaleData(this);
+            //ScaleData hitboxHeightScale = ScaleTypes.HITBOX_HEIGHT.getScaleData(this);
+            //ScaleData hitboxWidthScale = ScaleTypes.HITBOX_WIDTH.getScaleData(this);
 
             heightScale.setScale(this.currentScale);
             widthScale.setScale(this.currentScale);
-            hitboxHeightScale.setScale(this.currentScale);
-            hitboxWidthScale.setScale(this.currentScale);
+            //hitboxHeightScale.setScale(this.currentScale);
+            //hitboxWidthScale.setScale(this.currentScale);
         }
     }
 
