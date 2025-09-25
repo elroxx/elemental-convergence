@@ -118,7 +118,7 @@ public class ElementalConvergence implements ModInitializer {
 	public static final String[] BASE_MAGIC_ID = {"earth", "air", "fire", "water", "shadow", "light", "life", "death"};
 
 	//star was removed
-	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy", "Honey", "Blood", "Quantum", "Mystic", "Slime", "Void", "Spider", "Electricity", "Emotions"};
+	public static final String[] CONVERGENCE_MAGIC_DISPLAY = {"Plague", "Gravity", "Steam", "Holy", "Honey", "Blood", "Quantum", "Mystic", "Slime", "Void", "Silk", "Electricity", "Emotions"};
 	public static final String[] CONVERGENCE_MAGIC_ID = {"rat", "gravity", "steam", "holy", "honey", "blood", "quantum", "mystic", "slime", "void", "spider", "electricity", "emotions"};
 	public static HashMap<String, ArrayList<Integer>> convergenceRequirementsMap = new HashMap<>();
 
