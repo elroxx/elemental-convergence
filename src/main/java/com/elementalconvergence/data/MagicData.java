@@ -20,33 +20,25 @@ public class MagicData {
         magicLevels[magicIndex] = level;
     }
 
-    // Save data to NBT
     public NbtCompound writeNbt(NbtCompound nbt) {
-        //Save nbt for magic levels
         for (int i = 0; i < magicLevels.length; i++) {
             nbt.putInt(ElementalConvergence.FULL_MAGIC_ID[i] + "_level", magicLevels[i]);
         }
-        //Save selected magic
         nbt.putInt("selected_magic", selectedMagic);
         return nbt;
     }
 
-    // Load data from NBT
     public void readNbt(NbtCompound nbt) {
-        //Load nbt for magic levels
         for (int i = 0; i < magicLevels.length; i++) {
             magicLevels[i] = nbt.getInt(ElementalConvergence.FULL_MAGIC_ID[i] + "_level");
         }
-        // Load nbt for selected magic
         selectedMagic = nbt.getInt("selected_magic");
     }
 
-    //Basic setter for selected Magic
     public int getSelectedMagic() {
         return selectedMagic;
     }
 
-    //Basic getter for selected Magic
     public void setSelectedMagic(int magic) {
         this.selectedMagic = magic;
     }
