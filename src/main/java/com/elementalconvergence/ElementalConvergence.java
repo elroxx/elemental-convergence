@@ -871,6 +871,8 @@ public class ElementalConvergence implements ModInitializer {
 		allRecipesList.add(id("shadow_magic_eye"));
 		allRecipesList.add(id("shadowball"));
 		allRecipesList.add(id("slime_convergent_eye"));
+		allRecipesList.add(id("spider_convergent_eye"));
+		allRecipesList.add(id("spider_grappling_hook"));
 		allRecipesList.add(id("steam_convergent_eye"));
 		allRecipesList.add(id("train_whistle"));
 		allRecipesList.add(id("void_convergent_eye"));

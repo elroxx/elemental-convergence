@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BSB",
+    "BCB",
+    "BLB"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:chainmail_leggings"
+    },
+    "N": {
+      "item": "minecraft:scaffolding"
+    },
+    "B": {
+      "item": "minecraft:black_wool"
+    },
+    "L": {
+      "item": "minecraft:loom"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:spider_grappling_hook",
+    "count": 8
+  }
+}

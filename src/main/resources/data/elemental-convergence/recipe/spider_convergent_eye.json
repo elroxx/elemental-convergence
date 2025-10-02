@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DFD",
+    "HES",
+    "BWB"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:spider_eye"
+    },
+    "F": {
+      "item": "minecraft:fermented_spider_eye"
+    },
+    "B": {
+      "item": "minecraft:black_glazed_terracotta"
+    },
+    "L": {
+      "item": "minecraft:white_wool"
+    },
+    "S": {
+      "item": "elemental-convergence:shadow_magic_eye"
+    },
+    "H": {
+      "item": "elemental-convergence:life_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:blood_convergent_eye",
+    "count": 1
+  }
+}
