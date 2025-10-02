@@ -28,7 +28,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
-public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver, IOriginalSkinDataSaver,  {
+public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver, IOriginalSkinDataSaver{
     private float miningSpeedMultiplier = 1.0f;
 
     //START OF STUFF FOR MAGIC
