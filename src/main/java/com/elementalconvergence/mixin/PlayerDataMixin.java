@@ -28,7 +28,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerEntity.class)
-public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver, IOriginalSkinDataSaver {
+public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver, IOriginalSkinDataSaver, IGrapplingHookDataSaver{
     private float miningSpeedMultiplier = 1.0f;
 
     //START OF STUFF FOR MAGIC
@@ -57,6 +57,16 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
     public OriginalSkinData getOriginalSkinData() {
         return originalSkinData;
     }
+
+    //START OF STUFF FOR GRAPPLING HOOK
+    @Unique
+    private final GrapplingHookData grapplingHookData = new GrapplingHookData();
+
+    @Override
+    public GrapplingHookData getGrapplingHookData() {
+        return grapplingHookData;
+    }
+
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
     public void writeCustomDataToNbt(NbtCompound nbt, CallbackInfo info) {

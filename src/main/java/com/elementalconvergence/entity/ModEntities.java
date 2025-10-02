@@ -8,6 +8,7 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.passive.ChickenEntity;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.passive.BeeEntity;
+import net.minecraft.entity.mob.SlimeEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
@@ -62,6 +63,24 @@ public class ModEntities {
                     .build()
     );
 
+    public static final EntityType<MinionSlimeEntity> MINION_SLIME = Registry.register(
+            Registries.ENTITY_TYPE,
+            ElementalConvergence.id("minion_slime"),
+            EntityType.Builder.create(MinionSlimeEntity::new, SpawnGroup.MONSTER)
+                    .dimensions(0.5f, 0.5f)
+                    .build()
+    );
+
+    public static final EntityType<LashingPotatoHookEntity> LASHING_POTATO_HOOK = Registry.register(
+            Registries.ENTITY_TYPE,
+            ElementalConvergence.id("lashing_potato_hook"),
+            EntityType.Builder.<LashingPotatoHookEntity>create(LashingPotatoHookEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.25f, 0.25f)
+                    .trackingTickInterval(5)
+                    .maxTrackingRange(4)
+                    .build()
+    );
+
     public static <T extends Entity> EntityType<T> register(String name, EntityType<T> entityType) {
         return Registry.register(Registries.ENTITY_TYPE, ElementalConvergence.id(name), entityType);
     }
@@ -73,6 +92,7 @@ public class ModEntities {
         FabricDefaultAttributeRegistry.register(PEGASUS, HorseEntity.createBaseHorseAttributes());
         FabricDefaultAttributeRegistry.register(POULET, ChickenEntity.createChickenAttributes());
         FabricDefaultAttributeRegistry.register(MINION_BEE, BeeEntity.createBeeAttributes());
+        FabricDefaultAttributeRegistry.register(MINION_SLIME, MinionSlimeEntity.createMinionSlimeAttributes());
 
         System.out.println("ModEntities initialized (server-side)");
 
