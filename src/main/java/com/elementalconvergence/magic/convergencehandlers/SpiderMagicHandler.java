@@ -35,7 +35,6 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
-import static com.elementalconvergence.world.dimension.ModDimensions.VOID_WORLD_KEY;
 
 public class SpiderMagicHandler implements IMagicHandler {
     public static final int SPIDER_INDEX= (BASE_MAGIC_ID.length-1)+11;
@@ -51,20 +50,21 @@ public class SpiderMagicHandler implements IMagicHandler {
 
     // Cobweb placement tracking
     private int cobwebsToPlace = 0;
-    private BlockPos currentCobwebPos = null;
+    private double currentX = 0;
+    private double currentY = 0;
+    private double currentZ = 0;
     private double directionX = 0;
     private double directionY = 0;
     private double directionZ = 0;
 
     //buff: wall climb
-    //buff: poison on hit.
-    //debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
-    //buff normal zombies, skeleton, creeper and spider+cave spiders dont attack you. (MAYBE NOT??) //actually i dont want, buff is wall climb.
-    //Passive: Spider webs are solid blocks.
+    //X - buff: poison on hit.
+    //X - debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
+    //X - Passive: Spider webs are solid blocks.
 
 
     //lvl 1: When right clicking with a stack of string in the air. Create a line of cobwebs in the sky. Consume 1 string per block placed. Place them 1 by 1 with a small delay like the vein miner ability.
-    //lvl 2: web slinging
+    //X - lvl 2: web slinging
     //lvl 3: keybind, stun everybody in front in a cone. This gives them weakness 2 for like 10 seconds, slowness 2 for 10 seconds, poison 1 for 5 seconds and places a cobweb on their face and feet. 15 seconds cooldown.
 
     //advancements:
@@ -100,21 +100,22 @@ public class SpiderMagicHandler implements IMagicHandler {
             directionY = Math.sin(pitch);
             directionZ = Math.cos(pitch) * Math.sin(yaw);
 
-            // Start placing cobwebs in a line from feet level, first block in look direction
-            cobwebsToPlace = stringCount;
-            BlockPos playerFeetPos = player.getBlockPos(); // This is already at feet level
+            // Normalize the direction vector
+            double magnitude = Math.sqrt(directionX * directionX + directionY * directionY + directionZ * directionZ);
+            directionX /= magnitude;
+            directionY /= magnitude;
+            directionZ /= magnitude;
 
-            // Start one block away from player in look direction
-            int startX = playerFeetPos.getX() + (int) Math.round(directionX);
-            int startY = playerFeetPos.getY() + (int) Math.round(directionY);
-            int startZ = playerFeetPos.getZ() + (int) Math.round(directionZ);
-            currentCobwebPos = new BlockPos(startX, startY, startZ);
+            // Start placing cobwebs from player's feet position, offset by one block in look direction
+            BlockPos playerFeetPos = player.getBlockPos();
+            currentX = playerFeetPos.getX() + 0.5 + directionX;
+            currentY = playerFeetPos.getY() + 0.5 + directionY;
+            currentZ = playerFeetPos.getZ() + 0.5 + directionZ;
+
+            cobwebsToPlace = stringCount;
 
             // Set cooldown based on number of strings (2 ticks per string)
             silkBridgeCooldown = stringCount * 2;
-
-            // Consume the string
-            mainHand.decrement(stringCount);
 
             // Play activation sound
             player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENTITY_SPIDER_AMBIENT,
@@ -158,42 +159,58 @@ public class SpiderMagicHandler implements IMagicHandler {
         }
 
         // Handle gradual cobweb placement (1 per tick)
-        if (cobwebsToPlace > 0 && currentCobwebPos != null) {
+        if (cobwebsToPlace > 0) {
+            // Stop if player is no longer holding string
+            if (!player.getMainHandStack().isOf(Items.STRING)) {
+                cobwebsToPlace = 0;
+                currentX = 0;
+                currentY = 0;
+                currentZ = 0;
+                return;
+            }
+
             World world = player.getWorld();
+            BlockPos targetPos = new BlockPos((int) Math.floor(currentX), (int) Math.floor(currentY), (int) Math.floor(currentZ));
 
-            // Check if current position can have cobweb placed (must be air)
-            if (world.getBlockState(currentCobwebPos).isAir()) {
+            //need air. can't break anything
+            if (world.getBlockState(targetPos).isAir()) {
                 // Place cobweb
-                world.setBlockState(currentCobwebPos, Blocks.COBWEB.getDefaultState());
+                world.setBlockState(targetPos, Blocks.COBWEB.getDefaultState());
 
-                // Play placement sound
-                world.playSound(null, currentCobwebPos, SoundEvents.BLOCK_WOOL_PLACE,
-                        SoundCategory.BLOCKS, 0.5f, 1.0f);
-
-                // Spawn some particles for visual effect
-                if (world instanceof ServerWorld serverWorld) {
-                    serverWorld.spawnParticles(ParticleTypes.ITEM_COBWEB,
-                            currentCobwebPos.getX() + 0.5,
-                            currentCobwebPos.getY() + 0.5,
-                            currentCobwebPos.getZ() + 0.5,
-                            3, 0.2, 0.2, 0.2, 0.05);
+                // consume 1 string at a time
+                ItemStack mainHand = player.getMainHandStack();
+                if (mainHand.isOf(Items.STRING)) {
+                    mainHand.decrement(1);
                 }
 
-                // Move to next position in look direction
-                int nextX = currentCobwebPos.getX() + (int) Math.round(directionX);
-                int nextY = currentCobwebPos.getY() + (int) Math.round(directionY);
-                int nextZ = currentCobwebPos.getZ() + (int) Math.round(directionZ);
-                currentCobwebPos = new BlockPos(nextX, nextY, nextZ);
-                cobwebsToPlace--;
+                // playsound
+                world.playSound(null, targetPos, SoundEvents.BLOCK_WOOL_PLACE,
+                        SoundCategory.BLOCKS, 0.5f, 1.0f);
+
+                // spider particles ig
+                if (world instanceof ServerWorld serverWorld) {
+                    serverWorld.spawnParticles(ParticleTypes.ITEM_COBWEB,
+                            targetPos.getX() + 0.5,
+                            targetPos.getY() + 0.5,
+                            targetPos.getZ() + 0.5,
+                            3, 0.2, 0.2, 0.2, 0.05);
+                }
             } else {
                 // Hit a block, stop placing cobwebs
                 cobwebsToPlace = 0;
-                currentCobwebPos = null;
             }
+
+            // Move to next position along the look vector
+            currentX += directionX;
+            currentY += directionY;
+            currentZ += directionZ;
+            cobwebsToPlace--;
 
             // Check if we're done placing all cobwebs
             if (cobwebsToPlace <= 0) {
-                currentCobwebPos = null;
+                currentX = 0;
+                currentY = 0;
+                currentZ = 0;
             }
         }
     }
