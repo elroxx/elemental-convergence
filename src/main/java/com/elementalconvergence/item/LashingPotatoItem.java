@@ -1,5 +1,6 @@
 package com.elementalconvergence.item;
 
+import com.elementalconvergence.data.IGrapplingHookDataSaver;
 import com.elementalconvergence.entity.LashingPotatoHookEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,7 +21,8 @@ public class LashingPotatoItem extends Item {
 
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        LashingPotatoHookEntity existingHook = user.lashingPotatoHook;
+        IGrapplingHookDataSaver hookDataSaver = (IGrapplingHookDataSaver) user;
+        LashingPotatoHookEntity existingHook = hookDataSaver.getGrapplingHookData().getGrapplingHookEntity();
         if (existingHook != null) {
             retractHook(world, user, existingHook);
         } else {
@@ -47,7 +49,8 @@ public class LashingPotatoItem extends Item {
     private static void retractHook(World world, PlayerEntity playerEntity, LashingPotatoHookEntity hookEntity) {
         if (!world.isClient()) {
             hookEntity.discard();
-            playerEntity.lashingPotatoHook = null;
+            IGrapplingHookDataSaver hookDataSaver = (IGrapplingHookDataSaver) playerEntity;
+            hookDataSaver.getGrapplingHookData().clearHook();
         }
 
         world.playSound((PlayerEntity)null, playerEntity.getX(), playerEntity.getY(), playerEntity.getZ(), SoundEvents.ENTITY_FISHING_BOBBER_RETRIEVE, SoundCategory.NEUTRAL, 1.0F, 0.4F / (world.getRandom().nextFloat() * 0.4F + 0.8F));

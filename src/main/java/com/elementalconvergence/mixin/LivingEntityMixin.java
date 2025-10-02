@@ -328,7 +328,7 @@ public abstract class LivingEntityMixin {
 
         //check if bouncy
         if (entity instanceof PlayerEntity player &&
-                player.hasStatusEffect(ModEffects.BOUNCY) && //so not in creative flight either
+                (player.hasStatusEffect(ModEffects.BOUNCY) || player.hasStatusEffect(ModEffects.ARACHNID)) && //so not in creative flight either
                 !player.isOnGround() && !player.getAbilities().flying &&
                 this.storedMovementInput != null &&
                 this.storedMovementInput.lengthSquared() < 1.0E-7 && //i.e. no movement input

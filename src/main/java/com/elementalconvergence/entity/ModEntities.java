@@ -71,11 +71,13 @@ public class ModEntities {
                     .build()
     );
 
-    public static final EntityType<SpiderGrapplingHookEntity> SPIDER_GRAPPLING_HOOK = Registry.register(
+    public static final EntityType<LashingPotatoHookEntity> LASHING_POTATO_HOOK = Registry.register(
             Registries.ENTITY_TYPE,
-            ElementalConvergence.id("spider_grappling_hook"),
-            EntityType.Builder.<SpiderGrapplingHookEntity>create(SpiderGrapplingHookEntity::new, SpawnGroup.MISC)
+            ElementalConvergence.id("lashing_potato_hook"),
+            EntityType.Builder.<LashingPotatoHookEntity>create(LashingPotatoHookEntity::new, SpawnGroup.MISC)
                     .dimensions(0.25f, 0.25f)
+                    .trackingTickInterval(5)
+                    .maxTrackingRange(4)
                     .build()
     );
 

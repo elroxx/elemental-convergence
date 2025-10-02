@@ -1,5 +1,7 @@
 package com.elementalconvergence.entity;
 
+import com.elementalconvergence.data.IGrapplingHookDataSaver;
+import com.elementalconvergence.item.ModItems;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.Entity.MoveEffect;
@@ -33,7 +35,7 @@ public class LashingPotatoHookEntity extends ProjectileEntity {
     }
 
     public LashingPotatoHookEntity(World world, PlayerEntity playerEntity) {
-        this(EntityType.LASHING_POTATO_HOOK, world);
+        this(ModEntities.LASHING_POTATO_HOOK, world);
         this.setOwner(playerEntity);
         this.setPosition(playerEntity.getX(), playerEntity.getEyeY() - 0.1, playerEntity.getZ());
         this.setVelocity(playerEntity.getRotationVec(1.0F).multiply(VELOCITY_MULTIPLIER));
@@ -68,7 +70,7 @@ public class LashingPotatoHookEntity extends ProjectileEntity {
     }
 
     private boolean shouldRemove(PlayerEntity playerEntity) {
-        if (!playerEntity.isRemoved() && playerEntity.isAlive() && playerEntity.isHolding(Items.LASHING_POTATO) && !(this.squaredDistanceTo(playerEntity) > (double)(MAX_LENGTH * MAX_LENGTH))) {
+        if (!playerEntity.isRemoved() && playerEntity.isAlive() && playerEntity.isHolding(ModItems.LASHING_POTATO_HOOK) && !(this.squaredDistanceTo(playerEntity) > (double)(MAX_LENGTH * MAX_LENGTH))) {
             return false;
         } else {
             this.discard();
@@ -138,7 +140,8 @@ public class LashingPotatoHookEntity extends ProjectileEntity {
     private void updatePlayerHook(@Nullable LashingPotatoHookEntity hookEntity) {
         PlayerEntity playerEntity = this.getPlayerOwner();
         if (playerEntity != null) {
-            playerEntity.lashingPotatoHook = hookEntity;
+            IGrapplingHookDataSaver hookDataSaver = (IGrapplingHookDataSaver) playerEntity;
+            hookDataSaver.getGrapplingHookData().setGrapplingHookEntity(hookEntity);
         }
     }
 
@@ -152,10 +155,11 @@ public class LashingPotatoHookEntity extends ProjectileEntity {
         return false;
     }
 
-    public Packet<ClientPlayPacketListener> createSpawnPacket() {
-        Entity entity = this.getOwner();
-        return new EntitySpawnS2CPacket(this, entity == null ? this.getId() : entity.getId());
-    }
+    /*@Override
+    public Packet<ClientPlayPacketListener> createSpawnPacket(net.minecraft.server.network.EntityTrackerEntry entry) {
+        int ownerId = this.getOwner() == null ? 0 : this.getOwner().getId();
+        return new EntitySpawnS2CPacket(this, ownerId); // second arg is the int entityData
+    }*/
 
     public void onSpawnPacket(EntitySpawnS2CPacket packet) {
         super.onSpawnPacket(packet);
