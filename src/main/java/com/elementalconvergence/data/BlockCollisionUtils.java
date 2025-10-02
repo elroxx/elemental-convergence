@@ -43,8 +43,6 @@ public class BlockCollisionUtils {
                         VoxelShape originalCollision = state.getOutlineShape(world, pos);
 
                         if (context.isAbove(originalCollision, pos, true) && !context.isDescending()) {
-                            //cir.setReturnValue(NORMAL_OUTLINE_SHAPE);
-                            //cir.setReturnValue(state.getBlock()); //because slabs
                             cir.setReturnValue(originalCollision);
                         }
                         else{
@@ -54,7 +52,22 @@ public class BlockCollisionUtils {
                             cir.setReturnValue(context.isAbove(OUTLINE_SHAPE, pos, true) && blockBelow.equals(Blocks.AIR) ? COLLISION_SHAPE : VoxelShapes.empty());
                         }
                     }
-                } else {
+                }
+                else if (player.hasStatusEffect(ModEffects.ARACHNID)){
+                    //same as quantum, BUT ONLY FOR COBWEB
+                    if (state.getBlock().equals(Blocks.COBWEB)) {
+                        VoxelShape originalCollision = state.getOutlineShape(world, pos);
+
+                        if (context.isAbove(originalCollision, pos, true) && !context.isDescending()) {
+                            cir.setReturnValue(originalCollision);
+                        }
+                        else{
+                            //can just walk through (still slowed, this is handled in the other mixin)
+                            cir.setReturnValue(VoxelShapes.empty());
+                        }
+                    }
+                }
+                else {
 
                     //first check if opaque to remove as many checks as possible
                     if (!state.isOpaque()) {

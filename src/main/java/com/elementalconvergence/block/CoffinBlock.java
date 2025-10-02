@@ -131,7 +131,7 @@ public class CoffinBlock extends BedBlock {
 
     @Override
     protected ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (world.isClient || player instanceof ClientPlayerEntity) {
+        if (world.isClient) {
             return ActionResult.CONSUME;
         }
 

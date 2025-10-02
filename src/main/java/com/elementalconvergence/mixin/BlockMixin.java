@@ -88,7 +88,7 @@ public class BlockMixin {
             if( livingEntity.hasStatusEffect(ModEffects.BOUNCY)) {
                 livingEntity.setVelocity(livingEntity.getVelocity().multiply(1F, -0.9,1F));
                 livingEntity.velocityModified=true;
-                livingEntity.getWorld().playSound(null, livingEntity.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.PLAYERS, 1.0F, 1F);
+                livingEntity.getWorld().playSound(null, livingEntity.getBlockPos(), SoundEvents.BLOCK_SLIME_BLOCK_FALL, SoundCategory.PLAYERS, 0.5F, 0.8F);
                 callbackInfo.cancel();
                 return;
             }

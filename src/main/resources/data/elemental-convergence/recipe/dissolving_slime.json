@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "DVD",
+    "PRP"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:slime_block"
+    },
+    "D": {
+      "item": "minecraft:diamond"
+    },
+    "V": {
+      "item": "minecraft:verdant_froglight"
+    },
+    "P": {
+      "item": "minecraft:poisonous_potato"
+    },
+    "R": {
+      "item": "elemental-convergence:rotten_corpse"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:dissolving_slime",
+    "count": 1
+  }
+}

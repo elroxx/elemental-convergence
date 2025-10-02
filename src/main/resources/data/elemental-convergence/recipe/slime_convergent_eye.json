@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SOM",
+    "WET",
+    "MUS"
+  ],
+  "key": {
+    "S": {
+      "item": "minecraft:slime_ball"
+    },
+    "O": {
+      "item": "minecraft:blue_orchid"
+    },
+    "M": {
+      "item": "minecraft:magma_cream"
+    },
+    "U": {
+      "item": "minecraft:mud"
+    },
+    "W": {
+      "item": "elemental-convergence:water_magic_eye"
+    },
+    "T": {
+      "item": "elemental-convergence:earth_magic_eye"
+    },
+    "E": {
+      "item": "elemental-convergence:convergent_eye"
+    }
+  },
+  "result": {
+    "id": "elemental-convergence:slime_convergent_eye",
+    "count": 1
+  }
+}

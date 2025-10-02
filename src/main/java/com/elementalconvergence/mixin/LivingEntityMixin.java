@@ -38,9 +38,7 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -294,6 +292,53 @@ public abstract class LivingEntityMixin {
             entity.getAttributeInstance(EntityAttributes.GENERIC_STEP_HEIGHT)
                     .addTemporaryModifier(modifier);
         }
+    }
+
+    private Vec3d storedMovementInput;
+
+    @Inject(method = "travel", at = @At("HEAD"))
+    private void storeMovementInput(Vec3d movementInput, CallbackInfo ci) {
+        this.storedMovementInput = movementInput;
+    }
+
+    //modify x when air resistance is applied
+    @ModifyArg(
+            method = "travel",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V"),
+            index = 0 // X velocity argument
+    )
+    private double modifyHorizontalXVelocity(double originalX) {
+        return modifyHorizontalVelocity(originalX);
+    }
+
+    //modify z when air resistance is applide
+    @ModifyArg(
+            method = "travel",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/entity/LivingEntity;setVelocity(DDD)V"),
+            index = 2 // Z velocity argument
+    )
+    private double modifyHorizontalZVelocity(double originalZ) {
+        return modifyHorizontalVelocity(originalZ);
+    }
+
+    private double modifyHorizontalVelocity(double originalVelocity) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+
+        //check if bouncy
+        if (entity instanceof PlayerEntity player &&
+                (player.hasStatusEffect(ModEffects.BOUNCY) || player.hasStatusEffect(ModEffects.ARACHNID)) && //so not in creative flight either
+                !player.isOnGround() && !player.getAbilities().flying &&
+                this.storedMovementInput != null &&
+                this.storedMovementInput.lengthSquared() < 1.0E-7 && //i.e. no movement input
+                !entity.hasNoDrag()) { //only when air resistance is being applied
+
+            //less air resistance
+            return originalVelocity * (0.99 / 0.91);
+        }
+
+        return originalVelocity; //otherwise we default
     }
 
 }
