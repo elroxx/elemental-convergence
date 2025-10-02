@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -56,23 +57,27 @@ public class SpiderMagicHandler implements IMagicHandler {
     private double directionZ = 0;
 
     //buff: wall climb
+    //buff: poison on hit.
     //debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
     //buff normal zombies, skeleton, creeper and spider+cave spiders dont attack you. (MAYBE NOT??) //actually i dont want, buff is wall climb.
     //Passive: Spider webs are solid blocks.
 
+
     //lvl 1: When right clicking with a stack of string in the air. Create a line of cobwebs in the sky. Consume 1 string per block placed. Place them 1 by 1 with a small delay like the vein miner ability.
     //lvl 2: web slinging
-    //lvl 3: when right clicking with a spider's abdomen, stun everybody in front in a cone. This gives them weakness 2 for like 10 seconds, slowness 2 for 10 seconds, poison 1 for 5 seconds and places a cobweb on their face and feet. 15 seconds cooldown.
+    //lvl 3: keybind, stun everybody in front in a cone. This gives them weakness 2 for like 10 seconds, slowness 2 for 10 seconds, poison 1 for 5 seconds and places a cobweb on their face and feet. 15 seconds cooldown.
 
     //advancements:
     //1: cobweb
-    //2: spider's abdomen (reusable item that will be used for the next ability)
-    //3: danger pottery shard
+    //2: spider's abdomen
+    //3: dangers pottery shard
 
-    //spider's abdomen is like b:blackwoold c:scaffolding, l:loom
+    //spider's abdomen is like b:blackwoold c:scaffolding, l:loom, p:chainmail leggings
     //bcb
-    //bLb
-    //bcb
+    //bpb
+    //blb
+
+    //spider's eye*2, fermentedx1, black glazed terracotta, x2, loomx1
 
 
 
@@ -195,6 +200,21 @@ public class SpiderMagicHandler implements IMagicHandler {
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
+        //add poison on hit (part of buff ig)
+        if (victim instanceof LivingEntity livingEntity){
+            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 2*20, 0, true, true, true));
+        }
+
+        //add feedback sound to know it was a weak hit
+        BlockPos playerPosition = player.getBlockPos();
+        int lightLevel = player.getWorld().getLightLevel(playerPosition);
+        if (lightLevel<=SPIDER_LIGHT_THRESHOLD){
+            //good hit
+        }else{
+            //bad hit
+            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ITEM_SHIELD_BREAK,
+                    SoundCategory.PLAYERS, 0.8f, 1.2f);
+        }
 
     }
 
