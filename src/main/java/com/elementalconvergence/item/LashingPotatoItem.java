@@ -1,11 +1,14 @@
 package com.elementalconvergence.item;
 
 import com.elementalconvergence.data.IGrapplingHookDataSaver;
+import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.entity.LashingPotatoHookEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
@@ -14,6 +17,8 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import net.minecraft.world.event.GameEvent;
 
+import static com.elementalconvergence.magic.convergencehandlers.SpiderMagicHandler.SPIDER_INDEX;
+
 public class LashingPotatoItem extends Item {
     public LashingPotatoItem(Item.Settings settings) {
         super(settings);
@@ -21,16 +26,23 @@ public class LashingPotatoItem extends Item {
 
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        IGrapplingHookDataSaver hookDataSaver = (IGrapplingHookDataSaver) user;
-        LashingPotatoHookEntity existingHook = hookDataSaver.getGrapplingHookData().getGrapplingHookEntity();
-        if (existingHook != null) {
-            retractHook(world, user, existingHook);
-        } else {
-            if (!world.isClient) {
-                itemStack.damage(1, user, LivingEntity.getSlotForHand(hand));
-            }
+        if (user instanceof ServerPlayerEntity) {
+            IMagicDataSaver dataSaver = (IMagicDataSaver) user;
+            MagicData magicData = dataSaver.getMagicData();
+            int spiderLvl = magicData.getMagicLevel(SPIDER_INDEX);
+            if (spiderLvl>=2 && magicData.getSelectedMagic()==SPIDER_INDEX) {
+                IGrapplingHookDataSaver hookDataSaver = (IGrapplingHookDataSaver) user;
+                LashingPotatoHookEntity existingHook = hookDataSaver.getGrapplingHookData().getGrapplingHookEntity();
+                if (existingHook != null) {
+                    retractHook(world, user, existingHook);
+                } else {
+                    if (!world.isClient) {
+                        itemStack.damage(1, user, LivingEntity.getSlotForHand(hand));
+                    }
 
-            this.throwHook(world, user);
+                    this.throwHook(world, user);
+                }
+            }
         }
 
         return TypedActionResult.success(itemStack, world.isClient);
