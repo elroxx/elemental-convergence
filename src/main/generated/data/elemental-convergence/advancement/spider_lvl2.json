@@ -1,0 +1,51 @@
+{
+  "parent": "elemental-convergence:spider_lvl1",
+  "criteria": {
+    "has_spider_selected_concurrent": {
+      "conditions": {
+        "advancementName": "elemental-convergence:spider_lvl2",
+        "criterionName": "spider_criterion_lvl2",
+        "magicIndex": 18
+      },
+      "trigger": "minecraft:elemental-convergence/is_selected_magic_concurrent"
+    },
+    "spider_criterion_lvl2": {
+      "conditions": {
+        "items": [
+          {
+            "items": "elemental-convergence:spider_grappling_hook"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "spider_has_lvl2": {
+      "conditions": {
+        "advancementName": "elemental-convergence:spider_lvl2",
+        "criterionName": "spider_criterion_lvl2",
+        "parentAdvancement": "elemental-convergence:spider_lvl1"
+      },
+      "trigger": "minecraft:elemental-convergence/has_parent"
+    }
+  },
+  "display": {
+    "description": "Craft a spider's abdomen",
+    "icon": {
+      "count": 1,
+      "id": "elemental-convergence:spider_grappling_hook"
+    },
+    "title": "Spider Level 2"
+  },
+  "requirements": [
+    [
+      "spider_criterion_lvl2"
+    ],
+    [
+      "spider_has_lvl2"
+    ],
+    [
+      "has_spider_selected_concurrent"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
