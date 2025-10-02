@@ -27,11 +27,14 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
@@ -56,6 +59,12 @@ public class SpiderMagicHandler implements IMagicHandler {
     private double directionX = 0;
     private double directionY = 0;
     private double directionZ = 0;
+
+    public static final int DEFAULT_WEAVE_COOLDOWN=5*20; //5 seconds cooldown
+    private int weaveCooldown=0;
+    private static final double WEAVE_CONE_RANGE = 50;
+    private static final double WEAVE_CONE_ANGLE = 120.0;
+    private static final int WEAVE_EFFECT_DURATION = 4*20;
 
     //buff: wall climb
     //X - buff: poison on hit.
@@ -153,14 +162,10 @@ public class SpiderMagicHandler implements IMagicHandler {
             }
         }
 
-        //cooldowns
-        if (silkBridgeCooldown>0){
-            silkBridgeCooldown--;
-        }
 
-        // Handle gradual cobweb placement (1 per tick)
+        //place cobwebs tick by tick
         if (cobwebsToPlace > 0) {
-            // Stop if player is no longer holding string
+            //stop if no longer holding string
             if (!player.getMainHandStack().isOf(Items.STRING)) {
                 cobwebsToPlace = 0;
                 currentX = 0;
@@ -174,7 +179,6 @@ public class SpiderMagicHandler implements IMagicHandler {
 
             //need air. can't break anything
             if (world.getBlockState(targetPos).isAir()) {
-                // Place cobweb
                 world.setBlockState(targetPos, Blocks.COBWEB.getDefaultState());
 
                 // consume 1 string at a time
@@ -196,23 +200,33 @@ public class SpiderMagicHandler implements IMagicHandler {
                             3, 0.2, 0.2, 0.2, 0.05);
                 }
             } else {
-                // Hit a block, stop placing cobwebs
+                //then we hit block so we stop
                 cobwebsToPlace = 0;
             }
 
-            // Move to next position along the look vector
+            // next pos
             currentX += directionX;
             currentY += directionY;
             currentZ += directionZ;
             cobwebsToPlace--;
 
-            // Check if we're done placing all cobwebs
+            //if done
             if (cobwebsToPlace <= 0) {
                 currentX = 0;
                 currentY = 0;
                 currentZ = 0;
             }
         }
+
+        //cooldowns
+        if (silkBridgeCooldown>0){
+            silkBridgeCooldown--;
+        }
+
+        if (weaveCooldown>0){
+            weaveCooldown--;
+        }
+
     }
 
     @Override
@@ -252,6 +266,28 @@ public class SpiderMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int spiderLevel = magicData.getMagicLevel(SPIDER_INDEX);
+
+        if (spiderLevel >= 3 && weaveCooldown == 0) {
+            ServerWorld world = (ServerWorld) player.getWorld();
+
+            stunEntities(player, world);
+
+            //add particles
+
+            // sound
+            world.playSound(
+                    null,
+                    player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_SPIDER_AMBIENT,
+                    SoundCategory.PLAYERS,
+                    1.0F,
+                    0.5F
+            );
+            weaveCooldown=DEFAULT_WEAVE_COOLDOWN;
+        }
 
     }
 
@@ -263,5 +299,53 @@ public class SpiderMagicHandler implements IMagicHandler {
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
 
+    }
+
+    public void stunEntities(PlayerEntity player, ServerWorld world){
+        double range = WEAVE_CONE_RANGE;
+        double coneAngle = WEAVE_CONE_ANGLE;
+
+        // lookdirection
+        Vec3d lookDirection = player.getRotationVec(1.0F);
+        Box searchBox = player.getBoundingBox().expand(range);
+
+        List<LivingEntity> nearbyEntities = world.getEntitiesByClass(
+                LivingEntity.class,
+                searchBox,
+                entity -> entity != player // dont push player
+        );
+
+        for (LivingEntity entity : nearbyEntities) {
+            //vector player entity
+            Vec3d toEntity = entity.getPos().subtract(player.getPos());
+
+            // dont check behind players
+            if (toEntity.dotProduct(lookDirection) <= 0) {
+                continue;
+            }
+
+            // normalized
+            Vec3d normalizedLook = lookDirection.normalize();
+            Vec3d normalizedToEntity = toEntity.normalize();
+
+            // CONE COMPUTING
+            double dot = normalizedLook.dotProduct(normalizedToEntity);
+            double angleInRadians = Math.acos(dot);
+            double angleInDegrees = Math.toDegrees(angleInRadians);
+
+            // check if cone
+            if (angleInDegrees <= coneAngle / 2) {
+                //STUN
+                //place block
+                if (world.getBlockState(entity.getBlockPos()).equals(Blocks.AIR)){
+                    world.setBlockState(entity.getBlockPos(), Blocks.COBWEB.getDefaultState());
+                }
+
+                //give slowness 5, weakness 4, mining fatigue 10 (so they cant just mine the cobweb instantly
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, WEAVE_EFFECT_DURATION, 9, false, true, true));
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, WEAVE_EFFECT_DURATION, 9, false, true, true));
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, WEAVE_EFFECT_DURATION, 9, false, true, true));
+            }
+        }
     }
 }
