@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "elemental-convergence:item/spider_grappling_hook_extended"
+  }
+}

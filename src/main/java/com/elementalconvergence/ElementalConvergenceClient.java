@@ -2,6 +2,7 @@ package com.elementalconvergence;
 
 import com.elementalconvergence.container.MysticalTomeScreen;
 import com.elementalconvergence.container.MysticalTomeScreenHandler;
+import com.elementalconvergence.data.IGrapplingHookDataSaver;
 import com.elementalconvergence.data.IPlayerMiningMixin;
 import com.elementalconvergence.entity.ModEntitiesClient;
 import com.elementalconvergence.item.ModItems;
@@ -17,9 +18,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.particle.PortalParticle;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 import static com.elementalconvergence.ElementalConvergence.LOGGER;
@@ -57,6 +60,23 @@ public class ElementalConvergenceClient implements ClientModInitializer {
         registerKeybindings(); //Keybinds
 
         ModEntitiesClient.initializeClient();
+
+        ModelPredicateProviderRegistry.register(
+                ModItems.LASHING_POTATO_HOOK,
+                ElementalConvergence.id("extended"),
+                (stack, world, entity, seed) -> {
+                    if (entity == null) return 0.0F;
+
+                    // Check if the hook is currently extended
+                    if (entity instanceof IGrapplingHookDataSaver saver) {
+                        if (saver.getGrapplingHookData().getGrapplingHookEntity() != null) {
+                            return 1.0F; // use extended texture
+                        }
+                    }
+
+                    return 0.0F; // default texture
+                }
+        );
     }
 
     private void registerKeybindings() {

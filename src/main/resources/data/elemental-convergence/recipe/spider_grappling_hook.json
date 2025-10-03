@@ -10,7 +10,7 @@
     "C": {
       "item": "minecraft:chainmail_leggings"
     },
-    "N": {
+    "S": {
       "item": "minecraft:scaffolding"
     },
     "B": {
@@ -22,6 +22,6 @@
   },
   "result": {
     "id": "elemental-convergence:spider_grappling_hook",
-    "count": 8
+    "count": 1
   }
 }

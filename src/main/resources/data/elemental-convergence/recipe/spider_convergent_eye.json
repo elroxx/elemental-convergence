@@ -16,7 +16,7 @@
     "B": {
       "item": "minecraft:black_glazed_terracotta"
     },
-    "L": {
+    "W": {
       "item": "minecraft:white_wool"
     },
     "S": {
@@ -30,7 +30,7 @@
     }
   },
   "result": {
-    "id": "elemental-convergence:blood_convergent_eye",
+    "id": "elemental-convergence:spider_convergent_eye",
     "count": 1
   }
 }
