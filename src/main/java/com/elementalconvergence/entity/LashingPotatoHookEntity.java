@@ -26,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 public class LashingPotatoHookEntity extends ProjectileEntity {
     public static final TrackedData<Boolean> IN_BLOCK;
     public static final TrackedData<Float> LENGTH;
-    private static final float MAX_LENGTH = 100.0F;
-    private static final double VELOCITY_MULTIPLIER = (double)5.0F;
+    private static final float MAX_LENGTH = 120.0F;
+    private static final double VELOCITY_MULTIPLIER = (double)10.0F;
 
     public LashingPotatoHookEntity(EntityType<? extends LashingPotatoHookEntity> entityType, World world) {
         super(entityType, world);
