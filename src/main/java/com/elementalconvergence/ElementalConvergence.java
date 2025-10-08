@@ -850,6 +850,7 @@ public class ElementalConvergence implements ModInitializer {
 		allRecipesList.add(id("epsilon_dust"));
 		allRecipesList.add(id("fire_magic_eye"));
 		allRecipesList.add(id("flower_gateway"));
+		allRecipesList.add(id("gilded_blackstone"));
 		allRecipesList.add(id("gravity_convergent_eye"));
 		allRecipesList.add(id("gravity_shard"));
 		allRecipesList.add(id("halo"));
