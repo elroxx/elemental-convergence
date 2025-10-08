@@ -202,7 +202,7 @@ Playstyle: Builder, Stealth
 
 ### Passives
 
-***Void's Herald* (Buff)**: Can fly in the void.
+***Void's Herald* (Buff)**: Keeps inventory on death (not xp).
 
 ***Empty Feets* (Buff)**: Very low fall damage.
 
@@ -213,6 +213,6 @@ Playstyle: Builder, Stealth
 
 ***Bob's Drill* (Level 1) - Item**: Right click with Bob's drill to destroy a block of bedrock.
 
-***Void Swap* (Level 2) - Keybind**: Press to teleport in the void. 1 block in the void is 4 blocks in the overworld.
+***Void Swap* (Level 2) - Keybind**: Press to teleport in the void. 1 block in the void is 4 blocks in the overworld. Can fly while in the void.
 
 ***Void Infusion* (Level 3) - Item**: Right click an entity with a void essence to infuse them with void. This teleports the entity in the void for a moment. The entity gets to have a block platform placed under them. How nice.
