@@ -87,7 +87,7 @@ public class VoidSicknessEffect extends StatusEffect {
 
         // coordinates
         double voidPosX = entity.getPos().x / 4.0;
-        double voidPosY = (entity.getPos().y - 64.0) / 4.0;
+        double voidPosY = (entity.getPos().y) / 4.0;
         double voidPosZ = entity.getPos().z / 4.0;
 
         // get world
@@ -146,7 +146,7 @@ public class VoidSicknessEffect extends StatusEffect {
 
         //get overworld coordinates
         double owPosX = entity.getPos().x * 4.0;
-        double owPosY = (entity.getPos().y * 4.0) + 64.0;
+        double owPosY = (entity.getPos().y * 4.0);
         double owPosZ = entity.getPos().z * 4.0;
 
         //overworld

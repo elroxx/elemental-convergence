@@ -225,7 +225,7 @@ public class VoidMagicHandler implements IMagicHandler {
 
 
                     double owPosX = player.getPos().x * 4.0;
-                    double owPosY = (player.getPos().y * 4.0) + 64.0;
+                    double owPosY = (player.getPos().y * 4.0);
                     double owPosZ = player.getPos().z * 4.0;
 
                     //tp
@@ -254,7 +254,7 @@ public class VoidMagicHandler implements IMagicHandler {
                             SoundEvents.ENTITY_SQUID_SQUIRT, SoundCategory.PLAYERS, 1.0F, 0.5F);
 
                     double voidPosX = player.getPos().x / 4.0;
-                    double voidPosY = (player.getPos().y - 64.0) / 4.0;
+                    double voidPosY = (player.getPos().y) / 4.0;
                     double voidPosZ = player.getPos().z / 4.0;
 
                     ServerWorld voidWorld = server.getWorld(VOID_DIMENSION);
