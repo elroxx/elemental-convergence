@@ -42,7 +42,7 @@ import static com.elementalconvergence.world.dimension.ModDimensions.VOID_WORLD_
 public class VoidMagicHandler implements IMagicHandler {
     public static final int VOID_INDEX= (BASE_MAGIC_ID.length-1)+10;
 
-    public static final float VOID_GRAVITY = 0.02f; // 1/50 grav
+    public static final float VOID_GRAVITY = 0f; // 1/50 grav
 
     public static final int DEFAULT_DIMENSIONSICK_COOLDOWN = 20*10; //every 10 seconds take half a heart of dmg
     private int dimensionSickCooldown=0;
