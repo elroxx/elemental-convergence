@@ -178,7 +178,7 @@ public class SpiderMagicHandler implements IMagicHandler {
             BlockPos targetPos = new BlockPos((int) Math.floor(currentX), (int) Math.floor(currentY), (int) Math.floor(currentZ));
 
             //need air. can't break anything
-            if (world.getBlockState(targetPos).isAir()) {
+            if (world.getBlockState(targetPos).isAir() || world.getBlockState(targetPos).equals(Blocks.COBWEB.getDefaultState())) {
                 world.setBlockState(targetPos, Blocks.COBWEB.getDefaultState());
 
                 // consume 1 string at a time
@@ -274,8 +274,39 @@ public class SpiderMagicHandler implements IMagicHandler {
             ServerWorld world = (ServerWorld) player.getWorld();
 
             stunEntities(player, world);
+            spawnExplosionParticles(player, world);
 
             //add particles
+            Vec3d playerPos = player.getPos().add(0, player.getStandingEyeHeight(), 0);
+            Vec3d lookDirection = player.getRotationVec(1.0F);
+
+            for (int i = 0; i < 150; i++) {
+                double distance = world.random.nextDouble() * WEAVE_CONE_RANGE;
+                double spread = Math.tan(Math.toRadians(WEAVE_CONE_ANGLE / 2)) * distance;
+
+                double offsetX = (world.random.nextDouble() - 0.5) * spread * 2;
+                double offsetY = (world.random.nextDouble() - 0.5) * spread * 2;
+
+                Vec3d particlePos = playerPos.add(
+                        lookDirection.x * distance + offsetX,
+                        lookDirection.y * distance + offsetY,
+                        lookDirection.z * distance + offsetX
+                );
+
+                if (i % 3 == 0) {
+                    world.spawnParticles(
+                            ParticleTypes.ITEM_COBWEB,
+                            particlePos.x, particlePos.y, particlePos.z,
+                            1, 0.1, 0.1, 0.1, 0.02
+                    );
+                } else {
+                    world.spawnParticles(
+                            ParticleTypes.WHITE_ASH,
+                            particlePos.x, particlePos.y, particlePos.z,
+                            1, 0.05, 0.05, 0.05, 0.01
+                    );
+                }
+            }
 
             // sound
             world.playSound(
@@ -337,15 +368,64 @@ public class SpiderMagicHandler implements IMagicHandler {
             if (angleInDegrees <= coneAngle / 2) {
                 //STUN
                 //place block
-                if (world.getBlockState(entity.getBlockPos()).equals(Blocks.AIR)){
+                if (world.getBlockState(entity.getBlockPos()).equals(Blocks.AIR.getDefaultState())){
                     world.setBlockState(entity.getBlockPos(), Blocks.COBWEB.getDefaultState());
                 }
+
+                world.spawnParticles(
+                        ParticleTypes.ITEM_COBWEB,
+                        entity.getX(),
+                        entity.getY() + entity.getHeight() / 2,
+                        entity.getZ(),
+                        30, 0.5, 0.5, 0.5, 0.1
+                );
+
+                world.spawnParticles(
+                        ParticleTypes.WHITE_ASH,
+                        entity.getX(),
+                        entity.getY() + entity.getHeight() / 2,
+                        entity.getZ(),
+                        20, 0.3, 0.5, 0.3, 0.05
+                );
+
 
                 //give slowness 5, weakness 4, mining fatigue 10 (so they cant just mine the cobweb instantly
                 entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, WEAVE_EFFECT_DURATION, 9, false, true, true));
                 entity.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, WEAVE_EFFECT_DURATION, 9, false, true, true));
                 entity.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, WEAVE_EFFECT_DURATION, 9, false, true, true));
             }
+        }
+    }
+
+    private void spawnExplosionParticles(PlayerEntity player, ServerWorld world) {
+        Vec3d lookDir = player.getRotationVec(1.0F);
+        Vec3d playerPos = player.getEyePos();
+
+        int particleCount = 300;
+
+        for (int i = 0; i < particleCount; i++) {
+            // same cone
+            double distance = world.random.nextDouble() * WEAVE_CONE_RANGE;
+            double spread = Math.tan(Math.toRadians(WEAVE_CONE_ANGLE / 2)) * distance;
+
+            double offsetX = (world.random.nextDouble() - 0.5) * spread * 2;
+            double offsetY = (world.random.nextDouble() - 0.5) * spread * 2;
+            double offsetZ = (world.random.nextDouble() - 0.5) * spread * 2;
+
+            // cone
+            Vec3d particlePos = playerPos.add(
+                    lookDir.x * distance + offsetX,
+                    lookDir.y * distance + offsetY,
+                    lookDir.z * distance + offsetZ
+            );
+
+            world.spawnParticles(
+                    ParticleTypes.SPIT,
+                    particlePos.x, particlePos.y, particlePos.z,
+                    1,
+                    0.0, 0.0, 0.0,
+                    0.0
+            );
         }
     }
 }
