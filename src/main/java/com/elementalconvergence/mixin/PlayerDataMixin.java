@@ -8,6 +8,8 @@ import com.elementalconvergence.magic.handlers.EarthMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.session.report.ReporterEnvironment;
+import net.minecraft.component.EnchantmentEffectComponentTypes;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffects;
@@ -18,6 +20,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Hand;
+import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -26,6 +29,8 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static com.elementalconvergence.magic.convergencehandlers.VoidMagicHandler.VOID_INDEX;
 
 @Mixin(PlayerEntity.class)
 public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISchrodingerTPDataSaver, IOriginalSkinDataSaver, IGrapplingHookDataSaver{
@@ -66,6 +71,11 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
     public GrapplingHookData getGrapplingHookData() {
         return grapplingHookData;
     }
+
+    //start of stuff for void keepinventory
+
+    @Unique
+    private DefaultedList<ItemStack> voidInventoryBackup = null;
 
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
@@ -189,6 +199,54 @@ public class PlayerDataMixin implements IMagicDataSaver, IPlayerMiningMixin, ISc
         if (player.hasStatusEffect(ModEffects.BOUNCY) && !player.isSneaking()){
             cir.setReturnValue(false);
         }
+    }
+
+
+    //VOID KEEP INVENTORY PART HERE:
+
+    //NO INV DROP
+    @Inject(method = "dropInventory", at = @At("HEAD"), cancellable = true)
+    private void preventInventoryDrop(CallbackInfo ci) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+
+        //only for void
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            IMagicDataSaver dataSaver = (IMagicDataSaver) serverPlayer;
+            MagicData currentMagicData = dataSaver.getMagicData();
+            if (currentMagicData.getSelectedMagic() == VOID_INDEX) {
+                vanishCursedItems(player); //kill all vanish items
+
+                //backup inventory for the rest
+                voidInventoryBackup = DefaultedList.ofSize(player.getInventory().size(), ItemStack.EMPTY);
+                for (int i = 0; i < player.getInventory().size(); i++) {
+                    voidInventoryBackup.set(i, player.getInventory().getStack(i).copy());
+                }
+
+
+                ci.cancel(); //stop inventory from dropping
+            }
+        }
+    }
+
+    //helper method, WHICH IS EXACTLY but like EXACTLY the same as vanishCursedItem in the playerEntity since it was protected
+    protected void vanishCursedItems(PlayerEntity player) {
+        for(int i = 0; i < player.getInventory().size(); ++i) {
+            ItemStack itemStack = player.getInventory().getStack(i);
+            if (!itemStack.isEmpty() && EnchantmentHelper.hasAnyEnchantmentsWith(itemStack, EnchantmentEffectComponentTypes.PREVENT_EQUIPMENT_DROP)) {
+                player.getInventory().removeStack(i);
+            }
+        }
+
+    }
+
+    //GETTER METHODS SO THAT SERVERPLAYERDATAMIXIN CAN COPYFROM DIRECTLY!!!!!!!!
+
+    public DefaultedList<ItemStack> getVoidInventoryBackup() {
+        return voidInventoryBackup;
+    }
+
+    public void clearVoidBackup() {
+        voidInventoryBackup = null;
     }
 
 }

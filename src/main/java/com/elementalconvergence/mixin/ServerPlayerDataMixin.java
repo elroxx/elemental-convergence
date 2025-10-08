@@ -2,12 +2,17 @@ package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.*;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.world.GameRules;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static com.elementalconvergence.magic.convergencehandlers.VoidMagicHandler.VOID_INDEX;
 
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerDataMixin {
@@ -52,5 +57,27 @@ public class ServerPlayerDataMixin {
         newSkinData.setOriginalSkinValue(oldSkinData.getOriginalSkinValue());
         newSkinData.setOriginalSkinSignature(oldSkinData.getOriginalSkinSignature());
         newSkinData.setHasFetchedOnce(oldSkinData.hasFetchedOnce());
+
+
+        //ADD VOID INVENTORY IF IT IS BACKED UP!
+
+        //verify if keep inventory is not already on, because then I modify stuff so i dont want to touch it
+        if (!oldPlayer.getWorld().getGameRules().getBoolean(GameRules.KEEP_INVENTORY)) {
+            PlayerDataMixin oldMixin = (PlayerDataMixin) (Object) oldPlayer;
+            if (oldMixin.getVoidInventoryBackup() != null) {
+                ServerPlayerEntity newPlayerEntity = (ServerPlayerEntity) (Object) this;
+                if (newPlayer.getMagicData().getSelectedMagic() == VOID_INDEX) {
+
+                    //restore inv
+                    DefaultedList<ItemStack> backup = oldMixin.getVoidInventoryBackup();
+                    for (int i = 0; i < backup.size() && i < newPlayerEntity.getInventory().size(); i++) {
+                        newPlayerEntity.getInventory().setStack(i, backup.get(i).copy());
+                    }
+
+                    //clear backup
+                    oldMixin.clearVoidBackup();
+                }
+            }
+        }
     }
 }
