@@ -37,7 +37,7 @@ public class LashingPotatoHookEntityRenderer extends EntityRenderer<LashingPotat
         PlayerEntity playerEntity = hookEntity.getPlayerOwner();
         if (playerEntity != null) {
             matrixStack.push();
-            this.itemRenderer.renderItem(new ItemStack(Items.POISONOUS_POTATO), ModelTransformationMode.GROUND, light, OverlayTexture.DEFAULT_UV, matrixStack, vertexConsumerProvider, hookEntity.getWorld(), hookEntity.getId());
+            this.itemRenderer.renderItem(new ItemStack(Items.COBWEB), ModelTransformationMode.GROUND, light, OverlayTexture.DEFAULT_UV, matrixStack, vertexConsumerProvider, hookEntity.getWorld(), hookEntity.getId());
             Vec3d handPos = playerEntity.getPos().add(0, 1, 0); //playerEntity.getHandPosOffset(ModItems.LASHING_POTATO_HOOK);
             //Vec3d handPos = FishingBobberEntityRenderer.getHandPos(playerEntity, tickDelta, ModItems.LASHING_POTATO_HOOK, this.dispatcher);
             Vec3d hookPos = new Vec3d(MathHelper.lerp((double)tickDelta, hookEntity.prevX, hookEntity.getX()), MathHelper.lerp((double)tickDelta, hookEntity.prevY, hookEntity.getY()) + (double)hookEntity.getStandingEyeHeight(), MathHelper.lerp((double)tickDelta, hookEntity.prevZ, hookEntity.getZ()));
@@ -80,7 +80,7 @@ public class LashingPotatoHookEntityRenderer extends EntityRenderer<LashingPotat
     }
 
     private static void addVertex(VertexConsumer vertexConsumer, MatrixStack.Entry entry, float x, float y, float z, float u, float v) {
-        vertexConsumer.vertex(entry, x, y, z).color(128, 255, 128, 255).texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(15728880).normal(0.0F, 1.0F, 0.0F);
+        vertexConsumer.vertex(entry, x, y, z).color(255, 255, 255, 255).texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(15728880).normal(0.0F, 1.0F, 0.0F);
     }
 
     public Identifier getTexture(LashingPotatoHookEntity hookEntity) {

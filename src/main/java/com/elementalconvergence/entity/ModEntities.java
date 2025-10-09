@@ -81,13 +81,22 @@ public class ModEntities {
                     .build()
     );
 
+    public static final EntityType<ConductiveArrowEntity> CONDUCTIVE_ARROW = Registry.register(
+            Registries.ENTITY_TYPE,
+            ElementalConvergence.id("conductive_arrow"),
+            EntityType.Builder.<ConductiveArrowEntity>create(ConductiveArrowEntity::new, SpawnGroup.MISC)
+                    .dimensions(0.5f, 0.5f)
+                    .maxTrackingRange(4)
+                    .trackingTickInterval(20)
+                    .build()
+    );
+
     public static <T extends Entity> EntityType<T> register(String name, EntityType<T> entityType) {
         return Registry.register(Registries.ENTITY_TYPE, ElementalConvergence.id(name), entityType);
     }
 
-    // Server-side initialization (no renderers!)
     public static void initialize() {
-        // Register entity attributes (server-side)
+        //attributes (server-side)
         FabricDefaultAttributeRegistry.register(MINION_ZOMBIE, MinionZombieEntity.createMinionZombieAttributes());
         FabricDefaultAttributeRegistry.register(PEGASUS, HorseEntity.createBaseHorseAttributes());
         FabricDefaultAttributeRegistry.register(POULET, ChickenEntity.createChickenAttributes());

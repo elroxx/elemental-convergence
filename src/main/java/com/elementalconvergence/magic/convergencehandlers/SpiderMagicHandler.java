@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -26,15 +27,17 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import virtuoel.pehkui.api.ScaleData;
 import virtuoel.pehkui.api.ScaleTypes;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
-import static com.elementalconvergence.world.dimension.ModDimensions.VOID_WORLD_KEY;
 
 public class SpiderMagicHandler implements IMagicHandler {
     public static final int SPIDER_INDEX= (BASE_MAGIC_ID.length-1)+11;
@@ -44,35 +47,47 @@ public class SpiderMagicHandler implements IMagicHandler {
     public static final float SPIDER_DARK_ATTACK=1.0f;
     public static final float SPIDER_LIGHT_KB=0.01f;
     public static final float SPIDER_DARK_KB=1.0f;
+    public static final float SPIDER_GRAVITY = 0.2f; // 1/5 grav
+
 
     public static final int DEFAULT_SILK_BRIDGE_COOLDOWN=10;
     private int silkBridgeCooldown=0;
 
     // Cobweb placement tracking
     private int cobwebsToPlace = 0;
-    private BlockPos currentCobwebPos = null;
+    private double currentX = 0;
+    private double currentY = 0;
+    private double currentZ = 0;
     private double directionX = 0;
     private double directionY = 0;
     private double directionZ = 0;
 
+    public static final int DEFAULT_WEAVE_COOLDOWN=5*20; //5 seconds cooldown
+    private int weaveCooldown=0;
+    private static final double WEAVE_CONE_RANGE = 50;
+    private static final double WEAVE_CONE_ANGLE = 120.0;
+    private static final int WEAVE_EFFECT_DURATION = 4*20;
     //buff: wall climb
-    //debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
-    //buff normal zombies, skeleton, creeper and spider+cave spiders dont attack you. (MAYBE NOT??) //actually i dont want, buff is wall climb.
-    //Passive: Spider webs are solid blocks.
+    //X - buff: poison on hit.
+    //X - debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
+    //X - Passive: Spider webs are solid blocks.
+
 
     //lvl 1: When right clicking with a stack of string in the air. Create a line of cobwebs in the sky. Consume 1 string per block placed. Place them 1 by 1 with a small delay like the vein miner ability.
-    //lvl 2: web slinging
-    //lvl 3: when right clicking with a spider's abdomen, stun everybody in front in a cone. This gives them weakness 2 for like 10 seconds, slowness 2 for 10 seconds, poison 1 for 5 seconds and places a cobweb on their face and feet. 15 seconds cooldown.
+    //X - lvl 2: web slinging
+    //lvl 3: keybind, stun everybody in front in a cone. This gives them weakness 2 for like 10 seconds, slowness 2 for 10 seconds, poison 1 for 5 seconds and places a cobweb on their face and feet. 15 seconds cooldown.
 
     //advancements:
     //1: cobweb
-    //2: spider's abdomen (reusable item that will be used for the next ability)
-    //3: danger pottery shard
+    //2: spider's abdomen
+    //3: dangers pottery shard
 
-    //spider's abdomen is like b:blackwoold c:scaffolding, l:loom
+    //spider's abdomen is like b:blackwoold c:scaffolding, l:loom, p:chainmail leggings
     //bcb
-    //bLb
-    //bcb
+    //bpb
+    //blb
+
+    //spider's eye*2, fermentedx1, black glazed terracotta, x2, loomx1
 
 
 
@@ -95,21 +110,22 @@ public class SpiderMagicHandler implements IMagicHandler {
             directionY = Math.sin(pitch);
             directionZ = Math.cos(pitch) * Math.sin(yaw);
 
-            // Start placing cobwebs in a line from feet level, first block in look direction
-            cobwebsToPlace = stringCount;
-            BlockPos playerFeetPos = player.getBlockPos(); // This is already at feet level
+            // Normalize the direction vector
+            double magnitude = Math.sqrt(directionX * directionX + directionY * directionY + directionZ * directionZ);
+            directionX /= magnitude;
+            directionY /= magnitude;
+            directionZ /= magnitude;
 
-            // Start one block away from player in look direction
-            int startX = playerFeetPos.getX() + (int) Math.round(directionX);
-            int startY = playerFeetPos.getY() + (int) Math.round(directionY);
-            int startZ = playerFeetPos.getZ() + (int) Math.round(directionZ);
-            currentCobwebPos = new BlockPos(startX, startY, startZ);
+            // Start placing cobwebs from player's feet position, offset by one block in look direction
+            BlockPos playerFeetPos = player.getBlockPos();
+            currentX = playerFeetPos.getX() + 0.5 + directionX;
+            currentY = playerFeetPos.getY() + 0.5 + directionY;
+            currentZ = playerFeetPos.getZ() + 0.5 + directionZ;
+
+            cobwebsToPlace = stringCount;
 
             // Set cooldown based on number of strings (2 ticks per string)
             silkBridgeCooldown = stringCount * 2;
-
-            // Consume the string
-            mainHand.decrement(stringCount);
 
             // Play activation sound
             player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ENTITY_SPIDER_AMBIENT,
@@ -130,6 +146,12 @@ public class SpiderMagicHandler implements IMagicHandler {
             player.addStatusEffect(new StatusEffectInstance(ModEffects.ARACHNID, -1, 0, false, false, false));
         }
 
+        //Lower gravity slightly
+        double currentgStrength = GravityChangerAPI.getBaseGravityStrength(player);
+        if (Math.abs(currentgStrength-SPIDER_GRAVITY)>=0.01){
+            GravityChangerAPI.setBaseGravityStrength(player, SPIDER_GRAVITY);
+        }
+
         //can't attack in daylight (DEBUFF)
         BlockPos playerPosition = player.getBlockPos();
         int lightLevel = player.getWorld().getLightLevel(playerPosition);
@@ -147,54 +169,90 @@ public class SpiderMagicHandler implements IMagicHandler {
             }
         }
 
+
+        //place cobwebs tick by tick
+        if (cobwebsToPlace > 0) {
+            //stop if no longer holding string
+            if (!player.getMainHandStack().isOf(Items.STRING)) {
+                cobwebsToPlace = 0;
+                currentX = 0;
+                currentY = 0;
+                currentZ = 0;
+                return;
+            }
+
+            World world = player.getWorld();
+            BlockPos targetPos = new BlockPos((int) Math.floor(currentX), (int) Math.floor(currentY), (int) Math.floor(currentZ));
+
+            //need air. can't break anything
+            if (world.getBlockState(targetPos).isAir() || world.getBlockState(targetPos).equals(Blocks.COBWEB.getDefaultState())) {
+                world.setBlockState(targetPos, Blocks.COBWEB.getDefaultState());
+
+                // consume 1 string at a time
+                ItemStack mainHand = player.getMainHandStack();
+                if (mainHand.isOf(Items.STRING)) {
+                    mainHand.decrement(1);
+                }
+
+                // playsound
+                world.playSound(null, targetPos, SoundEvents.BLOCK_WOOL_PLACE,
+                        SoundCategory.BLOCKS, 0.5f, 1.0f);
+
+                // spider particles ig
+                if (world instanceof ServerWorld serverWorld) {
+                    serverWorld.spawnParticles(ParticleTypes.ITEM_COBWEB,
+                            targetPos.getX() + 0.5,
+                            targetPos.getY() + 0.5,
+                            targetPos.getZ() + 0.5,
+                            3, 0.2, 0.2, 0.2, 0.05);
+                }
+            } else {
+                //then we hit block so we stop
+                cobwebsToPlace = 0;
+            }
+
+            // next pos
+            currentX += directionX;
+            currentY += directionY;
+            currentZ += directionZ;
+            cobwebsToPlace--;
+
+            //if done
+            if (cobwebsToPlace <= 0) {
+                currentX = 0;
+                currentY = 0;
+                currentZ = 0;
+            }
+        }
+
         //cooldowns
         if (silkBridgeCooldown>0){
             silkBridgeCooldown--;
         }
 
-        // Handle gradual cobweb placement (1 per tick)
-        if (cobwebsToPlace > 0 && currentCobwebPos != null) {
-            World world = player.getWorld();
-
-            // Check if current position can have cobweb placed (must be air)
-            if (world.getBlockState(currentCobwebPos).isAir()) {
-                // Place cobweb
-                world.setBlockState(currentCobwebPos, Blocks.COBWEB.getDefaultState());
-
-                // Play placement sound
-                world.playSound(null, currentCobwebPos, SoundEvents.BLOCK_WOOL_PLACE,
-                        SoundCategory.BLOCKS, 0.5f, 1.0f);
-
-                // Spawn some particles for visual effect
-                if (world instanceof ServerWorld serverWorld) {
-                    serverWorld.spawnParticles(ParticleTypes.ITEM_COBWEB,
-                            currentCobwebPos.getX() + 0.5,
-                            currentCobwebPos.getY() + 0.5,
-                            currentCobwebPos.getZ() + 0.5,
-                            3, 0.2, 0.2, 0.2, 0.05);
-                }
-
-                // Move to next position in look direction
-                int nextX = currentCobwebPos.getX() + (int) Math.round(directionX);
-                int nextY = currentCobwebPos.getY() + (int) Math.round(directionY);
-                int nextZ = currentCobwebPos.getZ() + (int) Math.round(directionZ);
-                currentCobwebPos = new BlockPos(nextX, nextY, nextZ);
-                cobwebsToPlace--;
-            } else {
-                // Hit a block, stop placing cobwebs
-                cobwebsToPlace = 0;
-                currentCobwebPos = null;
-            }
-
-            // Check if we're done placing all cobwebs
-            if (cobwebsToPlace <= 0) {
-                currentCobwebPos = null;
-            }
+        if (weaveCooldown>0){
+            weaveCooldown--;
         }
+
     }
 
     @Override
     public void handleAttack(PlayerEntity player, Entity victim) {
+        //add poison on hit (part of buff ig)
+        if (victim instanceof LivingEntity livingEntity){
+            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 2*20, 0, true, true, true));
+        }
+
+        //add feedback sound to know it was a weak hit
+        BlockPos playerPosition = player.getBlockPos();
+        int lightLevel = player.getWorld().getLightLevel(playerPosition);
+        if (lightLevel<=SPIDER_LIGHT_THRESHOLD){
+            //good hit
+        }else{
+            //bad hit
+            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ITEM_SHIELD_BREAK,
+                    SoundCategory.PLAYERS, 0.8f, 1.2f);
+        }
 
     }
 
@@ -215,6 +273,59 @@ public class SpiderMagicHandler implements IMagicHandler {
 
     @Override
     public void handlePrimarySpell(PlayerEntity player) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int spiderLevel = magicData.getMagicLevel(SPIDER_INDEX);
+
+        if (spiderLevel >= 3 && weaveCooldown == 0) {
+            ServerWorld world = (ServerWorld) player.getWorld();
+
+            stunEntities(player, world);
+            spawnExplosionParticles(player, world);
+
+            //add particles
+            Vec3d playerPos = player.getPos().add(0, player.getStandingEyeHeight(), 0);
+            Vec3d lookDirection = player.getRotationVec(1.0F);
+
+            for (int i = 0; i < 150; i++) {
+                double distance = world.random.nextDouble() * WEAVE_CONE_RANGE;
+                double spread = Math.tan(Math.toRadians(WEAVE_CONE_ANGLE / 2)) * distance;
+
+                double offsetX = (world.random.nextDouble() - 0.5) * spread * 2;
+                double offsetY = (world.random.nextDouble() - 0.5) * spread * 2;
+
+                Vec3d particlePos = playerPos.add(
+                        lookDirection.x * distance + offsetX,
+                        lookDirection.y * distance + offsetY,
+                        lookDirection.z * distance + offsetX
+                );
+
+                if (i % 3 == 0) {
+                    world.spawnParticles(
+                            ParticleTypes.ITEM_COBWEB,
+                            particlePos.x, particlePos.y, particlePos.z,
+                            1, 0.1, 0.1, 0.1, 0.02
+                    );
+                } else {
+                    world.spawnParticles(
+                            ParticleTypes.WHITE_ASH,
+                            particlePos.x, particlePos.y, particlePos.z,
+                            1, 0.05, 0.05, 0.05, 0.01
+                    );
+                }
+            }
+
+            // sound
+            world.playSound(
+                    null,
+                    player.getX(), player.getY(), player.getZ(),
+                    SoundEvents.ENTITY_SPIDER_AMBIENT,
+                    SoundCategory.PLAYERS,
+                    1.0F,
+                    0.5F
+            );
+            weaveCooldown=DEFAULT_WEAVE_COOLDOWN;
+        }
 
     }
 
@@ -226,5 +337,102 @@ public class SpiderMagicHandler implements IMagicHandler {
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
 
+    }
+
+    public void stunEntities(PlayerEntity player, ServerWorld world){
+        double range = WEAVE_CONE_RANGE;
+        double coneAngle = WEAVE_CONE_ANGLE;
+
+        // lookdirection
+        Vec3d lookDirection = player.getRotationVec(1.0F);
+        Box searchBox = player.getBoundingBox().expand(range);
+
+        List<LivingEntity> nearbyEntities = world.getEntitiesByClass(
+                LivingEntity.class,
+                searchBox,
+                entity -> entity != player // dont push player
+        );
+
+        for (LivingEntity entity : nearbyEntities) {
+            //vector player entity
+            Vec3d toEntity = entity.getPos().subtract(player.getPos());
+
+            // dont check behind players
+            if (toEntity.dotProduct(lookDirection) <= 0) {
+                continue;
+            }
+
+            // normalized
+            Vec3d normalizedLook = lookDirection.normalize();
+            Vec3d normalizedToEntity = toEntity.normalize();
+
+            // CONE COMPUTING
+            double dot = normalizedLook.dotProduct(normalizedToEntity);
+            double angleInRadians = Math.acos(dot);
+            double angleInDegrees = Math.toDegrees(angleInRadians);
+
+            // check if cone
+            if (angleInDegrees <= coneAngle / 2) {
+                //STUN
+                //place block
+                if (world.getBlockState(entity.getBlockPos()).equals(Blocks.AIR.getDefaultState())){
+                    world.setBlockState(entity.getBlockPos(), Blocks.COBWEB.getDefaultState());
+                }
+
+                world.spawnParticles(
+                        ParticleTypes.ITEM_COBWEB,
+                        entity.getX(),
+                        entity.getY() + entity.getHeight() / 2,
+                        entity.getZ(),
+                        30, 0.5, 0.5, 0.5, 0.1
+                );
+
+                world.spawnParticles(
+                        ParticleTypes.WHITE_ASH,
+                        entity.getX(),
+                        entity.getY() + entity.getHeight() / 2,
+                        entity.getZ(),
+                        20, 0.3, 0.5, 0.3, 0.05
+                );
+
+
+                //give slowness 5, weakness 4, mining fatigue 10 (so they cant just mine the cobweb instantly
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, WEAVE_EFFECT_DURATION, 9, false, true, true));
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, WEAVE_EFFECT_DURATION, 9, false, true, true));
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, WEAVE_EFFECT_DURATION, 9, false, true, true));
+            }
+        }
+    }
+
+    private void spawnExplosionParticles(PlayerEntity player, ServerWorld world) {
+        Vec3d lookDir = player.getRotationVec(1.0F);
+        Vec3d playerPos = player.getEyePos();
+
+        int particleCount = 300;
+
+        for (int i = 0; i < particleCount; i++) {
+            // same cone
+            double distance = world.random.nextDouble() * WEAVE_CONE_RANGE;
+            double spread = Math.tan(Math.toRadians(WEAVE_CONE_ANGLE / 2)) * distance;
+
+            double offsetX = (world.random.nextDouble() - 0.5) * spread * 2;
+            double offsetY = (world.random.nextDouble() - 0.5) * spread * 2;
+            double offsetZ = (world.random.nextDouble() - 0.5) * spread * 2;
+
+            // cone
+            Vec3d particlePos = playerPos.add(
+                    lookDir.x * distance + offsetX,
+                    lookDir.y * distance + offsetY,
+                    lookDir.z * distance + offsetZ
+            );
+
+            world.spawnParticles(
+                    ParticleTypes.SPIT,
+                    particlePos.x, particlePos.y, particlePos.z,
+                    1,
+                    0.0, 0.0, 0.0,
+                    0.0
+            );
+        }
     }
 }

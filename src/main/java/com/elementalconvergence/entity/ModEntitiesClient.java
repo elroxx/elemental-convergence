@@ -26,6 +26,8 @@ public class ModEntitiesClient {
 
         EntityRendererRegistry.register(ModEntities.LASHING_POTATO_HOOK, LashingPotatoHookEntityRenderer::new);
 
+        EntityRendererRegistry.register(ModEntities.CONDUCTIVE_ARROW, ConductiveArrowRenderer::new);
+
 
         System.out.println("ModEntities client renderers initialized");
     }
