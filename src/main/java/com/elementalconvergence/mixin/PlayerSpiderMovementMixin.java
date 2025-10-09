@@ -52,7 +52,7 @@ public abstract class PlayerSpiderMovementMixin {
         PlayerEntity player = (PlayerEntity)(Object)this;
 
         if (player.hasStatusEffect(ModEffects.ARACHNID)) {
-            if (player.horizontalCollision) {
+            if (player.horizontalCollision && !player.isFallFlying()) {
                 Vec3d velocity = player.getVelocity();
 
                 double slideSpeed = -0.05;
@@ -63,10 +63,10 @@ public abstract class PlayerSpiderMovementMixin {
                     player.fallDistance = 0.0F;
                 } else if (player.forwardSpeed > 0.0F) {
                     velocity = new Vec3d(velocity.x, climbSpeed, velocity.z); //climb
-                } else if (velocity.y < slideSpeed) {
+                } /*else if (velocity.y < slideSpeed) {
                     velocity = new Vec3d(velocity.x, slideSpeed, velocity.z); //slide down
                     player.fallDistance = 0.0F;
-                }
+                }*/
 
                 player.setVelocity(velocity);
                 player.velocityModified=true;

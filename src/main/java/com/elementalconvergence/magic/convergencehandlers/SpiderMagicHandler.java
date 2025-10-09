@@ -47,6 +47,8 @@ public class SpiderMagicHandler implements IMagicHandler {
     public static final float SPIDER_DARK_ATTACK=1.0f;
     public static final float SPIDER_LIGHT_KB=0.01f;
     public static final float SPIDER_DARK_KB=1.0f;
+    public static final float SPIDER_GRAVITY = 0.1f; // 1/10 grav
+
 
     public static final int DEFAULT_SILK_BRIDGE_COOLDOWN=10;
     private int silkBridgeCooldown=0;
@@ -65,7 +67,6 @@ public class SpiderMagicHandler implements IMagicHandler {
     private static final double WEAVE_CONE_RANGE = 50;
     private static final double WEAVE_CONE_ANGLE = 120.0;
     private static final int WEAVE_EFFECT_DURATION = 4*20;
-
     //buff: wall climb
     //X - buff: poison on hit.
     //X - debuff: can't attack in a light level that is too high (probably can attack up to when light level is 9. After 9, can't attack)
@@ -143,6 +144,12 @@ public class SpiderMagicHandler implements IMagicHandler {
         //for cobweb and climbing related stuff
         if (!player.hasStatusEffect(ModEffects.ARACHNID)){
             player.addStatusEffect(new StatusEffectInstance(ModEffects.ARACHNID, -1, 0, false, false, false));
+        }
+
+        //Lower gravity slightly
+        double currentgStrength = GravityChangerAPI.getBaseGravityStrength(player);
+        if (Math.abs(currentgStrength-SPIDER_GRAVITY)>=0.01){
+            GravityChangerAPI.setBaseGravityStrength(player, SPIDER_GRAVITY);
         }
 
         //can't attack in daylight (DEBUFF)
