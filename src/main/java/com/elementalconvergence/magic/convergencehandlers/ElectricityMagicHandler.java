@@ -5,14 +5,20 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-import static com.elementalconvergence.ElementalConvergence.BASE_MAGIC_ID;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import static com.elementalconvergence.ElementalConvergence.*;
 
 public class ElectricityMagicHandler implements IMagicHandler {
     public static final int ELECTRICITY_INDEX= (BASE_MAGIC_ID.length-1)+12;
-
-    public static final int SPIDER_LIGHT_THRESHOLD = 9;
     //passive: sine wave motion. I want it drastic, like 1/3 speed up to *3 speed. I need to write it in NBT to save the attributes to be able to restart my sine wave where it supposed to be
 
     //lvl 1: looking at spyglass activates blocks. MAYBE add a
@@ -25,7 +31,6 @@ public class ElectricityMagicHandler implements IMagicHandler {
     //3: zombie head
 
     // Electric eye: top line: repeater, comparator, repeater, bottom line: copper block, redstone block, copper block
-    // 4 copper
     //2 electric arrow== 4 arrow, 4 redstone, 1 lightning rod. Gives 4 arrows.
 
 
@@ -45,6 +50,20 @@ public class ElectricityMagicHandler implements IMagicHandler {
     @Override
     public void handlePassive(PlayerEntity player) {
 
+        //Lvl 1
+        if (player.isUsingSpyglass()) {
+            //raycast to get block
+            HitResult hitResult = player.raycast(256.0, 0.0f, false);
+
+            if (hitResult.getType() == HitResult.Type.BLOCK) {
+                BlockHitResult blockHit = (BlockHitResult) hitResult;
+                BlockPos targetPos = blockHit.getBlockPos();
+                World world = player.getWorld();
+
+                //power the block
+                powerBlock(world, targetPos);
+            }
+        }
     }
 
     @Override
@@ -80,6 +99,52 @@ public class ElectricityMagicHandler implements IMagicHandler {
     @Override
     public void handleTertiarySpell(PlayerEntity player) {
 
+    }
+
+    private void powerBlock(World world, BlockPos pos) {
+        //create map if doesnt exist yet
+        Map<BlockPos, Integer> worldPowers = poweredBlocks.computeIfAbsent(world, k -> new HashMap<>());
+
+        //add power duration
+        worldPowers.put(pos.toImmutable(), MIN_POWER_TICKS);
+
+        //update neighbors
+        world.updateNeighborsAlways(pos, world.getBlockState(pos).getBlock());
+    }
+
+    public static void decayPoweredBlocks(MinecraftServer server) {
+        for (World world : server.getWorlds()) {
+            Map<BlockPos, Integer> worldPowers = poweredBlocks.get(world);
+            if (worldPowers == null) {
+                continue;
+            }
+            Iterator<Map.Entry<BlockPos, Integer>> iterator = worldPowers.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<BlockPos, Integer> entry = iterator.next();
+                int ticksLeft = entry.getValue() - 1;
+
+                if (ticksLeft <= 0) {
+                    //remove power
+                    BlockPos pos = entry.getKey();
+                    iterator.remove();
+
+                    //update neighbors again
+                    world.updateNeighborsAlways(pos, world.getBlockState(pos).getBlock());
+                } else {
+                    //decrement counter
+                    entry.setValue(ticksLeft);
+                }
+            }
+        }
+    }
+
+    public static boolean isBlockPoweredBySpyglass(World world, BlockPos pos) {
+        Map<BlockPos, Integer> worldPowers = poweredBlocks.get(world);
+        return worldPowers != null && worldPowers.containsKey(pos);
+    }
+
+    public static int getSpyglassPowerLevel(World world, BlockPos pos) {
+        return isBlockPoweredBySpyglass(world, pos) ? 15 : 0;
     }
 }
 

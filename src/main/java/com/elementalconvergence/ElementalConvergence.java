@@ -19,6 +19,7 @@ import com.elementalconvergence.item.SchrodingerCatItem;
 import com.elementalconvergence.magic.LevelManager;
 import com.elementalconvergence.magic.MagicRegistry;
 import com.elementalconvergence.magic.SpellManager;
+import com.elementalconvergence.magic.convergencehandlers.ElectricityMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.MysticMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.QuantumMagicHandler;
 import com.elementalconvergence.magic.handlers.DeathMagicHandler;
@@ -167,11 +168,13 @@ public class ElementalConvergence implements ModInitializer {
 	private static Random random = new Random();
 	private static final int DEATH_PARTICLES_COUNT=4; //So either no particles, 1 particle or 2 particles
 
-
-
 	//Section for quantum debuff/teleportation part
 	private static final Map<UUID, Long> lastTeleportTimes = new HashMap<>();
 	private static final long TELEPORT_COOLDOWN = 1000; // 1 sec cooldown on tp
+
+	//Section for electricity block powering
+	public static final Map<World, Map<BlockPos, Integer>> poweredBlocks = new HashMap<>();
+	public static final int MIN_POWER_TICKS = 5;
 
 	public static final ScreenHandlerType<MysticalTomeScreenHandler> MYSTICAL_TOME_SCREEN_HANDLER = Registry.register(Registries.SCREEN_HANDLER, id("mystical_tome"), new ScreenHandlerType<>(MysticalTomeScreenHandler::new, FeatureSet.empty()));
 
@@ -246,13 +249,15 @@ public class ElementalConvergence implements ModInitializer {
 		});
 
 
-		//each tick, but ONLY and like ONLY for the quantum TP debuff
+		//each tick, but ONLY and like ONLY for the quantum TP debuff. ALSO FOR ELECTRICITY DECAYING TICKS NOW
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			for (ServerWorld world : server.getWorlds()) {
 				for (ServerPlayerEntity observer : world.getPlayers()) {
 					checkPlayerLookingAt(observer, world);
 				}
 			}
+
+			ElectricityMagicHandler.decayPoweredBlocks(server); //DECAYING THE POWER EVERYWHERE
 		});
 
 		//pretty much only for carrier
