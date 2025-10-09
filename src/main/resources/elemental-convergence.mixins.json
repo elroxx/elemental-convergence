@@ -20,7 +20,10 @@
 		"BambooBlockMixin",
 		"HorizontalConnectingBlockMixin",
 		"CobwebBlockMixin",
-		"PlayerGrapplingMovementMixin"
+		"PlayerSpiderMovementMixin",
+		"BowItemMixin",
+		"CrossbowItemMixin",
+		"LightningEntityMixin"
 	],
 	"client": [
 		"ArmorFeatureRendererMixin",

@@ -231,7 +231,7 @@ Playstyle: Summoner, Movement, Size Modification
 ### Spells
 
 
-***Body Split* (Level 1) - Keybind**: Press to split. This cuts your current size in half and summons appropriately sized slime minions. Can only be done if you are at least as big as a normal player. 
+***Body Split* (Level 1) - Keybind**: Press to split. This cuts your current size in half and summons appropriately sized slime minions. Can only be done if you are at least as big as a normal player.
 
 ***Elastic Jump* (Level 2) - Keybind**: Press to leap in the direction you are looking.
 
@@ -249,9 +249,9 @@ Playstyle: Builder, Stealth
 
 ### Passives
 
-***Void's Herald* (Buff)**: Can fly in the void.
+***Void's Herald* (Buff)**: Keeps inventory on death. Does not keep experiences points.
 
-***Empty Feets* (Buff)**: Very low fall damage.
+***Empty Feets* (Buff)**: No fall damage.
 
 ***Dimension Sickness* (Debuff)**: Takes damage when in the overworld.
 
@@ -260,6 +260,38 @@ Playstyle: Builder, Stealth
 
 ***Bob's Drill* (Level 1) - Item**: Right click with Bob's drill to destroy a block of bedrock.
 
-***Void Swap* (Level 2) - Keybind**: Press to teleport in the void. 1 block in the void is 4 blocks in the overworld.
+***Void Swap* (Level 2) - Keybind**: Press to teleport in the void. 1 block in the void is 4 blocks in the overworld. Can fly while in the void.
 
 ***Void Infusion* (Level 3) - Item**: Right click an entity with a void essence to infuse them with void. This teleports the entity in the void for a moment. The entity gets to have a block platform placed under them. How nice.
+
+**IMPORTANT NOTE:** After teleporting to the void using Void Swap, you will ALREADY be set in creative flight. Consequently, double pressing space bar after teleporting will make you fall to your death.
+
+
+## Silk
+
+Index: 18
+
+Parent Magics: Life, Shadow
+
+Convergence Impact: **Medium**
+
+Playstyle: Crowd Control, Movement
+
+### Passives
+
+***Venomous* (Buff)**: Inflicts poison on successful hits.
+
+***Van der Waals Limbs* (Buff)**: Can climb walls.
+
+***Daddy Long-Legs* (Buff)**: Has 1/5th fall damage.
+
+***Nocturnal Hunter* (Debuff)**: Can only attack during the day.
+
+### Spells
+
+
+***Silk Bridge* (Level 1) - Item**: Right click with a stack of string to create a bridge of cobweb where you are looking.
+
+***Your Friendly Neighborhood Spider* (Level 2) - Item**: Right click with a spider's abdomen to web sling.
+
+***Arachne's Apprentice* (Level 3) - Keybind**: Press to weave entities in front of you. This stops them from moving temporarily. 

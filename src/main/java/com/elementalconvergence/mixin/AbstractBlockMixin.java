@@ -7,6 +7,7 @@ import com.elementalconvergence.data.PollenDrop;
 import com.elementalconvergence.effect.InsectWeightEffect;
 import com.elementalconvergence.effect.ModEffects;
 import com.elementalconvergence.item.ModItems;
+import com.elementalconvergence.magic.convergencehandlers.ElectricityMagicHandler;
 import com.elementalconvergence.magic.convergencehandlers.HoneyMagicHandler;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
@@ -24,6 +25,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
@@ -113,6 +115,27 @@ public class AbstractBlockMixin {
         MagicData magicData = dataSaver.getMagicData();
         int honeyLevel = magicData.getMagicLevel(HONEY_INDEX);
         return (honeyLevel>=3 && magicData.getSelectedMagic()==HONEY_INDEX);
+    }
+
+    //for redstone emitting signal.
+    @Inject(method = "getStrongRedstonePower", at = @At("RETURN"), cancellable = true)
+    protected void getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction, CallbackInfoReturnable<Integer> cir) {
+        if (world instanceof net.minecraft.world.World) {
+            int spyglassPower = ElectricityMagicHandler.getSpyglassPowerLevel((net.minecraft.world.World) world, pos);
+            if (spyglassPower > cir.getReturnValue()) {
+                cir.setReturnValue(spyglassPower);
+            }
+        }
+    }
+
+    @Inject(method = "getWeakRedstonePower", at = @At("RETURN"), cancellable = true)
+    protected void getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction, CallbackInfoReturnable<Integer> cir) {
+        if (world instanceof net.minecraft.world.World) {
+            int spyglassPower = ElectricityMagicHandler.getSpyglassPowerLevel((net.minecraft.world.World) world, pos);
+            if (spyglassPower > cir.getReturnValue()) {
+                cir.setReturnValue(spyglassPower);
+            }
+        }
     }
 
 }

@@ -537,6 +537,32 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 			//VOID LVL 3
 			AdvancementEntry voidLevel3 = generateVoidLevelsAdvancements(voidSelectedCN, voidSelectedAdvName, voidSelectedAdvancement, consumer);
 
+			//SPIDER MAGIC SELECTED
+			String spiderSelectedCN = "spider_magic_selected";
+			String spiderSelectedAdvName = ElementalConvergence.MOD_ID + ":spider_magic_selected";
+			AdvancementEntry spiderSelectedAdvancement = Advancement.Builder.create()
+					.display(
+							Items.STRING,
+							Text.literal("Silk Convergence Magic"),
+							Text.literal("Convergence of Shadow and Life Magics"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							true
+					)
+					.criterion(spiderSelectedCN, ModCriterions.SELECTED_MAGIC_CRITERION.create(new SelectedMagicCriterion.Conditions(Optional.empty(),
+							18)))
+					.criterion("has_no_magic", ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							rootAdvName, spiderSelectedCN, spiderSelectedAdvName)))
+					.parent(shadowLevel3)
+					.build(consumer, spiderSelectedAdvName);
+
+			//SPIDER LVL 1
+			//SPIDER LVL 2
+			//SPIDER LVL 3
+			AdvancementEntry spiderLevel3 = generateSpiderLevelsAdvancements(spiderSelectedCN, spiderSelectedAdvName, spiderSelectedAdvancement, consumer);
+
 		}
 
 		public AdvancementEntry generateEarthLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
@@ -2031,6 +2057,89 @@ public class ElementalConvergenceDataGenerator implements DataGeneratorEntrypoin
 					.build(consumer, advName + lvl);
 
 			return voidAdv3;
+		}
+
+		public AdvancementEntry generateSpiderLevelsAdvancements(String selectedCN, String selectedAdvName, AdvancementEntry selectedAdvEntry, Consumer<AdvancementEntry> consumer) {
+
+			int magicIndex = SpiderMagicHandler.SPIDER_INDEX;
+			String goodMagicPicked = "has_spider_selected_concurrent";
+			String achievementTitle = "Spider Level ";
+			String CN = "spider_criterion_lvl";
+			String advName = ElementalConvergence.MOD_ID + ":spider_lvl";
+			String haslvl = "spider_has_lvl";
+			String previousAdvName;
+			AdvancementEntry previousAdvEntry;
+			int lvl;
+
+
+			previousAdvName = selectedAdvName;
+			previousAdvEntry = selectedAdvEntry;
+			lvl = 1;
+			AdvancementEntry spiderAdv1 = Advancement.Builder.create()
+					.display(
+							Items.COBWEB,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Obtain a cobweb"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.COBWEB))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = spiderAdv1;
+			lvl = 2;
+			AdvancementEntry spiderAdv2 = Advancement.Builder.create()
+					.display(
+							ModItems.LASHING_POTATO_HOOK,
+							Text.literal(achievementTitle + lvl),
+							Text.literal("Craft a spider's abdomen"),
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(ModItems.LASHING_POTATO_HOOK))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			previousAdvName = advName + lvl;
+			previousAdvEntry = spiderAdv2;
+			lvl = 3;
+			AdvancementEntry spiderAdv3 = Advancement.Builder.create()
+					.display(
+							Items.DANGER_POTTERY_SHERD,
+							Text.literal(achievementTitle + lvl), //title
+							Text.literal("Find a danger pottery sherd"), //description
+							null,
+							AdvancementFrame.TASK,
+							true,
+							true,
+							false
+					)
+					.criterion(CN + lvl, InventoryChangedCriterion.Conditions.items(Items.DANGER_POTTERY_SHERD))
+					.criterion(haslvl + lvl, ModCriterions.HAS_PARENT_CRITERION.create(new HasParentCriterion.Conditions(Optional.empty(),
+							previousAdvName, CN + lvl, advName + lvl)))
+					.criterion(goodMagicPicked, ModCriterions.IS_SELECTED_MAGIC_CONCURRENT_CRITERION.create(new isSelectedMagicConcurrentCriterion.Conditions(Optional.empty(),
+							CN + lvl, advName + lvl, magicIndex)))
+					.parent(previousAdvEntry)
+					.build(consumer, advName + lvl);
+
+			return spiderAdv3;
 		}
 
 	}
