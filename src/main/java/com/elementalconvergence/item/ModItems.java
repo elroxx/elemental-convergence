@@ -145,6 +145,8 @@ public class ModItems {
 
     public static final Item LASHING_POTATO_HOOK = register("spider_grappling_hook", new LashingPotatoItem(new Item.Settings().rarity(Rarity.EPIC)));
 
+    public static final Item CONDUCTIVE_ARROW =  register("conductive_arrow", new ConductiveArrowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(64)));
+
 
     //all pollen effects:
     //Luck, bad luck, darkness, dolphin's grace, Gills, Wings, Light Phasing, Plague, insect weight

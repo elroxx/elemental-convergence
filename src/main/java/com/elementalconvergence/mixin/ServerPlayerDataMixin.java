@@ -2,6 +2,8 @@ package com.elementalconvergence.mixin;
 
 import com.elementalconvergence.ElementalConvergence;
 import com.elementalconvergence.data.*;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.DefaultedList;
@@ -12,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static com.elementalconvergence.magic.convergencehandlers.ElectricityMagicHandler.ELECTRICITY_INDEX;
 import static com.elementalconvergence.magic.convergencehandlers.VoidMagicHandler.VOID_INDEX;
 
 @Mixin(ServerPlayerEntity.class)
@@ -77,6 +80,24 @@ public class ServerPlayerDataMixin {
                     //clear backup
                     oldMixin.clearVoidBackup();
                 }
+            }
+        }
+    }
+
+    //cancel dmg here for lightning as well
+    @Inject(method = "damage", at = @At("HEAD"), cancellable = true)
+    private void preventLightningDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+
+        //check fi lightning damage
+        if (source.isOf(DamageTypes.LIGHTNING_BOLT)) {
+            IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+            MagicData magicData = dataSaver.getMagicData();
+            int selectedMagic = magicData.getSelectedMagic();
+
+            //cancel lightning damage
+            if (selectedMagic == ELECTRICITY_INDEX) {
+                cir.setReturnValue(false);
             }
         }
     }

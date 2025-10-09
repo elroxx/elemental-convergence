@@ -1,5 +1,7 @@
 package com.elementalconvergence.magic.convergencehandlers;
 
+import com.elementalconvergence.data.IMagicDataSaver;
+import com.elementalconvergence.data.MagicData;
 import com.elementalconvergence.magic.IMagicHandler;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -52,7 +54,11 @@ public class ElectricityMagicHandler implements IMagicHandler {
     public void handlePassive(PlayerEntity player) {
 
         //Lvl 1
-        if (player.isUsingSpyglass()) {
+        IMagicDataSaver dataSaver = (IMagicDataSaver) player;
+        MagicData magicData = dataSaver.getMagicData();
+        int electricityLevel = magicData.getMagicLevel(ELECTRICITY_INDEX);
+
+        if (electricityLevel>=1 && player.isUsingSpyglass()) {
             //raycast to get block
             HitResult hitResult = player.raycast(256.0, 0.0f, false);
 
