@@ -47,7 +47,7 @@ public class SpiderMagicHandler implements IMagicHandler {
     public static final float SPIDER_DARK_ATTACK=1.0f;
     public static final float SPIDER_LIGHT_KB=0.01f;
     public static final float SPIDER_DARK_KB=1.0f;
-    public static final float SPIDER_GRAVITY = 0.1f; // 1/10 grav
+    public static final float SPIDER_GRAVITY = 0.2f; // 1/5 grav
 
 
     public static final int DEFAULT_SILK_BRIDGE_COOLDOWN=10;
