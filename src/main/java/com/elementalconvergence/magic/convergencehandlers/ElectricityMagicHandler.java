@@ -9,6 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 
 import java.util.HashMap;
@@ -105,11 +106,22 @@ public class ElectricityMagicHandler implements IMagicHandler {
         //create map if doesnt exist yet
         Map<BlockPos, Integer> worldPowers = poweredBlocks.computeIfAbsent(world, k -> new HashMap<>());
 
+        boolean wasUnpowered = !worldPowers.containsKey(pos.toImmutable());
+
         //add power duration
         worldPowers.put(pos.toImmutable(), MIN_POWER_TICKS);
 
-        //update neighbors
-        world.updateNeighborsAlways(pos, world.getBlockState(pos).getBlock());
+        if (wasUnpowered) {
+
+            //to try and update itself
+            BlockState state = world.getBlockState(pos);
+            for (Direction direction : Direction.values()) {
+                state.neighborUpdate(world, pos, state.getBlock(), pos.offset(direction), false);
+            }
+
+            //update neighbors
+            world.updateNeighborsAlways(pos, world.getBlockState(pos).getBlock());
+        }
     }
 
     public static void decayPoweredBlocks(MinecraftServer server) {
@@ -128,8 +140,22 @@ public class ElectricityMagicHandler implements IMagicHandler {
                     BlockPos pos = entry.getKey();
                     iterator.remove();
 
+                    //to try and update itself
+                    BlockState state = world.getBlockState(pos);
+                    for (Direction direction : Direction.values()) {
+                        state.neighborUpdate(world, pos, state.getBlock(), pos.offset(direction), false);
+                    }
+
                     //update neighbors again
                     world.updateNeighborsAlways(pos, world.getBlockState(pos).getBlock());
+
+                    for (Direction direction : Direction.values()) {
+                        BlockPos neighborPos = pos.offset(direction);
+                        BlockState neighborState = world.getBlockState(neighborPos);
+                        // Trigger each neighbor to update itself
+                        neighborState.neighborUpdate(world, neighborPos, state.getBlock(), pos, false);
+                    }
+
                 } else {
                     //decrement counter
                     entry.setValue(ticksLeft);
