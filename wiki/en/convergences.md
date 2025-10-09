@@ -9,6 +9,8 @@ Convergences are magics that are only playable when have its parents magics maxe
 
 Index: 8
 
+Parent Magics: Life, Death
+
 Convergence Impact: **Medium**
 
 Playstyle: Fighter, PvP, DoT
@@ -31,6 +33,8 @@ Playstyle: Fighter, PvP, DoT
 ## Gravity
 
 Index: 9
+
+Parent Magics: Earth, Shadow
 
 Convergence Impact: **Extreme**
 
@@ -55,6 +59,9 @@ Playstyle: Movement, Building
 
 Index: 10
 
+
+Parent Magics: Water, Fire
+
 Convergence Impact: **Extreme**
 
 Playstyle: Tank, Support
@@ -77,6 +84,8 @@ Playstyle: Tank, Support
 ## Holy
 
 Index: 11
+
+Parent Magics: Light, Air
 
 Convergence Impact: **Low**
 
@@ -103,6 +112,8 @@ Playstyle: Support, Cook
 
 Index: 12
 
+Parent Magics: Life, Air
+
 Convergence Impact: **High**
 
 Playstyle: Summoner, Flying
@@ -128,6 +139,8 @@ Playstyle: Summoner, Flying
 
 Index: 13
 
+Parent Magics: Shadow, Death
+
 Convergence Impact: **High**
 
 Playstyle: Fighter, Stealth, Flying
@@ -152,6 +165,8 @@ Playstyle: Fighter, Stealth, Flying
 
 Index: 14
 
+Parent Magics: Light, Water
+
 Convergence Impact: **Medium**
 
 Playstyle: Phaser, Loot Transportation
@@ -173,6 +188,8 @@ Playstyle: Phaser, Loot Transportation
 
 Index: 15
 
+Parent Magics: Fire, Earth
+
 Convergence Impact: **Low**
 
 Playstyle: Enchantments, Support
@@ -192,9 +209,39 @@ Playstyle: Enchantments, Support
 
 ***Energy Channeling* (Level 3) - Item**: Right click with solid mystical energy (in main hand) and an enchanted piece of equipment (in off hand) to add one level to every enchantment that is on the piece of equipment.
 
+## Slime
+
+Index: 16
+
+Parent Magics: Water, Earth
+
+Convergence Impact: **Low**
+
+Playstyle: Summoner, Movement, Size Modification
+
+### Passives
+
+***Boiiing* (Passive)**: Bounces on every single blocks. Blocks are also bouncy when hit on the side. This can be disabled by sneaking.
+
+***Regenerating Slime* (Passive)**: Grows back in size when under the normal player size.
+
+***Squishy body* (Passive)**: Health and reach scales on the player size.
+
+
+### Spells
+
+
+***Body Split* (Level 1) - Keybind**: Press to split. This cuts your current size in half and summons appropriately sized slime minions. Can only be done if you are at least as big as a normal player.
+
+***Elastic Jump* (Level 2) - Keybind**: Press to leap in the direction you are looking.
+
+***Dissolve and Absorb* (Level 3) - Item**: Right click an entity with dissolving slime to dissolve them into your body for absorption. This locks the entity in place until they jump, you move or you get hit. Every heart of damage dealt by dissolving them increases your height upon termination of the ability. This size increase is kept until Body Split is used again.
+
 ## Void
 
 Index: 17
+
+Parent Magics: Air, Death
 
 Convergence Impact: **High**
 
@@ -202,9 +249,9 @@ Playstyle: Builder, Stealth
 
 ### Passives
 
-***Void's Herald* (Buff)**: Keeps inventory on death (not xp).
+***Void's Herald* (Buff)**: Keeps inventory on death. Does not keep experiences points.
 
-***Empty Feets* (Buff)**: Very low fall damage.
+***Empty Feets* (Buff)**: No fall damage.
 
 ***Dimension Sickness* (Debuff)**: Takes damage when in the overworld.
 
@@ -216,3 +263,35 @@ Playstyle: Builder, Stealth
 ***Void Swap* (Level 2) - Keybind**: Press to teleport in the void. 1 block in the void is 4 blocks in the overworld. Can fly while in the void.
 
 ***Void Infusion* (Level 3) - Item**: Right click an entity with a void essence to infuse them with void. This teleports the entity in the void for a moment. The entity gets to have a block platform placed under them. How nice.
+
+**IMPORTANT NOTE:** After teleporting to the void using Void Swap, you will ALREADY be set in creative flight. Consequently, double pressing space bar after teleporting will make you fall to your death.
+
+
+## Silk
+
+Index: 18
+
+Parent Magics: Life, Shadow
+
+Convergence Impact: **Medium**
+
+Playstyle: Crowd Control, Movement
+
+### Passives
+
+***Venomous* (Buff)**: Inflicts poison on successful hits.
+
+***Van der Waals Limbs* (Buff)**: Can climb walls.
+
+***Daddy Long-Legs* (Buff)**: Has 1/5th fall damage.
+
+***Nocturnal Hunter* (Debuff)**: Can only attack during the day.
+
+### Spells
+
+
+***Silk Bridge* (Level 1) - Item**: Right click with a stack of string to create a bridge of cobweb where you are looking.
+
+***Your Friendly Neighborhood Spider* (Level 2) - Item**: Right click with a spider's abdomen to web sling.
+
+***Arachne's Apprentice* (Level 3) - Keybind**: Press to weave entities in front of you. This stops them from moving temporarily. 
