@@ -13,20 +13,21 @@ public class ElectricityMagicHandler implements IMagicHandler {
     public static final int ELECTRICITY_INDEX= (BASE_MAGIC_ID.length-1)+12;
 
     public static final int SPIDER_LIGHT_THRESHOLD = 9;
+    //passive: sine wave motion. I want it drastic, like 1/3 speed up to *3 speed. I need to write it in NBT to save the attributes to be able to restart my sine wave where it supposed to be
 
-    //buff:
-    //debuff:
-    //buff:
-    //passive:
-
-    //lvl 1:
-    //lvl 2:
-    //lvl 3:
+    //lvl 1: looking at spyglass activates blocks. MAYBE add a
+    //lvl 2: Thunderbow. add a trail of damage that disappears once the arrow hits the ground. Can right click on a redstone dust to teleport to the other side of the redstone trail. DOES NOT CONSUME IT
+    //lvl 3: toggle lightning on hits
 
     //advancements:
-    //1:
-    //2:
-    //3:
+    //1: conductive arrow
+    //2: bolt armor trim
+    //3: zombie head
+
+    // Electric eye: top line: repeater, comparator, repeater, bottom line: copper block, redstone block, copper block
+    // 4 copper
+    //2 electric arrow== 4 arrow, 4 redstone, 1 lightning rod. Gives 4 arrows.
+
 
 
 
