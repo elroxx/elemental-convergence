@@ -143,7 +143,7 @@ public class ModItems {
     public static final Item VOID_DRILL = register("void_drill", new VoidDrillItem(new Item.Settings().maxCount(1).rarity(Rarity.UNCOMMON)));
     public static final Item VOID_ESSENCE = register("void_essence", new Item(new Item.Settings().rarity(Rarity.EPIC)));
 
-    public static final Item LASHING_POTATO_HOOK = register("spider_grappling_hook", new LashingPotatoItem(new Item.Settings().rarity(Rarity.EPIC)));
+    public static final Item LASHING_POTATO_HOOK = register("spider_grappling_hook", new LashingPotatoItem(new Item.Settings().rarity(Rarity.EPIC).maxCount(1)));
 
     public static final Item CONDUCTIVE_ARROW =  register("conductive_arrow", new ConductiveArrowItem(new Item.Settings().rarity(Rarity.UNCOMMON).maxCount(64)));
 

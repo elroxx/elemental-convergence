@@ -51,19 +51,25 @@ public class LashingPotatoHookEntity extends ProjectileEntity {
     }
 
     public void updateTrackedPositionAndAngles(double x, double y, double z, float yaw, float pitch, int interpolationSteps) {
+        this.setPosition(x, y, z);
+        this.setRotation(yaw, pitch);
     }
 
     public void tick() {
         super.tick();
         PlayerEntity playerEntity = this.getPlayerOwner();
-        if (playerEntity != null && (this.getWorld().isClient() || !this.shouldRemove(playerEntity))) {
-            HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
-            if (hitResult.getType() != Type.MISS) {
-                this.onCollision(hitResult);
-            }
 
-            this.setPosition(hitResult.getPos());
-            this.checkBlockCollision();
+        if (playerEntity != null && (this.getWorld().isClient() || !this.shouldRemove(playerEntity))) {
+            // Only check for collisions if not already stuck in a block
+            if (!this.isInBlock()) {
+                HitResult hitResult = ProjectileUtil.getCollision(this, this::canHit);
+                if (hitResult.getType() != Type.MISS) {
+                    this.onCollision(hitResult);
+                }
+
+                this.setPosition(hitResult.getPos());
+                this.checkBlockCollision();
+            }
         } else {
             this.discard();
         }
